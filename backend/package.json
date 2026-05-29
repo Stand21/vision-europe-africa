@@ -4,7 +4,7 @@
   "description": "Backend API for Vision Europe Africa immigration platform",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
+    "start": "node src/startup.js",
     "dev": "nodemon src/index.js",
     "migrate": "node src/migrations/run.js"
   },

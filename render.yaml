@@ -1,0 +1,69 @@
+services:
+  # ── Backend API ───────────────────────────────────────────
+  - type: web
+    name: vea-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node src/index.js
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DB_HOST
+        fromDatabase:
+          name: vea-database
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: vea-database
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: vea-database
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: vea-database
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: vea-database
+          property: password
+      - key: DB_SSL
+        value: "true"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: DASHBOARD_URL
+        sync: false
+
+  # ── Frontend ──────────────────────────────────────────────
+  - type: web
+    name: vea-frontend
+    runtime: node
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: NEXT_PUBLIC_API_URL
+        sync: false
+
+databases:
+  # ── PostgreSQL ────────────────────────────────────────────
+  - name: vea-database
+    plan: free
+    databaseName: vision_europe_africa
+    user: vea_user
