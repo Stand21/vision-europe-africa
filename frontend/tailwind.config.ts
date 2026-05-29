@@ -1,0 +1,110 @@
+import type { Config } from 'tailwindcss'
+
+const config: Config = {
+  content: [
+    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          50:  '#eff6ff',
+          100: '#dbeafe',
+          200: '#bfdbfe',
+          300: '#93c5fd',
+          400: '#60a5fa',
+          500: '#3b82f6',
+          600: '#1a56db',
+          700: '#1e40af',
+          800: '#1e3a8a',
+          900: '#1e3163',
+          950: '#0f1f4a',
+        },
+        gold: {
+          50:  '#fffbeb',
+          100: '#fef3c7',
+          200: '#fde68a',
+          300: '#fcd34d',
+          400: '#fbbf24',
+          500: '#c9a227',
+          600: '#b7860f',
+          700: '#92650a',
+          800: '#78500b',
+          900: '#633f0d',
+        },
+        dark: {
+          DEFAULT: '#0a0f1e',
+          100: '#111827',
+          200: '#1f2937',
+          300: '#374151',
+        },
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Playfair Display', 'Georgia', 'serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+      },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+        'hero-gradient': 'linear-gradient(135deg, #0f1f4a 0%, #1a56db 50%, #0f1f4a 100%)',
+        'gold-gradient': 'linear-gradient(135deg, #c9a227 0%, #fbbf24 50%, #c9a227 100%)',
+        'glass-gradient': 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+      },
+      animation: {
+        'fade-in': 'fadeIn 0.8s ease-in-out forwards',
+        'fade-up': 'fadeUp 0.8s ease-out forwards',
+        'slide-left': 'slideLeft 0.8s ease-out forwards',
+        'slide-right': 'slideRight 0.8s ease-out forwards',
+        'float': 'float 6s ease-in-out infinite',
+        'pulse-gold': 'pulseGold 2s ease-in-out infinite',
+        'shimmer': 'shimmer 2s linear infinite',
+        'spin-slow': 'spin 8s linear infinite',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        fadeUp: {
+          '0%': { opacity: '0', transform: 'translateY(30px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        slideLeft: {
+          '0%': { opacity: '0', transform: 'translateX(30px)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+        slideRight: {
+          '0%': { opacity: '0', transform: 'translateX(-30px)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-20px)' },
+        },
+        pulseGold: {
+          '0%, 100%': { boxShadow: '0 0 0 0 rgba(201,162,39,0.4)' },
+          '50%': { boxShadow: '0 0 0 15px rgba(201,162,39,0)' },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
+      },
+      backdropBlur: {
+        xs: '2px',
+      },
+      boxShadow: {
+        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+        'premium': '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+        'gold': '0 0 30px rgba(201, 162, 39, 0.3)',
+        'glow': '0 0 60px rgba(26, 86, 219, 0.4)',
+      },
+    },
+  },
+  plugins: [],
+}
+
+export default config
