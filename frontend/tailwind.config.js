@@ -1,6 +1,5 @@
-import type { Config } from 'tailwindcss'
-
-const config: Config = {
+/** @type {import('tailwindcss').Config} */
+module.exports = {
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -54,57 +53,32 @@ const config: Config = {
         'glass-gradient': 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
       },
       animation: {
-        'fade-in': 'fadeIn 0.8s ease-in-out forwards',
-        'fade-up': 'fadeUp 0.8s ease-out forwards',
+        'fade-in':    'fadeIn 0.8s ease-in-out forwards',
+        'fade-up':    'fadeUp 0.8s ease-out forwards',
         'slide-left': 'slideLeft 0.8s ease-out forwards',
-        'slide-right': 'slideRight 0.8s ease-out forwards',
-        'float': 'float 6s ease-in-out infinite',
+        'slide-right':'slideRight 0.8s ease-out forwards',
+        'float':      'float 6s ease-in-out infinite',
         'pulse-gold': 'pulseGold 2s ease-in-out infinite',
-        'shimmer': 'shimmer 2s linear infinite',
-        'spin-slow': 'spin 8s linear infinite',
+        'shimmer':    'shimmer 2s linear infinite',
+        'spin-slow':  'spin 8s linear infinite',
       },
       keyframes: {
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
-        },
-        fadeUp: {
-          '0%': { opacity: '0', transform: 'translateY(30px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
-        slideLeft: {
-          '0%': { opacity: '0', transform: 'translateX(30px)' },
-          '100%': { opacity: '1', transform: 'translateX(0)' },
-        },
-        slideRight: {
-          '0%': { opacity: '0', transform: 'translateX(-30px)' },
-          '100%': { opacity: '1', transform: 'translateX(0)' },
-        },
-        float: {
-          '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-20px)' },
-        },
-        pulseGold: {
-          '0%, 100%': { boxShadow: '0 0 0 0 rgba(201,162,39,0.4)' },
-          '50%': { boxShadow: '0 0 0 15px rgba(201,162,39,0)' },
-        },
-        shimmer: {
-          '0%': { backgroundPosition: '-200% 0' },
-          '100%': { backgroundPosition: '200% 0' },
-        },
+        fadeIn:     { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+        fadeUp:     { '0%': { opacity: '0', transform: 'translateY(30px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+        slideLeft:  { '0%': { opacity: '0', transform: 'translateX(30px)' }, '100%': { opacity: '1', transform: 'translateX(0)' } },
+        slideRight: { '0%': { opacity: '0', transform: 'translateX(-30px)' }, '100%': { opacity: '1', transform: 'translateX(0)' } },
+        float:      { '0%, 100%': { transform: 'translateY(0px)' }, '50%': { transform: 'translateY(-20px)' } },
+        pulseGold:  { '0%, 100%': { boxShadow: '0 0 0 0 rgba(201,162,39,0.4)' }, '50%': { boxShadow: '0 0 0 15px rgba(201,162,39,0)' } },
+        shimmer:    { '0%': { backgroundPosition: '-200% 0' }, '100%': { backgroundPosition: '200% 0' } },
       },
-      backdropBlur: {
-        xs: '2px',
-      },
+      backdropBlur: { xs: '2px' },
       boxShadow: {
-        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+        'glass':   '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
         'premium': '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-        'gold': '0 0 30px rgba(201, 162, 39, 0.3)',
-        'glow': '0 0 60px rgba(26, 86, 219, 0.4)',
+        'gold':    '0 0 30px rgba(201, 162, 39, 0.3)',
+        'glow':    '0 0 60px rgba(26, 86, 219, 0.4)',
       },
     },
   },
   plugins: [],
 }
-
-export default config

@@ -53,13 +53,28 @@ function AdminLogin({ onLogin }: { onLogin: (token: string) => void }) {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+
+    // ── Local demo mode — fonctionne sans backend ──────────
+    const DEMO_EMAIL = 'admin@visioneuropeafrica.com'
+    const DEMO_PASS  = 'Admin@2025'
+
+    if (email === DEMO_EMAIL && password === DEMO_PASS) {
+      const demoToken = 'demo_local_token'
+      Cookies.set('admin_token', demoToken, { expires: 1 })
+      onLogin(demoToken)
+      toast.success('Bienvenue Admin ! 🎉')
+      setLoading(false)
+      return
+    }
+
+    // ── Sinon essaie l'API backend ─────────────────────────
     try {
       const { data } = await axios.post(`${API}/admin/login`, { email, password })
       Cookies.set('admin_token', data.token, { expires: 1 })
       onLogin(data.token)
       toast.success('Welcome back, Admin!')
     } catch {
-      toast.error('Invalid credentials')
+      toast.error('Identifiants incorrects. Utilisez : admin@visioneuropeafrica.com / Admin@2025')
     } finally {
       setLoading(false)
     }
