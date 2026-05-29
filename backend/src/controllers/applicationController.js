@@ -2,6 +2,7 @@ const { v4: uuidv4 } = require('uuid')
 const { body, validationResult } = require('express-validator')
 const db = require('../config/database')
 const telegramService = require('../services/telegramService')
+const emailService = require('../services/emailService')
 const logger = require('../config/logger')
 
 // ── Validation Rules ───────────────────────────────────────────────────────────
@@ -77,8 +78,13 @@ exports.submitApplication = async (req, res) => {
     }
 
     const dashboardUrl = process.env.DASHBOARD_URL || 'https://visioneuropeafrica.com'
-    telegramService.sendApplicationNotification(application, dashboardUrl).catch(err => {
+    telegramService.sendApplicationNotification({ ...application, documentsCount: documents.length }, dashboardUrl).catch(err => {
       logger.error('Telegram notification error:', err)
+    })
+
+    // Auto confirmation email
+    emailService.sendConfirmationEmail({ fullName, email, profile, destination, applicationId: id }).catch(err => {
+      logger.error('Confirmation email error:', err)
     })
 
     // Activity log

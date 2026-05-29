@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const db = require('../config/database')
 const telegramService = require('../services/telegramService')
+const emailService = require('../services/emailService')
 const logger = require('../config/logger')
 
 const JWT_SECRET = process.env.JWT_SECRET || 'vea_secret_change_me'
@@ -66,6 +67,10 @@ exports.getApplications = async (req, res) => {
 
   let query = `SELECT id, full_name as "fullName", email, phone, whatsapp,
     profile, destination, budget, field, profession, category,
+    education_level as "educationLevel", target_degree as "targetDegree",
+    country, city, experience, work_hours as "workHours", expected_salary as "expectedSalary",
+    id_number as "idNumber", motivation_letter as "motivationLetter",
+    purpose, duration, documents, admin_notes as "adminNotes",
     status, created_at as "createdAt", updated_at as "updatedAt"
     FROM applications WHERE 1=1`
   const params = []
@@ -120,8 +125,14 @@ exports.updateStatus = async (req, res) => {
 
     if (!rows.length) return res.status(404).json({ error: 'Application not found' })
 
-    // Notify via Telegram
-    telegramService.sendStatusUpdate(rows[0], status).catch(() => {})
+    // Notify via Telegram + Email
+    const app = rows[0]
+    telegramService.sendStatusUpdate(app, status).catch(() => {})
+    emailService.sendStatusUpdateEmail(
+      { fullName: app.full_name, email: app.email },
+      status,
+      notes
+    ).catch(() => {})
 
     // Activity log
     await db.query(

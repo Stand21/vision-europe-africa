@@ -27,27 +27,28 @@ async function sendApplicationNotification(application, dashboardUrl) {
   const {
     id, fullName, profile, email, phone, whatsapp,
     destination, budget, field, profession, category,
-    idNumber, createdAt,
+    idNumber, createdAt, documentsCount,
   } = application
 
   const profileEmoji = PROFILE_EMOJI[profile] || '📋'
   const destEmoji = DEST_EMOJI[destination] || '🌍'
 
   const message = `
-${profileEmoji} *NEW APPLICATION — Vision Europe Africa*
+${profileEmoji} *NOUVEAU DOSSIER — Vision Europe Africa*
 ━━━━━━━━━━━━━━━━━━━━━━━━
-👤 *Name:* ${fullName}
+👤 *Nom:* ${fullName}
 📧 *Email:* ${email}
-📞 *Phone:* ${phone}
+📞 *Téléphone:* ${phone}
 💬 *WhatsApp:* wa.me/${whatsapp?.replace(/[^0-9]/g, '')}
 
-${profileEmoji} *Profile:* ${profile?.toUpperCase()}
+${profileEmoji} *Profil:* ${profile?.toUpperCase()}
 ${destEmoji} *Destination:* ${destination?.toUpperCase()}
-${field ? `📚 *Field:* ${field}` : ''}${profession ? `\n💼 *Profession:* ${profession}` : ''}${category ? `\n🏷️ *Category:* ${category}` : ''}
+${field ? `📚 *Filière:* ${field}` : ''}${profession ? `\n💼 *Métier:* ${profession}` : ''}${category ? `\n🏷️ *Catégorie:* ${category}` : ''}
 💰 *Budget:* €${budget}
-🪪 *ID Number:* ${idNumber || 'N/A'}
+🪪 *N° pièce d'identité:* ${idNumber || 'N/A'}
+📎 *Documents joints:* ${documentsCount || 0} fichier(s)
 
-📅 *Submitted:* ${new Date(createdAt).toLocaleString('fr-FR')}
+📅 *Soumis le:* ${new Date(createdAt).toLocaleString('fr-FR')}
 🔗 *Dashboard:* ${dashboardUrl}/admin
 ━━━━━━━━━━━━━━━━━━━━━━━━
 `
