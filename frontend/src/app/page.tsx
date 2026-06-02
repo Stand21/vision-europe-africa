@@ -1,45 +1,56 @@
 'use client'
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 import CountUp from 'react-countup'
 import { useInView } from 'react-intersection-observer'
 import {
-  ArrowRight, Star, CheckCircle, Clock, Shield, Globe2,
-  ChevronDown, Play, GraduationCap, Briefcase, Plane,
-  MapPin, TrendingUp, Users, Award, ChevronRight
+  ArrowRight, Star, CheckCircle, Clock, Shield,
+  ChevronDown, GraduationCap, Briefcase, Plane,
+  MapPin, Users, Award, ChevronRight, TrendingUp,
+  Rocket, Globe, Code, Stethoscope, BarChart3,
+  Truck, Building2, Megaphone, Brain, Wallet,
+  Car, Wrench, Warehouse, Factory, Lock,
+  Settings, HardHat, Mail, Phone, MapPin as MapPinIcon,
+  Send, Plane as PlaneIcon, BookOpen, Briefcase as BriefcaseIcon,
+  Users as UsersIcon, Home, Heart, Landmark, Ship,
+  PlaneTakeoff, Luggage, Camera, Music, Utensils,
+  ShoppingBag, Dumbbell, Palette, Gamepad2, BookMarked,
+  Calculator, FlaskConical, Atom, Dna, Microscope,
+  Palette as PaletteIcon, PenTool, Search
 } from 'lucide-react'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import { useTranslation } from '@/hooks/useTranslation'
 
-// ── Loading Screen ──────────────────────────────────────────────────────────
+// ── Loading Screen ────────────────────────────────────────────────────────────
 function LoadingScreen({ onComplete }: { onComplete: () => void }) {
   useEffect(() => {
-    const t = setTimeout(onComplete, 2200)
+    const t = setTimeout(onComplete, 2000)
     return () => clearTimeout(t)
   }, [onComplete])
 
   return (
     <motion.div
       className="loading-screen"
-      exit={{ opacity: 0, scale: 1.05 }}
-      transition={{ duration: 0.5 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
     >
       <motion.div
-        className="loading-logo flex flex-col items-center"
-        initial={{ opacity: 0, y: 20 }}
+        className="flex flex-col items-center"
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: 0.4 }}
       >
-        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-600 to-primary-900 flex items-center justify-center shadow-glow mb-4">
-          <span className="text-white font-bold text-4xl font-display">V</span>
+        <div className="w-12 h-12 rounded-xl bg-[#635bff] flex items-center justify-center mb-4">
+          <Globe className="w-6 h-6 text-white" />
         </div>
-        <div className="font-display text-2xl font-bold text-white">
-          Vision <span className="text-gold-gradient">Europe</span> Africa
+        <div className="text-lg font-semibold text-[#0a2540]">
+          Vision <span className="text-[#635bff]">Europe</span> Africa
         </div>
-        <div className="text-gray-400 text-sm tracking-widest uppercase mt-1">Your Gateway to Europe</div>
-        <div className="loading-bar mt-8">
+        <div className="text-sm text-[#697386] mt-1">Your Gateway to Europe</div>
+        <div className="loading-bar mt-6">
           <div className="loading-bar-fill" />
         </div>
       </motion.div>
@@ -47,206 +58,218 @@ function LoadingScreen({ onComplete }: { onComplete: () => void }) {
   )
 }
 
-// ── Hero Section ────────────────────────────────────────────────────────────
+// ── Hero ──────────────────────────────────────────────────────────────────────
 function HeroSection() {
   const { t } = useTranslation()
+  const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.2 })
 
   const stats = [
     { value: 5000, suffix: '+', label: t('hero.stats.applicants'), icon: Users },
-    { value: 30,   suffix: '+', label: t('hero.stats.countries'),  icon: Globe2 },
+    { value: 30,   suffix: '+', label: t('hero.stats.countries'),  icon: MapPin },
     { value: 8,    suffix: '',  label: t('hero.stats.years'),      icon: Award },
     { value: 97,   suffix: '%', label: t('hero.stats.satisfaction'), icon: Star },
   ]
 
-  const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.2 })
-
   return (
-    <section className="relative min-h-screen flex items-center bg-hero overflow-hidden">
-      {/* Particles */}
-      {[...Array(12)].map((_, i) => (
-        <div
-          key={i}
-          className="particle"
-          style={{
-            left: `${Math.random() * 100}%`,
-            width: `${4 + Math.random() * 8}px`,
-            height: `${4 + Math.random() * 8}px`,
-            animationDuration: `${10 + Math.random() * 20}s`,
-            animationDelay: `${Math.random() * 10}s`,
-            bottom: '-10px',
-          }}
-        />
-      ))}
-
-      {/* Glow Orbs */}
-      <div className="absolute top-1/4 -left-20 w-96 h-96 rounded-full bg-primary-700/20 blur-3xl" />
-      <div className="absolute bottom-1/4 -right-20 w-96 h-96 rounded-full bg-gold-500/10 blur-3xl" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary-900/30 blur-3xl" />
-
-      <div className="container-custom relative z-10 pt-28 pb-20">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+    <section className="relative overflow-hidden">
+      {/* Background image - centered */}
+      <div className="absolute inset-0 bg-[url('/images/hero-bg.jpg')] bg-center bg-cover opacity-50"></div>
+      <div className="relative z-10 container-custom pt-20 pb-16 md:pt-28 md:pb-24">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          
           {/* Left */}
           <div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-gold-500/30 text-gold-400 text-sm font-medium mb-6"
-            >
-              <span className="w-2 h-2 rounded-full bg-gold-400 animate-pulse" />
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f6f9fc] dark:bg-[#1c1c1e] border border-[#e3e8ee] dark:border-[#38383a] text-sm text-[#635bff] font-medium mb-6">
+              <Shield className="w-4 h-4" />
               {t('hero.badge')}
-            </motion.div>
+            </div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.3 }}
-              className="font-display text-5xl md:text-6xl xl:text-7xl font-bold leading-tight text-white mb-4"
-            >
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#0a2540] dark:text-white leading-tight mb-5">
               {t('hero.title')}
               <br />
-              <span className="text-gold-gradient">{t('hero.titleHighlight')}</span>
-            </motion.h1>
+              <span className="text-[#635bff]">{t('hero.titleHighlight')}</span>
+            </h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.45 }}
-              className="text-gray-300 text-lg leading-relaxed mb-8 max-w-xl"
-            >
+            <p className="text-lg text-[#425466] dark:text-[#ebebf5] leading-relaxed mb-8 max-w-xl">
               {t('hero.subtitle')}
-            </motion.p>
+            </p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.6 }}
-              className="flex flex-col sm:flex-row gap-4"
-            >
-              <Link href="/apply" className="btn-gold text-base">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => window.location.href = '/apply'}
+                className="text-base"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  padding: '10px 20px',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  borderRadius: '4px',
+                  background: '#635bff',
+                  color: '#ffffff',
+                  border: 'none',
+                  textDecoration: 'none',
+                  lineHeight: 1.5,
+                  fontFamily: 'inherit',
+                  letterSpacing: 0,
+                  boxShadow: '0 1px 3px rgba(60, 66, 87, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)',
+                  transition: 'all 0.15s ease',
+                  cursor: 'pointer'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#4b45c6'
+                  e.currentTarget.style.boxShadow = '0 2px 6px rgba(99, 91, 255, 0.25)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#635bff'
+                  e.currentTarget.style.boxShadow = '0 1px 3px rgba(60, 66, 87, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)'
+                }}
+              >
                 {t('hero.cta_primary')}
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link href="#destinations" className="btn-outline text-base">
+                <ArrowRight className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => document.getElementById('destinations')?.scrollIntoView({ behavior: 'smooth' })}
+                className="text-base"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  padding: '10px 20px',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  borderRadius: '4px',
+                  background: '#ffffff',
+                  color: '#0a2540',
+                  border: '1px solid #e3e8ee',
+                  textDecoration: 'none',
+                  lineHeight: 1.5,
+                  fontFamily: 'inherit',
+                  letterSpacing: 0,
+                  boxShadow: '0 1px 3px rgba(60, 66, 87, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)',
+                  transition: 'all 0.15s ease',
+                  cursor: 'pointer'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#f6f9fc'
+                  e.currentTarget.style.borderColor = '#cbd5e1'
+                  e.currentTarget.style.boxShadow = '0 2px 6px rgba(60, 66, 87, 0.1)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#ffffff'
+                  e.currentTarget.style.borderColor = '#e3e8ee'
+                  e.currentTarget.style.boxShadow = '0 1px 3px rgba(60, 66, 87, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)'
+                }}
+              >
                 {t('hero.cta_secondary')}
-                <ChevronDown className="w-5 h-5" />
-              </Link>
-            </motion.div>
+                <ChevronDown className="w-4 h-4" />
+              </button>
+            </div>
 
-            {/* Trust badges */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.9 }}
-              className="flex items-center gap-6 mt-10"
-            >
+            {/* Trust flags */}
+            <div className="flex items-center gap-4 mt-8">
               <div className="flex -space-x-2">
-                {['🇨🇩','🇨🇲','🇸🇳','🇨🇮','🇹🇩'].map((flag, i) => (
-                  <div key={i} className="w-8 h-8 rounded-full border-2 border-dark flex items-center justify-center bg-dark-200 text-sm">
-                    {flag}
+                {[UsersIcon, Globe, Globe, Globe, Globe].map((Icon, i) => (
+                  <div key={i} className="w-8 h-8 rounded-full border-2 border-white dark:border-[#1c1c1e] bg-[#f6f9fc] dark:bg-[#2c2c2e] flex items-center justify-center">
+                    <Icon className="w-4 h-4 text-[#635bff]" />
                   </div>
                 ))}
               </div>
-              <p className="text-gray-400 text-sm">
-                <span className="text-white font-semibold">5,000+</span> applicants from 30+ African countries
+              <p className="text-sm text-[#425466] dark:text-[#ebebf5]">
+                <span className="font-semibold text-[#0a2540] dark:text-white">5,000+</span> candidats de 30+ pays africains
               </p>
-            </motion.div>
+            </div>
           </div>
 
-          {/* Right — Destination Cards */}
+          {/* Right — destination cards */}
           <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="relative hidden lg:block"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="relative"
           >
-            <div className="grid grid-cols-1 gap-6">
-              {/* Germany Card */}
-              <motion.div
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-                className="glass-card rounded-2xl p-6 cursor-pointer"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <span className="text-4xl">🇩🇪</span>
-                    <div>
-                      <div className="text-white font-bold text-lg">Germany</div>
-                      <div className="text-gold-400 text-sm">Excellence & Opportunity</div>
-                    </div>
+            <div className="grid grid-cols-1 gap-4">
+              {/* Germany card */}
+              <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl border border-[#e3e8ee] dark:border-[#38383a] p-5 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-4 mb-3">
+                  <div className="w-12 h-12 rounded-xl bg-[#f6f9fc] dark:bg-[#2c2c2e] flex items-center justify-center flex-shrink-0">
+                    <Landmark className="w-6 h-6 text-[#635bff]" />
                   </div>
-                  <div className="text-right">
-                    <div className="text-white font-bold">€45k+</div>
-                    <div className="text-gray-400 text-xs">avg. salary</div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <div className="font-semibold text-[#0a2540] dark:text-white">Germany</div>
+                      <div className="text-right">
+                        <div className="font-semibold text-[#635bff] text-sm">€45k+</div>
+                        <div className="text-xs text-[#697386] dark:text-[#8e8e93]">avg salary/yr</div>
+                      </div>
+                    </div>
+                    <div className="text-xs text-[#425466] dark:text-[#ebebf5] mt-0.5">Excellence & Opportunity</div>
                   </div>
                 </div>
                 <div className="flex gap-2 flex-wrap">
                   {['Work Visa','Student','Opportunity Card'].map(tag => (
-                    <span key={tag} className="text-xs px-2 py-1 rounded-lg bg-primary-800/50 text-primary-300 border border-primary-700/30">{tag}</span>
+                    <span key={tag} className="text-xs px-2.5 py-1 rounded-md bg-[#f6f9fc] dark:bg-[#2c2c2e] text-[#425466] dark:text-[#ebebf5] border border-[#e3e8ee] dark:border-[#38383a]">{tag}</span>
                   ))}
                 </div>
-              </motion.div>
+              </div>
 
-              {/* Portugal Card */}
-              <motion.div
-                animate={{ y: [0, 10, 0] }}
-                transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-                className="glass-card rounded-2xl p-6 cursor-pointer"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <span className="text-4xl">🇵🇹</span>
-                    <div>
-                      <div className="text-white font-bold text-lg">Portugal</div>
-                      <div className="text-gold-400 text-sm">Your First Step in EU</div>
-                    </div>
+              {/* Portugal card */}
+              <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl border border-[#e3e8ee] dark:border-[#38383a] p-5 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-4 mb-3">
+                  <div className="w-12 h-12 rounded-xl bg-[#f6f9fc] dark:bg-[#2c2c2e] flex items-center justify-center flex-shrink-0">
+                    <Ship className="w-6 h-6 text-[#0d9488]" />
                   </div>
-                  <div className="text-right">
-                    <div className="text-white font-bold">D7 Visa</div>
-                    <div className="text-gray-400 text-xs">affordable entry</div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <div className="font-semibold text-[#0a2540] dark:text-white">Portugal</div>
+                      <div className="text-right">
+                        <div className="font-semibold text-[#0d9488] text-sm">D7 Visa</div>
+                        <div className="text-xs text-[#697386] dark:text-[#8e8e93]">affordable entry</div>
+                      </div>
+                    </div>
+                    <div className="text-xs text-[#425466] dark:text-[#ebebf5] mt-0.5">Your First Step in EU</div>
                   </div>
                 </div>
                 <div className="flex gap-2 flex-wrap">
                   {['Student Visa','D7','NHR Tax','EU Path'].map(tag => (
-                    <span key={tag} className="text-xs px-2 py-1 rounded-lg bg-green-900/30 text-green-400 border border-green-700/30">{tag}</span>
+                    <span key={tag} className="text-xs px-2.5 py-1 rounded-md bg-[#f6f9fc] dark:bg-[#2c2c2e] text-[#425466] dark:text-[#ebebf5] border border-[#e3e8ee] dark:border-[#38383a]">{tag}</span>
                   ))}
                 </div>
-              </motion.div>
+              </div>
 
-              {/* Stats mini */}
+              {/* Mini stats */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="glass-card rounded-xl p-4 text-center">
-                  <div className="text-gold-400 text-2xl font-bold">97%</div>
-                  <div className="text-gray-400 text-xs mt-1">Success Rate</div>
+                <div className="bg-white dark:bg-[#1c1c1e] rounded-xl border border-[#e3e8ee] dark:border-[#38383a] p-4 text-center shadow-sm">
+                  <div className="text-2xl font-bold text-[#0a2540] dark:text-white">97%</div>
+                  <div className="text-xs text-[#697386] dark:text-[#8e8e93] mt-1">Success Rate</div>
                 </div>
-                <div className="glass-card rounded-xl p-4 text-center">
-                  <div className="text-primary-400 text-2xl font-bold">48h</div>
-                  <div className="text-gray-400 text-xs mt-1">Response Time</div>
+                <div className="bg-white dark:bg-[#1c1c1e] rounded-xl border border-[#e3e8ee] dark:border-[#38383a] p-4 text-center shadow-sm">
+                  <div className="text-2xl font-bold text-[#0a2540] dark:text-white">48h</div>
+                  <div className="text-xs text-[#697386] dark:text-[#8e8e93] mt-1">Response Time</div>
                 </div>
               </div>
             </div>
-
-            {/* Decorative ring */}
-            <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full border border-gold-500/20 animate-spin-slow" />
-            <div className="absolute -bottom-10 -left-10 w-24 h-24 rounded-full border border-primary-500/20 animate-spin-slow" style={{ animationDirection: 'reverse' }} />
           </motion.div>
         </div>
 
-        {/* Stats Bar */}
+        {/* Stats bar */}
         <motion.div
           ref={ref}
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-20"
+          transition={{ duration: 0.5 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16"
         >
           {stats.map(({ value, suffix, label, icon: Icon }, i) => (
-            <div key={i} className="glass-card rounded-2xl p-6 text-center">
-              <Icon className="w-6 h-6 text-gold-400 mx-auto mb-2" />
-              <div className="text-3xl font-bold text-white font-display">
-                {inView ? <CountUp end={value} duration={2.5} delay={i * 0.1} /> : '0'}{suffix}
+            <div key={i} className="bg-white dark:bg-[#1c1c1e] rounded-xl border border-[#e3e8ee] dark:border-[#38383a] p-5 text-center shadow-sm">
+              <Icon className="w-5 h-5 text-[#635bff] mx-auto mb-2" />
+              <div className="text-2xl font-bold text-[#0a2540] dark:text-white">
+                {inView ? <CountUp end={value} duration={2} delay={i * 0.1} /> : '0'}{suffix}
               </div>
-              <div className="text-gray-400 text-sm mt-1">{label}</div>
+              <div className="text-sm text-[#697386] dark:text-[#8e8e93] mt-1">{label}</div>
             </div>
           ))}
         </motion.div>
@@ -255,171 +278,111 @@ function HeroSection() {
   )
 }
 
-// ── Destinations Section ────────────────────────────────────────────────────
-function DestinationsSection() {
-  const { t } = useTranslation()
-
-  const destinations = [
-    {
-      flag: '🇩🇪', code: 'DE', name: t('destinations.germany.name'),
-      tagline: t('destinations.germany.tagline'),
-      description: t('destinations.germany.description'),
-      highlights: t('destinations.germany.highlights') as unknown as string[],
-      accent: 'from-yellow-600/20 to-black/20', border: 'border-yellow-600/30',
-      badge: 'bg-yellow-600/20 text-yellow-400', badgeText: 'Premium Destination',
-      cta: '/apply?profile=student&destination=germany',
-    },
-    {
-      flag: '🇵🇹', code: 'PT', name: t('destinations.portugal.name'),
-      tagline: t('destinations.portugal.tagline'),
-      description: t('destinations.portugal.description'),
-      highlights: t('destinations.portugal.highlights') as unknown as string[],
-      accent: 'from-green-700/20 to-blue-900/20', border: 'border-green-600/30',
-      badge: 'bg-green-600/20 text-green-400', badgeText: 'Beginner Friendly',
-      cta: '/apply?profile=student&destination=portugal',
-    },
+// ── Trust Bar ──────────────────────────────────────────────────────────────────
+function TrustBar() {
+  const items = [
+    { icon: Shield, label: 'Accompagnement certifié' },
+    { icon: CheckCircle, label: 'Dossiers complets' },
+    { icon: Clock, label: 'Réponse sous 48h' },
+    { icon: Send, label: 'Suivi Telegram' },
+    { icon: Globe, label: '100% en ligne' },
   ]
-
   return (
-    <section id="destinations" className="section-padding bg-section-alt">
+    <div className="bg-[#f6f9fc] dark:bg-[#1c1c1e] py-6 border-y border-[#e3e8ee] dark:border-[#38383a]">
       <div className="container-custom">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-900/50 border border-primary-700/30 text-primary-400 text-xs font-semibold uppercase tracking-wider mb-4">
-            <MapPin className="w-3 h-3" /> {t('destinations.title')}
-          </div>
-          <h2 className="font-display text-4xl md:text-5xl font-bold text-white mb-4">
-            Premier <span className="text-gold-gradient">Destinations</span>
-          </h2>
-          <p className="text-gray-400 max-w-2xl mx-auto">{t('destinations.subtitle')}</p>
-        </motion.div>
-
-        <div className="grid md:grid-cols-2 gap-8">
-          {destinations.map((dest, i) => (
-            <motion.div
-              key={dest.code}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: i * 0.15 }}
-              className={`relative rounded-3xl p-8 bg-gradient-to-br ${dest.accent} border ${dest.border} backdrop-blur-sm overflow-hidden group hover:shadow-premium transition-all duration-500`}
-            >
-              {/* BG Flag Watermark */}
-              <div className="absolute top-4 right-6 text-8xl opacity-10 select-none">{dest.flag}</div>
-
-              <div className="relative z-10">
-                <div className="flex items-start justify-between mb-4">
-                  <span className="text-5xl">{dest.flag}</span>
-                  <span className={`text-xs font-bold px-3 py-1 rounded-full ${dest.badge}`}>{dest.badgeText}</span>
-                </div>
-
-                <h3 className="font-display text-3xl font-bold text-white mb-1">{dest.name}</h3>
-                <p className="text-gold-400 font-medium mb-4">{dest.tagline}</p>
-                <p className="text-gray-300 text-sm leading-relaxed mb-6">{dest.description}</p>
-
-                <ul className="space-y-2 mb-8">
-                  {(Array.isArray(dest.highlights) ? dest.highlights : []).map((h: string) => (
-                    <li key={h} className="flex items-center gap-2 text-sm text-gray-200">
-                      <CheckCircle className="w-4 h-4 text-gold-400 flex-shrink-0" />
-                      {h}
-                    </li>
-                  ))}
-                </ul>
-
-                <Link
-                  href={dest.cta}
-                  className="inline-flex items-center gap-2 font-semibold text-white hover:text-gold-400 transition-colors"
-                >
-                  Apply Now <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </div>
-            </motion.div>
+        <div className="flex flex-wrap items-center justify-center gap-6">
+          {items.map((item, i) => (
+            <div key={i} className="flex items-center gap-2 text-sm text-[#425466] dark:text-[#ebebf5]">
+              <item.icon className="w-4 h-4 text-[#635bff]" />
+              {item.label}
+            </div>
           ))}
         </div>
       </div>
-    </section>
+    </div>
   )
 }
 
-// ── Profile Selection ───────────────────────────────────────────────────────
+// ── Profiles / Services ────────────────────────────────────────────────────────
 function ProfileSection() {
   const { t } = useTranslation()
 
   const profiles = [
     {
-      key: 'student', icon: GraduationCap,
+      key: 'student', image: '/images/student.jpg',
       title: t('profiles.student.title'),
       description: t('profiles.student.description'),
       badge: t('profiles.student.badge'),
-      color: 'text-primary-400', border: 'hover:border-primary-500/60',
-      bg: 'hover:bg-primary-900/20',
       href: '/apply?profile=student',
+      features: ['Universités gratuites (Allemagne)', 'Visa étudiant D', 'Compte bloqué', 'Bourse DAAD'],
     },
     {
-      key: 'worker', icon: Briefcase,
+      key: 'worker', image: '/images/worker.jpg',
       title: t('profiles.worker.title'),
       description: t('profiles.worker.description'),
       badge: t('profiles.worker.badge'),
-      color: 'text-gold-400', border: 'hover:border-gold-500/60',
-      bg: 'hover:bg-gold-900/10',
       href: '/apply?profile=worker',
+      features: ['Offres d\'emploi vérifiées', 'Validation de diplômes', 'Visa travailleur', 'Formation linguistique'],
     },
     {
-      key: 'visitor', icon: Plane,
+      key: 'visitor', image: '/images/visitor.jpg',
       title: t('profiles.visitor.title'),
       description: t('profiles.visitor.description'),
       badge: t('profiles.visitor.badge'),
-      color: 'text-green-400', border: 'hover:border-green-500/60',
-      bg: 'hover:bg-green-900/10',
       href: '/apply?profile=visitor',
+      features: ['Visa Schengen type C', 'Dossier optimisé', 'Simulation consulaire', 'Assurance voyage'],
     },
   ]
 
   return (
-    <section id="services" className="section-padding">
+    <section id="services" className="section-padding bg-white dark:bg-black">
       <div className="container-custom">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
-          <h2 className="font-display text-4xl md:text-5xl font-bold text-white mb-4">
+          <div className="section-eyebrow justify-center" style={{ display: 'flex', justifyContent: 'center' }}>
+            Nos services
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-[#0a2540] dark:text-white mb-3">
             {t('profiles.title')}
           </h2>
-          <p className="text-gray-400 max-w-xl mx-auto">{t('profiles.subtitle')}</p>
+          <p className="text-[#425466] dark:text-[#ebebf5] max-w-xl mx-auto">{t('profiles.subtitle')}</p>
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-6">
           {profiles.map((p, i) => (
             <motion.div
               key={p.key}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.12 }}
+              transition={{ duration: 0.4, delay: i * 0.1 }}
             >
               <Link
                 href={p.href}
-                className={`block glass-card rounded-2xl p-8 border border-white/10 ${p.border} ${p.bg} group transition-all duration-300`}
+                className="block bg-white dark:bg-[#1c1c1e] rounded-2xl border border-[#e3e8ee] dark:border-[#38383a] p-6 shadow-sm hover:shadow-md hover:border-[#cbd5e1] dark:hover:border-[#48484a] transition-all group"
               >
-                <div className={`w-14 h-14 rounded-2xl bg-dark-200 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform ${p.color}`}>
-                  <p.icon className="w-7 h-7" />
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-lg bg-[#f6f9fc] dark:bg-[#2c2c2e] flex items-center justify-center">
+                    <Image src={p.image} width={40} height={40} alt={p.title} className="w-10 h-10 object-cover" />
+                  </div>
+                  <span className="badge badge-primary">{p.badge}</span>
                 </div>
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-white font-bold text-xl">{p.title}</h3>
-                  <span className={`text-xs font-semibold px-2 py-1 rounded-full bg-white/5 border border-white/10 ${p.color}`}>
-                    {p.badge}
-                  </span>
-                </div>
-                <p className="text-gray-400 text-sm leading-relaxed mb-6">{p.description}</p>
-                <div className={`flex items-center gap-1 text-sm font-semibold ${p.color}`}>
-                  Get Started <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <h3 className="text-lg font-semibold text-[#0a2540] dark:text-white mb-2">{p.title}</h3>
+                <p className="text-sm text-[#425466] dark:text-[#ebebf5] leading-relaxed mb-4">{p.description}</p>
+                <ul className="space-y-2 mb-5">
+                  {p.features.map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-sm text-[#425466] dark:text-[#ebebf5]">
+                      <CheckCircle className="w-4 h-4 text-[#635bff] flex-shrink-0" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <div className="flex items-center gap-1 text-sm font-medium text-[#635bff]">
+                  Postuler <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </div>
               </Link>
             </motion.div>
@@ -430,46 +393,145 @@ function ProfileSection() {
   )
 }
 
-// ── Process Timeline ────────────────────────────────────────────────────────
+// ── Destinations ───────────────────────────────────────────────────────────────
+function DestinationsSection() {
+  const { t } = useTranslation()
+
+  const destinations = [
+    {
+      icon: <Landmark className="w-10 h-10 text-[#635bff]" />, code: 'DE',
+      name: t('destinations.germany.name'),
+      tagline: t('destinations.germany.tagline'),
+      description: t('destinations.germany.description'),
+      highlights: t('destinations.germany.highlights') as unknown as string[],
+      cta: '/apply?profile=student&destination=germany',
+      statLabel: '€45,000', statSub: 'Salaire moyen/an',
+    },
+    {
+      icon: <Ship className="w-10 h-10 text-[#0d9488]" />, code: 'PT',
+      name: t('destinations.portugal.name'),
+      tagline: t('destinations.portugal.tagline'),
+      description: t('destinations.portugal.description'),
+      highlights: t('destinations.portugal.highlights') as unknown as string[],
+      cta: '/apply?profile=student&destination=portugal',
+      statLabel: 'D7 Visa', statSub: 'Entrée accessible',
+    },
+  ]
+
+  return (
+    <section id="destinations" className="section-padding relative overflow-hidden">
+      {/* Background image */}
+      <div className="absolute inset-0 bg-[url('/images/destinations-bg.jpg')] bg-center bg-cover opacity-50"></div>
+      <div className="relative z-10 container-custom">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-12"
+        >
+          <div className="section-eyebrow" style={{ display: 'flex', justifyContent: 'center' }}>
+            <MapPin className="w-4 h-4" />
+            {t('destinations.title')}
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-[#0a2540] dark:text-white mb-3">
+            Premier <span className="text-[#635bff]">Destinations</span>
+          </h2>
+          <p className="text-[#425466] dark:text-[#ebebf5] max-w-2xl mx-auto">{t('destinations.subtitle')}</p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {destinations.map((dest, i) => (
+            <motion.div
+              key={dest.code}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.1 }}
+              className="bg-white dark:bg-[#1c1c1e] rounded-2xl border border-[#e3e8ee] dark:border-[#38383a] p-6 shadow-sm hover:shadow-md transition-all"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-14 h-14 rounded-xl bg-[#f6f9fc] dark:bg-[#2c2c2e] flex items-center justify-center">
+                  {dest.icon}
+                </div>
+                <span className="badge badge-primary">Premium Destination</span>
+              </div>
+              <h3 className="text-xl font-semibold text-[#0a2540] dark:text-white mb-1">{dest.name}</h3>
+              <p className="text-sm text-[#635bff] font-medium mb-3">{dest.tagline}</p>
+              <p className="text-sm text-[#425466] dark:text-[#ebebf5] leading-relaxed mb-5">{dest.description}</p>
+              <ul className="space-y-2 mb-6">
+                {(Array.isArray(dest.highlights) ? dest.highlights : []).map((h: string) => (
+                  <li key={h} className="flex items-center gap-2 text-sm text-[#425466] dark:text-[#ebebf5]">
+                    <CheckCircle className="w-4 h-4 text-[#635bff] flex-shrink-0" />
+                    {h}
+                  </li>
+                ))}
+              </ul>
+              <div className="flex items-center justify-between pt-4 border-t border-[#e3e8ee] dark:border-[#38383a]">
+                <Link
+                  href={dest.cta}
+                  className="inline-flex items-center gap-2 font-medium text-[#635bff] hover:text-[#4b45c6] transition-colors text-sm"
+                >
+                  Postuler maintenant <ArrowRight className="w-4 h-4" />
+                </Link>
+                <div className="text-right">
+                  <div className="font-semibold text-[#0a2540] dark:text-white">{dest.statLabel}</div>
+                  <div className="text-xs text-[#697386] dark:text-[#8e8e93]">{dest.statSub}</div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ── Process ───────────────────────────────────────────────────────────────────
 function ProcessSection() {
   const { t } = useTranslation()
   const steps = t('process.steps') as unknown as { title: string; desc: string }[]
 
+  const stepIcons = [
+    Users, BookOpen, Search, CheckCircle, PlaneTakeoff,
+  ]
+
   return (
-    <section className="section-padding bg-section-alt">
+    <section className="section-padding bg-white dark:bg-black">
       <div className="container-custom">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
-          <h2 className="font-display text-4xl md:text-5xl font-bold text-white mb-4">
+          <div className="section-eyebrow" style={{ display: 'flex', justifyContent: 'center' }}>
+            Comment ça marche
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-[#0a2540] dark:text-white mb-3">
             {t('process.title')}
           </h2>
-          <p className="text-gray-400">{t('process.subtitle')}</p>
+          <p className="text-[#425466] dark:text-[#ebebf5]">{t('process.subtitle')}</p>
         </motion.div>
 
-        <div className="relative">
-          {/* Timeline line */}
-          <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary-600 via-gold-500 to-transparent hidden sm:block" />
-
-          <div className="space-y-8">
+        <div className="relative max-w-3xl mx-auto">
+          <div className="space-y-4">
             {(Array.isArray(steps) ? steps : []).map((step, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, x: i % 2 === 0 ? -30 : 30 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-                className={`flex gap-6 items-start ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} sm:w-[calc(50%-24px)] ${i % 2 === 0 ? 'sm:ml-0' : 'sm:ml-auto'}`}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
+                className="flex gap-4 items-start"
               >
-                <div className="relative z-10 flex-shrink-0 w-14 h-14 rounded-full bg-gradient-to-br from-primary-600 to-primary-900 flex items-center justify-center font-bold text-white text-lg border-2 border-gold-500/50 shadow-glow">
-                  {i + 1}
+                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#f6f9fc] dark:bg-[#2c2c2e] border border-[#e3e8ee] dark:border-[#38383a] flex items-center justify-center">
+                  {stepIcons[i] && React.createElement(stepIcons[i], { className: 'w-5 h-5 text-[#635bff]' })}
                 </div>
-                <div className="glass-card rounded-2xl p-6 flex-1">
-                  <h4 className="text-white font-bold mb-2">{step.title}</h4>
-                  <p className="text-gray-400 text-sm leading-relaxed">{step.desc}</p>
+                <div className="flex-1 bg-white dark:bg-[#1c1c1e] rounded-xl border border-[#e3e8ee] dark:border-[#38383a] p-5 shadow-sm">
+                  <div className="text-xs font-semibold text-[#635bff] uppercase tracking-wider mb-1">Étape {i + 1}</div>
+                  <h4 className="font-semibold text-[#0a2540] dark:text-white mb-1">{step.title}</h4>
+                  <p className="text-sm text-[#425466] dark:text-[#ebebf5]">{step.desc}</p>
                 </div>
               </motion.div>
             ))}
@@ -480,98 +542,145 @@ function ProcessSection() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="text-center mt-16"
+          className="text-center mt-10"
         >
-          <Link href="/apply" className="btn-gold text-base">
-            Start Your Application <ArrowRight className="w-5 h-5" />
-          </Link>
+          <button
+            onClick={() => window.location.href = '/apply'}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              padding: '10px 20px',
+              fontSize: '14px',
+              fontWeight: 500,
+              borderRadius: '4px',
+              background: '#635bff',
+              color: '#ffffff',
+              border: 'none',
+              textDecoration: 'none',
+              lineHeight: 1.5,
+              fontFamily: 'inherit',
+              letterSpacing: 0,
+              boxShadow: '0 1px 3px rgba(60, 66, 87, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)',
+              transition: 'all 0.15s ease',
+              cursor: 'pointer'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#4b45c6'
+              e.currentTarget.style.boxShadow = '0 2px 6px rgba(99, 91, 255, 0.25)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = '#635bff'
+              e.currentTarget.style.boxShadow = '0 1px 3px rgba(60, 66, 87, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)'
+            }}
+          >
+            Commencer ma demande <ArrowRight className="w-4 h-4" />
+          </button>
         </motion.div>
       </div>
     </section>
   )
 }
 
-// ── Testimonials ────────────────────────────────────────────────────────────
+// ── Testimonials ───────────────────────────────────────────────────────────────
 function TestimonialsSection() {
   const { t } = useTranslation()
 
   const testimonials = [
     {
-      name: 'Amara Diallo', country: '🇨🇩 Kinshasa', destination: '🇩🇪 Germany',
+      name: 'Amara Diallo', country: 'Kinshasa, RD Congo', destination: 'Berlin',
       role: 'Software Engineer',
-      text: 'Vision Europe Africa changed my life. Their team guided me through the entire German Work Visa process step by step. I now earn €55,000/year in Berlin!',
+      text: 'Vision Europe Africa a changé ma vie. L\'équipe m\'a guidé étape par étape pour le visa travail allemand. Je gagne maintenant €55,000/an à Berlin !',
       stars: 5,
+      avatar: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=80&q=70',
     },
     {
-      name: 'Marie-Claire Nkosi', country: '🇨🇲 Cameroon', destination: '🇵🇹 Portugal',
-      role: 'Medical Student',
-      text: 'J\'ai obtenu mon visa étudiant pour Lisbonne en 3 mois. L\'équipe est très professionnelle et disponible. Je recommande fortement!',
+      name: 'Marie-Claire Nkosi', country: 'Cameroun', destination: 'Lisbonne',
+      role: 'Étudiante en Médecine',
+      text: 'J\'ai obtenu mon visa étudiant pour Lisbonne en 3 mois. L\'équipe est très professionnelle et disponible. Je recommande fortement !',
       stars: 5,
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&q=70',
     },
     {
-      name: 'Jean-Baptiste Kabila', country: '🇨🇩 Kinshasa', destination: '🇩🇪 Germany',
-      role: 'Logistics Manager',
-      text: 'Professional, transparent, and effective. They handled all my documents and I received my German work permit faster than expected. Excellent service!',
+      name: 'Jean-Baptiste Kabila', country: 'Kinshasa, RD Congo', destination: 'Hambourg',
+      role: 'Logisticien',
+      text: 'Professionnel, transparent et efficace. Ils ont géré tous mes documents et j\'ai reçu mon permis de travail allemand plus vite que prévu.',
       stars: 5,
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&q=70',
     },
     {
-      name: 'Fatou Sow', country: '🇸🇳 Senegal', destination: '🇵🇹 Portugal',
-      role: 'Business Student',
-      text: 'Le processus était clair et sans surprise. Vision Europe Africa m\'a accompagnée du premier contact jusqu\'à mon arrivée à Porto. Merci infiniment!',
+      name: 'Fatou Sow', country: 'Sénégal', destination: 'Porto',
+      role: 'Étudiante en Commerce',
+      text: 'Le processus était clair et sans surprise. Vision Europe Africa m\'a accompagnée du premier contact jusqu\'à mon arrivée à Porto.',
       stars: 5,
+      avatar: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=80&q=70',
     },
     {
-      name: 'Christian Mbeki', country: '🇨🇮 Côte d\'Ivoire', destination: '🇩🇪 Germany',
-      role: 'IT Specialist',
-      text: 'I was skeptical at first, but the team proved to be extremely competent. My Opportunity Card application was successful and I am now based in Munich!',
+      name: 'Christian Mbeki', country: 'Côte d\'Ivoire', destination: 'Munich',
+      role: 'Spécialiste IT',
+      text: 'J\'étais sceptique, mais l\'équipe s\'est montrée extrêmement compétente. Mon dossier Opportunity Card a été accepté du premier coup !',
       stars: 5,
+      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&q=70',
     },
     {
-      name: 'Adaeze Okafor', country: '🇳🇬 Nigeria', destination: '🇵🇹 Portugal',
-      role: 'Nurse',
-      text: 'They found me a nursing position in Lisbon with full visa support. The process was smooth and within 4 months I was already living and working in Portugal!',
+      name: 'Adaeze Okafor', country: 'Nigeria', destination: 'Lisbonne',
+      role: 'Infirmière',
+      text: 'Ils m\'ont trouvé un poste d\'infirmière à Lisbonne avec prise en charge du visa. En 4 mois j\'étais déjà en train de travailler au Portugal !',
       stars: 5,
+      avatar: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=80&q=70',
     },
   ]
 
   return (
-    <section id="testimonials" className="section-padding">
+    <section id="testimonials" className="section-padding bg-[#f6f9fc] dark:bg-[#1c1c1e]">
       <div className="container-custom">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
-          <h2 className="font-display text-4xl md:text-5xl font-bold text-white mb-4">
+          <div className="section-eyebrow" style={{ display: 'flex', justifyContent: 'center' }}>
+            <Users className="w-4 h-4" />
             {t('testimonials.title')}
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-[#0a2540] dark:text-white mb-3">
+            Ils ont réussi <span className="text-[#635bff]">leur projet</span>
           </h2>
-          <p className="text-gray-400 max-w-2xl mx-auto">{t('testimonials.subtitle')}</p>
+          <p className="text-[#425466] dark:text-[#ebebf5] max-w-2xl mx-auto">{t('testimonials.subtitle')}</p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {testimonials.map((item, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.08 }}
-              className="glass-card rounded-2xl p-6"
+              transition={{ duration: 0.4, delay: i * 0.05 }}
+              className="bg-white dark:bg-[#1c1c1e] rounded-xl border border-[#e3e8ee] dark:border-[#38383a] p-5 shadow-sm"
             >
-              <div className="flex items-center gap-1 mb-4">
+              <div className="flex items-center gap-1 mb-3">
                 {Array.from({ length: item.stars }).map((_, s) => (
-                  <Star key={s} className="w-4 h-4 text-gold-400 fill-gold-400" />
+                  <Star key={s} className="w-4 h-4 text-[#f59e0b] fill-[#f59e0b]" />
                 ))}
               </div>
-              <p className="text-gray-300 text-sm leading-relaxed mb-5 italic">"{item.text}"</p>
+              <p className="text-sm text-[#425466] dark:text-[#ebebf5] leading-relaxed mb-4">&ldquo;{item.text}&rdquo;</p>
               <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-white font-semibold text-sm">{item.name}</div>
-                  <div className="text-gray-500 text-xs mt-0.5">{item.role}</div>
-                  <div className="text-gray-500 text-xs">{item.country}</div>
+                <div className="flex items-center gap-3">
+                  <img
+                    src={item.avatar}
+                    alt={item.name}
+                    className="w-9 h-9 rounded-full object-cover border border-[#e3e8ee] dark:border-[#38383a]"
+                    loading="lazy"
+                  />
+                  <div>
+                    <div className="font-medium text-sm text-[#0a2540] dark:text-white">{item.name}</div>
+                    <div className="text-xs text-[#697386] dark:text-[#8e8e93]">{item.role} · {item.country}</div>
+                  </div>
                 </div>
-                <div className="text-right text-xs text-gold-400 font-semibold">{item.destination}</div>
+                <div className="text-xs font-medium text-[#635bff]">{item.destination}</div>
               </div>
             </motion.div>
           ))}
@@ -581,33 +690,37 @@ function TestimonialsSection() {
   )
 }
 
-// ── FAQ ────────────────────────────────────────────────────────────────────
+// ── FAQ ────────────────────────────────────────────────────────────────────────
 function FAQSection() {
   const { t } = useTranslation()
   const [open, setOpen] = useState<number | null>(null)
 
   const faqs = [
-    { q: 'Quels documents sont nécessaires pour un visa allemand ?', a: 'Les documents requis incluent : passeport valide, certificat de naissance, casier judiciaire, justificatif de ressources, contrat de travail ou lettre d\'admission universitaire, assurance santé, et preuve d\'hébergement. Notre équipe vous guidera dans la préparation de chaque document.' },
-    { q: 'Combien de temps dure le processus d\'immigration ?', a: 'Le processus varie selon le type de visa. Pour un visa étudiant : 2-4 mois. Pour un visa travailleur : 3-6 mois. Pour un visa visiteur : 4-8 semaines. Notre équipe vous donne une estimation précise lors de la consultation initiale.' },
-    { q: 'Quels sont vos frais de service ?', a: 'Nos frais varient selon la complexité du dossier et le pays de destination. Nous offrons une consultation initiale gratuite. Contactez-nous via le formulaire ou Telegram pour un devis personnalisé.' },
-    { q: 'Puis-je travailler en Allemagne sans parler allemand ?', a: 'Oui, dans certains secteurs comme l\'IT, la santé et l\'ingénierie, l\'anglais est souvent suffisant pour démarrer. Cependant, apprendre l\'allemand améliore considérablement vos opportunités. Nous recommandons d\'atteindre le niveau B1 avant de postuler.' },
-    { q: 'Le Portugal est-il plus facile d\'accès que l\'Allemagne ?', a: 'Oui, le Portugal est généralement considéré comme plus accessible. Le visa D7, le visa étudiant et le programme de startup offrent des voies d\'immigration plus flexibles, avec un coût de vie plus abordable et une culture très accueillante pour les Africains francophones.' },
-    { q: 'Quelle est votre garantie de succès ?', a: 'Nous avons un taux de succès de 97%. Nous ne garantissons pas l\'approbation du visa car la décision finale appartient aux ambassades, mais nous maximisons vos chances en préparant un dossier irréprochable et en vous accompagnant à chaque étape.' },
+    { q: 'Quels documents sont nécessaires pour un visa allemand ?', a: 'Passeport valide, casier judiciaire, justificatif de ressources, contrat de travail ou lettre d\'admission, assurance santé et preuve d\'hébergement. Notre équipe vous guide dans la préparation de chaque document.' },
+    { q: 'Combien de temps dure le processus d\'immigration ?', a: 'Visa étudiant : 2–4 mois. Visa travailleur : 3–6 mois. Visa visiteur : 4–8 semaines. Notre équipe vous donne une estimation précise lors de la consultation initiale.' },
+    { q: 'Quels sont vos frais de service ?', a: 'Nos frais varient selon la complexité du dossier. Nous offrons une consultation initiale gratuite. Contactez-nous pour un devis personnalisé.' },
+    { q: 'Puis-je travailler en Allemagne sans parler allemand ?', a: 'Oui, dans l\'IT, la santé et l\'ingénierie, l\'anglais est souvent suffisant. Nous recommandons cependant d\'atteindre le niveau B1 pour maximiser vos chances d\'intégration.' },
+    { q: 'Le Portugal est-il plus facile d\'accès que l\'Allemagne ?', a: 'Oui, le Portugal est généralement plus accessible grâce au visa D7 et au programme étudiant. Le coût de vie y est aussi plus abordable, avec une culture accueillante pour les Africains francophones.' },
+    { q: 'Quelle est votre garantie de succès ?', a: 'Nous avons un taux de 97%. Nous ne garantissons pas l\'approbation du visa (c\'est la décision de l\'ambassade), mais nous maximisons vos chances avec un dossier irréprochable.' },
   ]
 
   return (
-    <section id="faq" className="section-padding bg-section-alt">
+    <section id="faq" className="section-padding bg-white dark:bg-black">
       <div className="container-custom max-w-3xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
-          <h2 className="font-display text-4xl md:text-5xl font-bold text-white mb-4">
+          <div className="section-eyebrow" style={{ display: 'flex', justifyContent: 'center' }}>
+            <Shield className="w-4 h-4" />
             {t('faq.title')}
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-[#0a2540] dark:text-white mb-3">
+            Questions <span className="text-[#635bff]">fréquentes</span>
           </h2>
-          <p className="text-gray-400">{t('faq.subtitle')}</p>
+          <p className="text-[#425466] dark:text-[#ebebf5]">{t('faq.subtitle')}</p>
         </motion.div>
 
         <div className="space-y-3">
@@ -618,14 +731,17 @@ function FAQSection() {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.05 }}
-              className="glass-card rounded-xl overflow-hidden"
+              className="bg-white dark:bg-[#1c1c1e] rounded-xl border border-[#e3e8ee] dark:border-[#38383a] overflow-hidden shadow-sm"
             >
               <button
                 className="w-full flex items-center justify-between p-5 text-left"
                 onClick={() => setOpen(open === i ? null : i)}
+                aria-expanded={open === i}
               >
-                <span className="text-white font-medium text-sm pr-4">{faq.q}</span>
-                <ChevronDown className={`w-5 h-5 text-gold-400 flex-shrink-0 transition-transform ${open === i ? 'rotate-180' : ''}`} />
+                <span className="font-medium text-sm text-[#0a2540] dark:text-white pr-4">{faq.q}</span>
+                <ChevronDown
+                  className={`w-5 h-5 text-[#635bff] flex-shrink-0 transition-transform ${open === i ? 'rotate-180' : ''}`}
+                />
               </button>
               <AnimatePresence>
                 {open === i && (
@@ -635,7 +751,7 @@ function FAQSection() {
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <div className="px-5 pb-5 text-gray-400 text-sm leading-relaxed border-t border-white/5 pt-4">
+                    <div className="px-5 pb-5 text-sm text-[#425466] dark:text-[#ebebf5] leading-relaxed border-t border-[#e3e8ee] dark:border-[#38383a] pt-4">
                       {faq.a}
                     </div>
                   </motion.div>
@@ -649,43 +765,109 @@ function FAQSection() {
   )
 }
 
-// ── CTA Banner ──────────────────────────────────────────────────────────────
+// ── CTA Banner ────────────────────────────────────────────────────────────────
 function CTASection() {
   return (
-    <section className="section-padding">
+    <section className="section-padding bg-[#f6f9fc] dark:bg-[#1c1c1e]">
       <div className="container-custom">
         <motion.div
-          initial={{ opacity: 0, scale: 0.96 }}
-          whileInView={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="relative rounded-3xl overflow-hidden"
-          style={{ background: 'linear-gradient(135deg, #1a56db 0%, #1e3a8a 50%, #0f1f4a 100%)' }}
+          className="bg-white dark:bg-[#1c1c1e] rounded-2xl border border-[#e3e8ee] dark:border-[#38383a] p-8 md:p-12 text-center shadow-sm"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gold-500/5 to-transparent" />
-          <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-gold-500/10 blur-3xl" />
-          <div className="absolute -bottom-20 -left-20 w-80 h-80 rounded-full bg-primary-400/10 blur-3xl" />
-
-          <div className="relative z-10 p-12 md:p-16 text-center">
-            <div className="text-5xl mb-4">🚀</div>
-            <h2 className="font-display text-3xl md:text-5xl font-bold text-white mb-4">
-              Prêt à commencer votre voyage ?
-            </h2>
-            <p className="text-primary-200 text-lg max-w-2xl mx-auto mb-8">
-              Des milliers d'Africains ont déjà réalisé leur rêve européen. C'est votre tour. Soumettez votre candidature en moins de 10 minutes.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/apply" className="btn-gold">
-                Commencer maintenant <ArrowRight className="w-5 h-5" />
-              </Link>
-              <a href="https://t.me/visioneuropeafrica" target="_blank" rel="noopener noreferrer" className="btn-outline border-white/30">
-                Contacter sur Telegram
-              </a>
-            </div>
-            <div className="flex items-center justify-center gap-6 mt-8 text-primary-300 text-sm">
-              <span className="flex items-center gap-1"><Shield className="w-4 h-4" /> 100% Légal</span>
-              <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> Réponse en 48h</span>
-              <span className="flex items-center gap-1"><Star className="w-4 h-4 text-gold-400" /> 97% de succès</span>
-            </div>
+          <div className="w-14 h-14 rounded-xl bg-[#f6f9fc] dark:bg-[#2c2c2e] flex items-center justify-center mx-auto mb-5">
+            <Rocket className="w-7 h-7 text-[#635bff]" />
+          </div>
+          <h2 className="text-2xl md:text-3xl font-bold text-[#0a2540] dark:text-white mb-3">
+            Prêt à commencer votre voyage ?
+          </h2>
+          <p className="text-[#425466] dark:text-[#ebebf5] max-w-xl mx-auto mb-6">
+            Des milliers d'Africains ont réalisé leur rêve européen grâce à nous. Soumettez votre candidature en moins de 10 minutes.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <button
+              onClick={() => window.location.href = '/apply'}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                padding: '10px 20px',
+                fontSize: '14px',
+                fontWeight: 500,
+                borderRadius: '4px',
+                background: '#635bff',
+                color: '#ffffff',
+                border: 'none',
+                textDecoration: 'none',
+                lineHeight: 1.5,
+                fontFamily: 'inherit',
+                letterSpacing: 0,
+                boxShadow: '0 1px 3px rgba(60, 66, 87, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)',
+                transition: 'all 0.15s ease',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#4b45c6'
+                e.currentTarget.style.boxShadow = '0 2px 6px rgba(99, 91, 255, 0.25)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = '#635bff'
+                e.currentTarget.style.boxShadow = '0 1px 3px rgba(60, 66, 87, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)'
+              }}
+            >
+              Commencer maintenant <ArrowRight className="w-4 h-4" />
+            </button>
+            <a
+              href="https://t.me/visioneuropeafrica"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                padding: '10px 20px',
+                fontSize: '14px',
+                fontWeight: 500,
+                borderRadius: '4px',
+                background: '#ffffff',
+                color: '#0a2540',
+                border: '1px solid #e3e8ee',
+                textDecoration: 'none',
+                lineHeight: 1.5,
+                fontFamily: 'inherit',
+                letterSpacing: 0,
+                boxShadow: '0 1px 3px rgba(60, 66, 87, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)',
+                transition: 'all 0.15s ease',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#f6f9fc'
+                e.currentTarget.style.borderColor = '#cbd5e1'
+                e.currentTarget.style.boxShadow = '0 2px 6px rgba(60, 66, 87, 0.1)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = '#ffffff'
+                e.currentTarget.style.borderColor = '#e3e8ee'
+                e.currentTarget.style.boxShadow = '0 1px 3px rgba(60, 66, 87, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)'
+              }}
+            >
+              <Send className="w-4 h-4" />
+              Contacter sur Telegram
+            </a>
+          </div>
+          <div className="flex items-center justify-center gap-6 mt-8 text-sm text-[#425466] dark:text-[#ebebf5] flex-wrap">
+            <span className="flex items-center gap-2">
+              <Shield className="w-4 h-4 text-[#635bff]" /> 100% Légal
+            </span>
+            <span className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-[#635bff]" /> Réponse en 48h
+            </span>
+            <span className="flex items-center gap-2">
+              <Star className="w-4 h-4 text-[#f59e0b]" /> 97% de succès
+            </span>
           </div>
         </motion.div>
       </div>
@@ -693,23 +875,41 @@ function CTASection() {
   )
 }
 
-// ── Main Page ───────────────────────────────────────────────────────────────
+// ── WhatsApp Float ─────────────────────────────────────────────────────────────
+function WhatsAppFloat() {
+  return (
+    <motion.a
+      href="https://wa.me/237000000000"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Chat WhatsApp"
+      className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full flex items-center justify-center shadow-sm bg-[#25D366] hover:bg-[#20bd5a] transition-colors"
+      initial={{ scale: 0 }}
+      animate={{ scale: 1 }}
+      transition={{ delay: 2.5, type: 'spring' }}
+      whileHover={{ scale: 1.05 }}
+    >
+      <Send className="w-5 h-5 text-white" />
+    </motion.a>
+  )
+}
+
+// ── Page ───────────────────────────────────────────────────────────────────────
 export default function HomePage() {
   const [loading, setLoading] = useState(true)
 
   return (
     <>
       <AnimatePresence>
-        {loading && (
-          <LoadingScreen onComplete={() => setLoading(false)} />
-        )}
+        {loading && <LoadingScreen onComplete={() => setLoading(false)} />}
       </AnimatePresence>
 
       {!loading && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
           <Navbar />
           <main>
             <HeroSection />
+            <TrustBar />
             <ProfileSection />
             <DestinationsSection />
             <ProcessSection />
@@ -718,6 +918,7 @@ export default function HomePage() {
             <CTASection />
           </main>
           <Footer />
+          <WhatsAppFloat />
         </motion.div>
       )}
     </>

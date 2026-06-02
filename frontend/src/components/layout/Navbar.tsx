@@ -2,22 +2,23 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Globe, ChevronDown } from 'lucide-react'
+import { Menu, X, ChevronDown, Globe, Moon, Sun } from 'lucide-react'
 import { useTranslation } from '@/hooks/useTranslation'
 import type { Language } from '@/i18n/translations'
 
 const LANGUAGES: { code: Language; label: string; flag: string }[] = [
-  { code: 'fr', label: 'Français', flag: '🇫🇷' },
-  { code: 'en', label: 'English',  flag: '🇬🇧' },
+  { code: 'fr', label: 'Français',  flag: '🇫🇷' },
+  { code: 'en', label: 'English',   flag: '🇬🇧' },
   { code: 'pt', label: 'Português', flag: '🇵🇹' },
-  { code: 'de', label: 'Deutsch',  flag: '🇩🇪' },
+  { code: 'de', label: 'Deutsch',   flag: '🇩🇪' },
 ]
 
 export default function Navbar() {
   const { t, language, changeLanguage } = useTranslation()
-  const [scrolled, setScrolled] = useState(false)
-  const [mobileOpen, setMobileOpen] = useState(false)
-  const [langOpen, setLangOpen] = useState(false)
+  const [scrolled,    setScrolled]    = useState(false)
+  const [mobileOpen,  setMobileOpen]  = useState(false)
+  const [langOpen,    setLangOpen]    = useState(false)
+  const [darkMode,    setDarkMode]    = useState(false)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -25,12 +26,21 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  useEffect(() => {
+    const root = window.document.documentElement
+    if (darkMode) {
+      root.classList.add('dark')
+    } else {
+      root.classList.remove('dark')
+    }
+  }, [darkMode])
+
   const navLinks = [
-    { href: '/', label: t('nav.home') },
     { href: '/#destinations', label: t('nav.destinations') },
-    { href: '/#services', label: t('nav.services') },
-    { href: '/#about', label: t('nav.about') },
-    { href: '/#contact', label: t('nav.contact') },
+    { href: '/#services',     label: t('nav.services')      },
+    { href: '/#testimonials', label: 'Témoignages'          },
+    { href: '/#faq',          label: 'FAQ'                  },
+    { href: '/#contact',      label: t('nav.contact')       },
   ]
 
   const currentLang = LANGUAGES.find(l => l.code === language) ?? LANGUAGES[0]
@@ -40,73 +50,83 @@ export default function Navbar() {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled ? 'glass-dark shadow-premium py-3' : 'py-5 bg-transparent'
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? 'bg-white/90 dark:bg-[#1c1c1e]/90 backdrop-blur-md border-b border-[#e3e8ee] dark:border-[#38383a] py-3'
+          : 'bg-white dark:bg-[#000000] py-4'
       }`}
     >
       <div className="container-custom flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-600 to-primary-800 flex items-center justify-center shadow-glow group-hover:shadow-gold transition-all duration-300">
-              <span className="text-white font-bold text-lg">V</span>
-            </div>
-            <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-gold-400 border-2 border-dark animate-pulse" />
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <div className="w-9 h-9 rounded-lg bg-[#635bff] flex items-center justify-center">
+            <Globe className="w-5 h-5 text-white" />
           </div>
           <div className="hidden sm:block">
-            <div className="font-display font-bold text-white text-lg leading-none">
-              Vision <span className="text-gold-gradient">Europe</span>
+            <div className="font-semibold text-[#0a2540] dark:text-white text-base leading-none">
+              Vision <span className="text-[#635bff]">Europe</span>
             </div>
-            <div className="text-xs text-gray-400 tracking-widest uppercase">Africa</div>
+            <div className="text-xs text-[#697386] dark:text-[#8e8e93] tracking-wider">Africa</div>
           </div>
         </Link>
 
-        {/* Desktop Nav */}
-        <div className="hidden lg:flex items-center gap-8">
+        {/* Desktop nav */}
+        <div className="hidden lg:flex items-center gap-6">
           {navLinks.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
-              className="text-sm font-medium text-gray-300 hover:text-white transition-colors duration-200 relative group"
+              className="text-sm font-medium text-[#425466] dark:text-[#ebebf5] hover:text-[#0a2540] dark:hover:text-white transition-colors duration-150"
             >
               {label}
-              <span className="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-gold-400 group-hover:w-full transition-all duration-300 rounded-full" />
             </Link>
           ))}
         </div>
 
-        {/* Right Side */}
-        <div className="flex items-center gap-3">
-          {/* Language Switcher */}
+        {/* Right */}
+        <div className="flex items-center gap-2">
+
+          {/* Dark mode toggle */}
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className="p-2 rounded-lg border border-[#e3e8ee] dark:border-[#38383a] text-[#425466] dark:text-[#ebebf5] hover:border-[#cbd5e1] dark:hover:border-[#48484a] hover:text-[#0a2540] dark:hover:text-white transition-all"
+            aria-label="Toggle dark mode"
+          >
+            {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
+
+          {/* Language switcher */}
           <div className="relative">
             <button
               onClick={() => setLangOpen(!langOpen)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg glass text-gray-300 hover:text-white text-sm transition-all duration-200 hover:border-white/20"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#e3e8ee] dark:border-[#38383a] text-sm text-[#425466] dark:text-[#ebebf5] hover:border-[#cbd5e1] dark:hover:border-[#48484a] hover:text-[#0a2540] dark:hover:text-white transition-all"
             >
-              <Globe className="w-4 h-4" />
-              <span className="hidden sm:inline">{currentLang.flag} {currentLang.label}</span>
-              <span className="sm:hidden">{currentLang.flag}</span>
+              <span className="text-base">{currentLang.flag}</span>
+              <span className="hidden sm:inline text-xs">{currentLang.label}</span>
               <ChevronDown className={`w-3 h-3 transition-transform ${langOpen ? 'rotate-180' : ''}`} />
             </button>
             <AnimatePresence>
               {langOpen && (
                 <motion.div
-                  initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                  initial={{ opacity: 0, y: 6, scale: 0.96 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                  exit={{ opacity: 0, y: 6, scale: 0.96 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute right-0 top-full mt-2 w-40 glass-dark rounded-xl border border-white/10 overflow-hidden shadow-premium"
+                  className="absolute right-0 top-full mt-2 w-40 bg-white dark:bg-[#1c1c1e] rounded-xl border border-[#e3e8ee] dark:border-[#38383a] overflow-hidden shadow-sm dark:shadow-lg"
                 >
                   {LANGUAGES.map(lang => (
                     <button
                       key={lang.code}
                       onClick={() => { changeLanguage(lang.code); setLangOpen(false) }}
-                      className={`w-full flex items-center gap-2 px-4 py-2.5 text-sm transition-colors hover:bg-white/10 ${
-                        language === lang.code ? 'text-gold-400 font-semibold' : 'text-gray-300'
+                      className={`w-full flex items-center gap-2 px-4 py-2.5 text-sm transition-colors hover:bg-[#f6f9fc] dark:hover:bg-[#2c2c2e] ${
+                        language === lang.code ? 'text-[#635bff] font-medium' : 'text-[#425466] dark:text-[#ebebf5]'
                       }`}
                     >
                       <span>{lang.flag}</span>
                       <span>{lang.label}</span>
+                      {language === lang.code && (
+                        <span className="ml-auto text-[#635bff]">✓</span>
+                      )}
                     </button>
                   ))}
                 </motion.div>
@@ -115,29 +135,30 @@ export default function Navbar() {
           </div>
 
           {/* CTA */}
-          <Link href="/apply" className="hidden sm:block btn-gold text-sm px-5 py-2.5 rounded-lg font-semibold">
+          <Link href="/apply" className="hidden sm:inline-flex btn-primary text-sm px-4 py-2 rounded-lg font-medium">
             {t('nav.apply')}
           </Link>
 
-          {/* Mobile Toggle */}
+          {/* Mobile toggle */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="lg:hidden p-2 rounded-lg glass text-white"
+            className="lg:hidden p-2 rounded-lg border border-[#e3e8ee] dark:border-[#38383a] text-[#425466] dark:text-[#ebebf5]"
+            aria-label="Menu"
           >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="lg:hidden glass-dark border-t border-white/10 mt-3"
+            transition={{ duration: 0.2 }}
+            className="lg:hidden bg-white dark:bg-[#1c1c1e] border-t border-[#e3e8ee] dark:border-[#38383a]"
           >
             <div className="container-custom py-4 flex flex-col gap-1">
               {navLinks.map(({ href, label }) => (
@@ -145,7 +166,7 @@ export default function Navbar() {
                   key={href}
                   href={href}
                   onClick={() => setMobileOpen(false)}
-                  className="px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-all"
+                  className="px-4 py-3 text-sm text-[#425466] dark:text-[#ebebf5] hover:text-[#0a2540] dark:hover:text-white hover:bg-[#f6f9fc] dark:hover:bg-[#2c2c2e] rounded-lg transition-all"
                 >
                   {label}
                 </Link>
@@ -153,7 +174,7 @@ export default function Navbar() {
               <Link
                 href="/apply"
                 onClick={() => setMobileOpen(false)}
-                className="btn-gold mt-3 justify-center"
+                className="btn-primary mt-3 justify-center"
               >
                 {t('nav.apply')}
               </Link>

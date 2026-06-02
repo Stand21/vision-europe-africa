@@ -1,5 +1,5 @@
 'use client'
-import { useState, useRef, useCallback, useEffect, Suspense } from 'react'
+import React, { useState, useRef, useCallback, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useForm } from 'react-hook-form'
@@ -8,7 +8,13 @@ import toast from 'react-hot-toast'
 import {
   GraduationCap, Briefcase, Plane, Upload, X, CheckCircle,
   ArrowRight, ArrowLeft, FileText, User, Phone, Mail, Globe2,
-  PenLine, Loader2
+  PenLine, Loader2, Code, Stethoscope, BarChart3, Truck,
+  Building2, Megaphone, Brain, Wallet, Car, Wrench, Warehouse,
+  Factory, Lock, Settings, HardHat, Globe, Ship, PlaneTakeoff,
+  Luggage, Camera, Music, Utensils, ShoppingBag, Dumbbell,
+  Palette, Gamepad2, BookMarked, Calculator, FlaskConical,
+  Atom, Dna, Microscope, PenTool as PenToolIcon, Mic,
+  DollarSign, Clock, TrendingUp, Heart
 } from 'lucide-react'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
@@ -18,40 +24,58 @@ type Profile = 'student' | 'worker' | 'visitor' | null
 
 // ── Study Fields ─────────────────────────────────────────────────────────────
 const STUDY_FIELDS = [
-  { id: 'cs', name: 'Computer Science', icon: '💻', tuition: '€0–500/yr', duration: '3–5 yrs', salary: '€45,000/yr', countries: ['🇩🇪', '🇵🇹'] },
-  { id: 'cyber', name: 'Cybersecurity', icon: '🔐', tuition: '€500–1500/yr', duration: '3–4 yrs', salary: '€55,000/yr', countries: ['🇩🇪', '🇵🇹'] },
-  { id: 'med', name: 'Medicine', icon: '🏥', tuition: '€1,000–5,000/yr', duration: '6 yrs', salary: '€70,000/yr', countries: ['🇩🇪', '🇵🇹'] },
-  { id: 'biz', name: 'Business Administration', icon: '📊', tuition: '€0–2,000/yr', duration: '3 yrs', salary: '€40,000/yr', countries: ['🇩🇪', '🇵🇹'] },
-  { id: 'log', name: 'Logistics', icon: '🚚', tuition: '€0–800/yr', duration: '3 yrs', salary: '€42,000/yr', countries: ['🇩🇪'] },
-  { id: 'civil', name: 'Civil Engineering', icon: '🏗️', tuition: '€0–600/yr', duration: '4–5 yrs', salary: '€52,000/yr', countries: ['🇩🇪', '🇵🇹'] },
-  { id: 'mkt', name: 'Marketing', icon: '📢', tuition: '€0–1,500/yr', duration: '3 yrs', salary: '€38,000/yr', countries: ['🇩🇪', '🇵🇹'] },
-  { id: 'ai', name: 'Artificial Intelligence', icon: '🤖', tuition: '€0–1,000/yr', duration: '4 yrs', salary: '€65,000/yr', countries: ['🇩🇪'] },
-  { id: 'fin', name: 'Finance', icon: '💰', tuition: '€500–2,000/yr', duration: '3–4 yrs', salary: '€48,000/yr', countries: ['🇩🇪', '🇵🇹'] },
-  { id: 'trade', name: 'International Trade', icon: '🌍', tuition: '€0–1,500/yr', duration: '3 yrs', salary: '€44,000/yr', countries: ['🇩🇪', '🇵🇹'] },
+  { id: 'cs', name: 'Computer Science', icon: Code, tuition: '€0–500/yr', duration: '3–5 yrs', salary: '€45,000/yr', countries: ['DE', 'PT'] },
+  { id: 'cyber', name: 'Cybersecurity', icon: Lock, tuition: '€500–1500/yr', duration: '3–4 yrs', salary: '€55,000/yr', countries: ['DE', 'PT'] },
+  { id: 'med', name: 'Medicine', icon: Stethoscope, tuition: '€1,000–5,000/yr', duration: '6 yrs', salary: '€70,000/yr', countries: ['DE', 'PT'] },
+  { id: 'biz', name: 'Business Administration', icon: BarChart3, tuition: '€0–2,000/yr', duration: '3 yrs', salary: '€40,000/yr', countries: ['DE', 'PT'] },
+  { id: 'log', name: 'Logistics', icon: Truck, tuition: '€0–800/yr', duration: '3 yrs', salary: '€42,000/yr', countries: ['DE'] },
+  { id: 'civil', name: 'Civil Engineering', icon: Building2, tuition: '€0–600/yr', duration: '4–5 yrs', salary: '€52,000/yr', countries: ['DE', 'PT'] },
+  { id: 'mkt', name: 'Marketing', icon: Megaphone, tuition: '€0–1,500/yr', duration: '3 yrs', salary: '€38,000/yr', countries: ['DE', 'PT'] },
+  { id: 'ai', name: 'Artificial Intelligence', icon: Brain, tuition: '€0–1,000/yr', duration: '4 yrs', salary: '€65,000/yr', countries: ['DE'] },
+  { id: 'fin', name: 'Finance', icon: Wallet, tuition: '€500–2,000/yr', duration: '3–4 yrs', salary: '€48,000/yr', countries: ['DE', 'PT'] },
+  { id: 'trade', name: 'International Trade', icon: Globe, tuition: '€0–1,500/yr', duration: '3 yrs', salary: '€44,000/yr', countries: ['DE', 'PT'] },
 ]
+
+const STUDY_ICONS: Record<string, React.ElementType> = {
+  cs: Code, cyber: Lock, med: Stethoscope, biz: BarChart3,
+  log: Truck, civil: Building2, mkt: Megaphone, ai: Brain,
+  fin: Wallet, trade: Globe,
+}
+
+const PROFESSION_ICONS: Record<string, React.ElementType> = {
+  dev: Code, driver: Car, welder: Wrench, nurse: Stethoscope,
+  warehouse: Warehouse, factory: Factory, security: Lock,
+  mechanic: Settings, construction: HardHat, delivery: Luggage,
+  hospitality: Utensils,
+}
+
+const VISITOR_ICONS: Record<string, React.ElementType> = {
+  tourism: Camera, family: Heart, business: Briefcase,
+  conference: Mic, discovery: Globe,
+}
 
 // ── Professions ───────────────────────────────────────────────────────────────
 const PROFESSIONS = [
-  { id: 'dev', name: 'Software Developer', icon: '💻', salary: '€45,000–80,000', demand: 'Very High', hours: '40h/week', countries: ['🇩🇪', '🇵🇹'] },
-  { id: 'driver', name: 'Driver', icon: '🚗', salary: '€28,000–38,000', demand: 'High', hours: '40–50h/week', countries: ['🇩🇪', '🇵🇹'] },
-  { id: 'welder', name: 'Welder', icon: '🔧', salary: '€30,000–45,000', demand: 'High', hours: '40h/week', countries: ['🇩🇪'] },
-  { id: 'nurse', name: 'Nurse', icon: '🏥', salary: '€35,000–55,000', demand: 'Very High', hours: '38–40h/week', countries: ['🇩🇪', '🇵🇹'] },
-  { id: 'warehouse', name: 'Warehouse Worker', icon: '📦', salary: '€25,000–35,000', demand: 'High', hours: '40h/week', countries: ['🇩🇪', '🇵🇹'] },
-  { id: 'factory', name: 'Factory Worker', icon: '🏭', salary: '€24,000–36,000', demand: 'High', hours: '40h/week', countries: ['🇩🇪'] },
-  { id: 'security', name: 'Security Agent', icon: '🔒', salary: '€22,000–32,000', demand: 'Medium', hours: '40–48h/week', countries: ['🇩🇪', '🇵🇹'] },
-  { id: 'mechanic', name: 'Mechanic', icon: '⚙️', salary: '€28,000–45,000', demand: 'High', hours: '40h/week', countries: ['🇩🇪', '🇵🇹'] },
-  { id: 'construction', name: 'Construction Worker', icon: '🏗️', salary: '€26,000–40,000', demand: 'Very High', hours: '40–50h/week', countries: ['🇩🇪', '🇵🇹'] },
-  { id: 'delivery', name: 'Delivery Driver', icon: '📬', salary: '€24,000–35,000', demand: 'Very High', hours: '40–50h/week', countries: ['🇩🇪', '🇵🇹'] },
-  { id: 'hospitality', name: 'Hospitality Worker', icon: '🏨', salary: '€20,000–32,000', demand: 'High', hours: '40h/week', countries: ['🇵🇹', '🇩🇪'] },
+  { id: 'dev', name: 'Software Developer', icon: Code, salary: '€45,000–80,000', demand: 'Very High', hours: '40h/week', countries: ['DE', 'PT'] },
+  { id: 'driver', name: 'Driver', icon: Car, salary: '€28,000–38,000', demand: 'High', hours: '40–50h/week', countries: ['DE', 'PT'] },
+  { id: 'welder', name: 'Welder', icon: Wrench, salary: '€30,000–45,000', demand: 'High', hours: '40h/week', countries: ['DE'] },
+  { id: 'nurse', name: 'Nurse', icon: Stethoscope, salary: '€35,000–55,000', demand: 'Very High', hours: '38–40h/week', countries: ['DE', 'PT'] },
+  { id: 'warehouse', name: 'Warehouse Worker', icon: Warehouse, salary: '€25,000–35,000', demand: 'High', hours: '40h/week', countries: ['DE', 'PT'] },
+  { id: 'factory', name: 'Factory Worker', icon: Factory, salary: '€24,000–36,000', demand: 'High', hours: '40h/week', countries: ['DE'] },
+  { id: 'security', name: 'Security Agent', icon: Lock, salary: '€22,000–32,000', demand: 'Medium', hours: '40–48h/week', countries: ['DE', 'PT'] },
+  { id: 'mechanic', name: 'Mechanic', icon: Settings, salary: '€28,000–45,000', demand: 'High', hours: '40h/week', countries: ['DE', 'PT'] },
+  { id: 'construction', name: 'Construction Worker', icon: HardHat, salary: '€26,000–40,000', demand: 'Very High', hours: '40–50h/week', countries: ['DE', 'PT'] },
+  { id: 'delivery', name: 'Delivery Driver', icon: Luggage, salary: '€24,000–35,000', demand: 'Very High', hours: '40–50h/week', countries: ['DE', 'PT'] },
+  { id: 'hospitality', name: 'Hospitality Worker', icon: Utensils, salary: '€20,000–32,000', demand: 'High', hours: '40h/week', countries: ['PT', 'DE'] },
 ]
 
 // ── Visitor Categories ────────────────────────────────────────────────────────
 const VISITOR_CATEGORIES = [
-  { id: 'tourism', name: 'Tourism', icon: '🗺️', desc: 'Explore Europe\'s most beautiful cities and landmarks.' },
-  { id: 'family', name: 'Family Visit', icon: '👨‍👩‍👧', desc: 'Visit family members residing in Europe.' },
-  { id: 'business', name: 'Business Visit', icon: '💼', desc: 'Attend meetings, conferences or sign contracts.' },
-  { id: 'conference', name: 'Conferences', icon: '🎤', desc: 'Participate in academic or professional conferences.' },
-  { id: 'discovery', name: 'European Discovery', icon: '🌍', desc: 'Multi-country exploration tour of Europe.' },
+  { id: 'tourism', name: 'Tourism', icon: Camera, desc: 'Explore Europe\'s most beautiful cities and landmarks.' },
+  { id: 'family', name: 'Family Visit', icon: Heart, desc: 'Visit family members residing in Europe.' },
+  { id: 'business', name: 'Business Visit', icon: Briefcase, desc: 'Attend meetings, conferences or sign contracts.' },
+  { id: 'conference', name: 'Conferences', icon: Mic, desc: 'Participate in academic or professional conferences.' },
+  { id: 'discovery', name: 'European Discovery', icon: Globe, desc: 'Multi-country exploration tour of Europe.' },
 ]
 
 // ── File Uploader ─────────────────────────────────────────────────────────────
@@ -78,28 +102,28 @@ function FileUploader({ label, onFiles }: { label: string; onFiles: (f: File[]) 
 
   return (
     <div className="space-y-3">
-      <label className="block text-sm font-medium text-gray-300">{label}</label>
+      <label className="block text-sm font-medium text-[#425466] dark:text-[#ebebf5] mb-1.5">{label}</label>
       <div
         {...getRootProps()}
         className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all duration-200 ${
-          isDragActive ? 'border-primary-500 bg-primary-900/20' : 'border-white/20 hover:border-white/40 hover:bg-white/5'
+          isDragActive ? 'border-[#635bff] bg-[#f6f9fc] dark:bg-[#2c2c2e]' : 'border-[#e3e8ee] dark:border-[#38383a] hover:border-[#cbd5e1] dark:hover:border-[#48484a] hover:bg-[#f6f9fc] dark:hover:bg-[#2c2c2e]'
         }`}
       >
         <input {...getInputProps()} />
-        <Upload className="w-8 h-8 text-gray-500 mx-auto mb-2" />
-        <p className="text-gray-400 text-sm">Drag & drop files here, or click to select</p>
-        <p className="text-gray-600 text-xs mt-1">PDF, JPG, PNG — max 10MB</p>
+        <Upload className="w-8 h-8 text-[#697386] dark:text-[#8e8e93] mx-auto mb-2" />
+        <p className="text-sm text-[#425466] dark:text-[#ebebf5]">Drag & drop files here, or click to select</p>
+        <p className="text-xs text-[#697386] dark:text-[#8e8e93] mt-1">PDF, JPG, PNG — max 10MB</p>
       </div>
       {files.length > 0 && (
         <div className="space-y-2">
           {files.map((f, i) => (
-            <div key={i} className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-white/5 text-sm">
+            <div key={i} className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-[#f6f9fc] dark:bg-[#2c2c2e] text-sm border border-[#e3e8ee] dark:border-[#38383a]">
               <div className="flex items-center gap-2 overflow-hidden">
-                <FileText className="w-4 h-4 text-primary-400 flex-shrink-0" />
-                <span className="text-gray-300 truncate">{f.name}</span>
-                <span className="text-gray-500 text-xs flex-shrink-0">({(f.size / 1024).toFixed(0)}KB)</span>
+                <FileText className="w-4 h-4 text-[#635bff] flex-shrink-0" />
+                <span className="text-[#0a2540] dark:text-white truncate">{f.name}</span>
+                <span className="text-[#697386] dark:text-[#8e8e93] text-xs flex-shrink-0">({(f.size / 1024).toFixed(0)}KB)</span>
               </div>
-              <button onClick={() => remove(i)} className="text-gray-500 hover:text-red-400 transition-colors flex-shrink-0">
+              <button onClick={() => remove(i)} className="text-[#697386] dark:text-[#8e8e93] hover:text-[#ef4444] transition-colors flex-shrink-0">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -136,7 +160,7 @@ function SignaturePad({ onSave }: { onSave: (dataUrl: string) => void }) {
     const y = 'touches' in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top
     ctx.lineWidth = 2
     ctx.lineCap = 'round'
-    ctx.strokeStyle = '#c9a227'
+    ctx.strokeStyle = '#635bff'
     ctx.lineTo(x, y)
     ctx.stroke()
     setHasSignature(true)
@@ -157,7 +181,7 @@ function SignaturePad({ onSave }: { onSave: (dataUrl: string) => void }) {
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-300">Electronic Signature *</label>
+      <label className="block text-sm font-medium text-[#425466] dark:text-[#ebebf5] mb-1.5">Electronic Signature *</label>
       <div className="relative">
         <canvas
           ref={canvasRef}
@@ -170,25 +194,24 @@ function SignaturePad({ onSave }: { onSave: (dataUrl: string) => void }) {
           onTouchStart={startDraw}
           onTouchMove={draw}
           onTouchEnd={stopDraw}
-          className="w-full rounded-xl border border-white/20 cursor-crosshair touch-none"
-          style={{ background: 'rgba(255,255,255,0.03)' }}
+          className="w-full rounded-xl border border-[#e3e8ee] dark:border-[#38383a] cursor-crosshair touch-none bg-white dark:bg-[#1c1c1e]"
         />
         {!hasSignature && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <span className="text-gray-600 text-sm flex items-center gap-2">
+            <span className="text-sm text-[#697386] dark:text-[#8e8e93] flex items-center gap-2">
               <PenLine className="w-4 h-4" /> Sign here
             </span>
           </div>
         )}
       </div>
-      <button type="button" onClick={clear} className="text-xs text-gray-500 hover:text-red-400 transition-colors">
+      <button type="button" onClick={clear} className="text-xs text-[#697386] dark:text-[#8e8e93] hover:text-[#ef4444] transition-colors">
         Clear signature
       </button>
     </div>
   )
 }
 
-// ── Student Form ───────────────────────────────────────────────────────────────
+// ── Student Form ──────────────────────────────────────────────────────────────
 function StudentForm({ selectedField }: { selectedField: string }) {
   const { register, handleSubmit, formState: { errors } } = useForm()
   const [files, setFiles] = useState<File[]>([])
@@ -206,15 +229,13 @@ function StudentForm({ selectedField }: { selectedField: string }) {
       formData.append('signature', signature)
       files.forEach(f => formData.append('documents', f))
       await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/applications`, formData)
-      toast.success('Application submitted! We\'ll contact you within 48 hours. 🎉')
+      toast.success('Application submitted! We\'ll contact you within 48 hours.')
     } catch {
       toast.error('Submission failed. Please try again.')
     } finally {
       setSubmitting(false)
     }
   }
-
-  const inputClass = `input-premium ${errors ? '' : ''}`
 
   return (
     <motion.form
@@ -223,36 +244,36 @@ function StudentForm({ selectedField }: { selectedField: string }) {
       onSubmit={handleSubmit(onSubmit)}
       className="space-y-6"
     >
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid md:grid-cols-2 gap-5">
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">Full Name *</label>
-          <input {...register('fullName', { required: true })} className="input-premium" placeholder="Jean-Baptiste Kabila" />
-          {errors.fullName && <span className="text-red-400 text-xs mt-1">Required</span>}
+          <label className="block text-sm font-medium text-[#425466] mb-1.5">Full Name *</label>
+          <input {...register('fullName', { required: true })} className="input" placeholder="Jean-Baptiste Kabila" />
+          {errors.fullName && <span className="text-xs text-[#ef4444] mt-1">Required</span>}
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">Email *</label>
-          <input {...register('email', { required: true, pattern: /^\S+@\S+\.\S+$/ })} type="email" className="input-premium" placeholder="jean@example.com" />
-          {errors.email && <span className="text-red-400 text-xs mt-1">Valid email required</span>}
+          <label className="block text-sm font-medium text-[#425466] mb-1.5">Email *</label>
+          <input {...register('email', { required: true, pattern: /^\S+@\S+\.\S+$/ })} type="email" className="input" placeholder="jean@example.com" />
+          {errors.email && <span className="text-xs text-[#ef4444] mt-1">Valid email required</span>}
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">Phone *</label>
-          <input {...register('phone', { required: true })} className="input-premium" placeholder="+243 000 000 000" />
+          <label className="block text-sm font-medium text-[#425466] mb-1.5">Phone *</label>
+          <input {...register('phone', { required: true })} className="input" placeholder="+243 000 000 000" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">WhatsApp *</label>
-          <input {...register('whatsapp', { required: true })} className="input-premium" placeholder="+243 000 000 000" />
+          <label className="block text-sm font-medium text-[#425466] mb-1.5">WhatsApp *</label>
+          <input {...register('whatsapp', { required: true })} className="input" placeholder="+243 000 000 000" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">Country *</label>
-          <input {...register('country', { required: true })} className="input-premium" placeholder="DR Congo" />
+          <label className="block text-sm font-medium text-[#425466] mb-1.5">Country *</label>
+          <input {...register('country', { required: true })} className="input" placeholder="DR Congo" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">City *</label>
-          <input {...register('city', { required: true })} className="input-premium" placeholder="Kinshasa" />
+          <label className="block text-sm font-medium text-[#425466] mb-1.5">City *</label>
+          <input {...register('city', { required: true })} className="input" placeholder="Kinshasa" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">Current Education Level *</label>
-          <select {...register('educationLevel', { required: true })} className="input-premium bg-dark-200">
+          <label className="block text-sm font-medium text-[#425466] mb-1.5">Current Education Level *</label>
+          <select {...register('educationLevel', { required: true })} className="input">
             <option value="">Select level</option>
             <option>High School</option>
             <option>Bachelor's (ongoing)</option>
@@ -262,8 +283,8 @@ function StudentForm({ selectedField }: { selectedField: string }) {
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">Target Degree *</label>
-          <select {...register('targetDegree', { required: true })} className="input-premium bg-dark-200">
+          <label className="block text-sm font-medium text-[#425466] mb-1.5">Target Degree *</label>
+          <select {...register('targetDegree', { required: true })} className="input">
             <option value="">Select degree</option>
             <option>Bachelor</option>
             <option>Master</option>
@@ -271,33 +292,33 @@ function StudentForm({ selectedField }: { selectedField: string }) {
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">Destination Country *</label>
-          <select {...register('destination', { required: true })} className="input-premium bg-dark-200">
+          <label className="block text-sm font-medium text-[#425466] mb-1.5">Destination Country *</label>
+          <select {...register('destination', { required: true })} className="input">
             <option value="">Select destination</option>
-            <option value="germany">🇩🇪 Germany</option>
-            <option value="portugal">🇵🇹 Portugal</option>
+            <option value="germany">Germany</option>
+            <option value="portugal">Portugal</option>
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">Available Budget (€) *</label>
-          <input {...register('budget', { required: true })} className="input-premium" placeholder="e.g. 5,000" />
+          <label className="block text-sm font-medium text-[#425466] mb-1.5">Available Budget (€) *</label>
+          <input {...register('budget', { required: true })} className="input" placeholder="e.g. 5,000" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">Passport/ID Number *</label>
-          <input {...register('idNumber', { required: true })} className="input-premium" placeholder="AB123456" />
+          <label className="block text-sm font-medium text-[#425466] mb-1.5">Passport/ID Number *</label>
+          <input {...register('idNumber', { required: true })} className="input" placeholder="AB123456" />
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-1.5">Motivation Letter</label>
-        <textarea {...register('motivationLetter')} rows={4} className="input-premium resize-none" placeholder="Explain why you want to study in Europe and what your goals are..." />
+        <label className="block text-sm font-medium text-[#425466] mb-1.5">Motivation Letter</label>
+        <textarea {...register('motivationLetter')} rows={4} className="input resize-none" placeholder="Explain why you want to study in Europe and what your goals are..." />
       </div>
 
       <FileUploader label="Upload Documents (Passport, ID, Diplomas)" onFiles={setFiles} />
       <SignaturePad onSave={setSignature} />
 
-      <button type="submit" disabled={submitting} className="w-full btn-gold justify-center text-base">
-        {submitting ? <><Loader2 className="w-5 h-5 animate-spin" /> Submitting...</> : <>Submit Application <ArrowRight className="w-5 h-5" /></>}
+      <button type="submit" disabled={submitting} className="btn-primary w-full justify-center">
+        {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</> : <>Submit Application <ArrowRight className="w-4 h-4" /></>}
       </button>
     </motion.form>
   )
@@ -321,7 +342,7 @@ function WorkerForm({ selectedJob }: { selectedJob: string }) {
       formData.append('signature', signature)
       files.forEach(f => formData.append('documents', f))
       await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/applications`, formData)
-      toast.success('Application submitted! Our team will contact you within 48 hours. 🎉')
+      toast.success('Application submitted! Our team will contact you within 48 hours.')
     } catch {
       toast.error('Submission failed. Please try again.')
     } finally {
@@ -336,38 +357,38 @@ function WorkerForm({ selectedJob }: { selectedJob: string }) {
       onSubmit={handleSubmit(onSubmit)}
       className="space-y-6"
     >
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid md:grid-cols-2 gap-5">
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">Full Name *</label>
-          <input {...register('fullName', { required: true })} className="input-premium" placeholder="Amara Diallo" />
+          <label className="block text-sm font-medium text-[#425466] mb-1.5">Full Name *</label>
+          <input {...register('fullName', { required: true })} className="input" placeholder="Amara Diallo" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">Email *</label>
-          <input {...register('email', { required: true })} type="email" className="input-premium" placeholder="amara@example.com" />
+          <label className="block text-sm font-medium text-[#425466] mb-1.5">Email *</label>
+          <input {...register('email', { required: true })} type="email" className="input" placeholder="amara@example.com" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">Phone *</label>
-          <input {...register('phone', { required: true })} className="input-premium" placeholder="+243 000 000 000" />
+          <label className="block text-sm font-medium text-[#425466] mb-1.5">Phone *</label>
+          <input {...register('phone', { required: true })} className="input" placeholder="+243 000 000 000" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">WhatsApp *</label>
-          <input {...register('whatsapp', { required: true })} className="input-premium" placeholder="+243 000 000 000" />
+          <label className="block text-sm font-medium text-[#425466] mb-1.5">WhatsApp *</label>
+          <input {...register('whatsapp', { required: true })} className="input" placeholder="+243 000 000 000" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">Years of Experience *</label>
-          <input {...register('experience', { required: true })} className="input-premium" placeholder="5" type="number" min="0" />
+          <label className="block text-sm font-medium text-[#425466] mb-1.5">Years of Experience *</label>
+          <input {...register('experience', { required: true })} className="input" placeholder="5" type="number" min="0" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">Destination *</label>
-          <select {...register('destination', { required: true })} className="input-premium bg-dark-200">
+          <label className="block text-sm font-medium text-[#425466] mb-1.5">Destination *</label>
+          <select {...register('destination', { required: true })} className="input">
             <option value="">Select destination</option>
-            <option value="germany">🇩🇪 Germany</option>
-            <option value="portugal">🇵🇹 Portugal</option>
+            <option value="germany">Germany</option>
+            <option value="portugal">Portugal</option>
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">Preferred Work Hours</label>
-          <select {...register('workHours')} className="input-premium bg-dark-200">
+          <label className="block text-sm font-medium text-[#425466] mb-1.5">Preferred Work Hours</label>
+          <select {...register('workHours')} className="input">
             <option>Full-time (40h/week)</option>
             <option>Part-time (20h/week)</option>
             <option>Flexible</option>
@@ -375,24 +396,24 @@ function WorkerForm({ selectedJob }: { selectedJob: string }) {
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">Expected Salary (€/year)</label>
-          <input {...register('expectedSalary')} className="input-premium" placeholder="e.g. 35,000" />
+          <label className="block text-sm font-medium text-[#425466] mb-1.5">Expected Salary (€/year)</label>
+          <input {...register('expectedSalary')} className="input" placeholder="e.g. 35,000" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">Immigration Budget (€) *</label>
-          <input {...register('budget', { required: true })} className="input-premium" placeholder="e.g. 3,000" />
+          <label className="block text-sm font-medium text-[#425466] mb-1.5">Immigration Budget (€) *</label>
+          <input {...register('budget', { required: true })} className="input" placeholder="e.g. 3,000" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">Passport/ID Number *</label>
-          <input {...register('idNumber', { required: true })} className="input-premium" placeholder="AB123456" />
+          <label className="block text-sm font-medium text-[#425466] mb-1.5">Passport/ID Number *</label>
+          <input {...register('idNumber', { required: true })} className="input" placeholder="AB123456" />
         </div>
       </div>
 
       <FileUploader label="Upload CV, Passport & Supporting Documents" onFiles={setFiles} />
       <SignaturePad onSave={setSignature} />
 
-      <button type="submit" disabled={submitting} className="w-full btn-gold justify-center text-base">
-        {submitting ? <><Loader2 className="w-5 h-5 animate-spin" /> Submitting...</> : <>Submit Application <ArrowRight className="w-5 h-5" /></>}
+      <button type="submit" disabled={submitting} className="btn-primary w-full justify-center">
+        {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</> : <>Submit Application <ArrowRight className="w-4 h-4" /></>}
       </button>
     </motion.form>
   )
@@ -413,7 +434,7 @@ function VisitorForm({ selectedCategory }: { selectedCategory: string }) {
       formData.append('category', selectedCategory)
       files.forEach(f => formData.append('documents', f))
       await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/applications`, formData)
-      toast.success('Visitor application submitted! We\'ll contact you shortly. ✈️')
+      toast.success('Visitor application submitted! We\'ll contact you shortly.')
     } catch {
       toast.error('Submission failed. Please try again.')
     } finally {
@@ -428,27 +449,27 @@ function VisitorForm({ selectedCategory }: { selectedCategory: string }) {
       onSubmit={handleSubmit(onSubmit)}
       className="space-y-6"
     >
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid md:grid-cols-2 gap-5">
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">Full Name *</label>
-          <input {...register('fullName', { required: true })} className="input-premium" placeholder="Full Name" />
+          <label className="block text-sm font-medium text-[#425466] mb-1.5">Full Name *</label>
+          <input {...register('fullName', { required: true })} className="input" placeholder="Full Name" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">Email *</label>
-          <input {...register('email', { required: true })} type="email" className="input-premium" placeholder="email@example.com" />
+          <label className="block text-sm font-medium text-[#425466] mb-1.5">Email *</label>
+          <input {...register('email', { required: true })} type="email" className="input" placeholder="email@example.com" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">Destination Country *</label>
-          <select {...register('destination', { required: true })} className="input-premium bg-dark-200">
+          <label className="block text-sm font-medium text-[#425466] mb-1.5">Destination Country *</label>
+          <select {...register('destination', { required: true })} className="input">
             <option value="">Select</option>
-            <option value="germany">🇩🇪 Germany</option>
-            <option value="portugal">🇵🇹 Portugal</option>
+            <option value="germany">Germany</option>
+            <option value="portugal">Portugal</option>
             <option value="multiple">Multiple Countries</option>
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">Planned Duration *</label>
-          <select {...register('duration', { required: true })} className="input-premium bg-dark-200">
+          <label className="block text-sm font-medium text-[#425466] mb-1.5">Planned Duration *</label>
+          <select {...register('duration', { required: true })} className="input">
             <option value="">Select</option>
             <option>Less than 2 weeks</option>
             <option>2–4 weeks</option>
@@ -457,22 +478,22 @@ function VisitorForm({ selectedCategory }: { selectedCategory: string }) {
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">Estimated Budget (€)</label>
-          <input {...register('budget')} className="input-premium" placeholder="e.g. 2,000" />
+          <label className="block text-sm font-medium text-[#425466] mb-1.5">Estimated Budget (€)</label>
+          <input {...register('budget')} className="input" placeholder="e.g. 2,000" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">Passport Number *</label>
-          <input {...register('passportNumber', { required: true })} className="input-premium" placeholder="AB123456" />
+          <label className="block text-sm font-medium text-[#425466] mb-1.5">Passport Number *</label>
+          <input {...register('passportNumber', { required: true })} className="input" placeholder="AB123456" />
         </div>
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-1.5">Purpose of Visit</label>
-        <textarea {...register('purpose')} rows={3} className="input-premium resize-none" placeholder="Describe the purpose of your visit..." />
+        <label className="block text-sm font-medium text-[#425466] mb-1.5">Purpose of Visit</label>
+        <textarea {...register('purpose')} rows={3} className="input resize-none" placeholder="Describe the purpose of your visit..." />
       </div>
       <FileUploader label="Upload Passport" onFiles={setFiles} />
 
-      <button type="submit" disabled={submitting} className="w-full btn-gold justify-center text-base">
-        {submitting ? <><Loader2 className="w-5 h-5 animate-spin" /> Submitting...</> : <>Submit Application <ArrowRight className="w-5 h-5" /></>}
+      <button type="submit" disabled={submitting} className="btn-primary w-full justify-center">
+        {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</> : <>Submit Application <ArrowRight className="w-4 h-4" /></>}
       </button>
     </motion.form>
   )
@@ -492,38 +513,38 @@ function ApplyContent() {
   )
 
   const profiles = [
-    { key: 'student' as Profile, icon: GraduationCap, label: 'Student', desc: 'Study at top European universities', color: 'text-primary-400', border: 'hover:border-primary-500/60' },
-    { key: 'worker' as Profile, icon: Briefcase, label: 'Worker', desc: 'Access high-demand professions in Europe', color: 'text-gold-400', border: 'hover:border-gold-500/60' },
-    { key: 'visitor' as Profile, icon: Plane, label: 'Visitor', desc: 'Tourism, business or family visits', color: 'text-green-400', border: 'hover:border-green-500/60' },
+    { key: 'student' as Profile, icon: GraduationCap, label: 'Student', desc: 'Study at top European universities' },
+    { key: 'worker' as Profile, icon: Briefcase, label: 'Worker', desc: 'Access high-demand professions in Europe' },
+    { key: 'visitor' as Profile, icon: Plane, label: 'Visitor', desc: 'Tourism, business or family visits' },
   ]
 
   return (
-    <div className="min-h-screen bg-hero pt-28 pb-20">
-      <div className="container-custom max-w-5xl">
+    <div className="min-h-screen bg-white dark:bg-black pt-20 pb-16">
+      <div className="container-custom max-w-4xl">
         {/* Header */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
-          <h1 className="font-display text-4xl md:text-5xl font-bold text-white mb-4">
-            Start Your <span className="text-gold-gradient">Application</span>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
+          <h1 className="text-3xl md:text-4xl font-bold text-[#0a2540] dark:text-white mb-3">
+            Start Your <span className="text-[#635bff]">Application</span>
           </h1>
-          <p className="text-gray-400 max-w-xl mx-auto">
+          <p className="text-[#425466] dark:text-[#ebebf5] max-w-xl mx-auto">
             Complete the form below. Our team will review your application and contact you within 48 hours.
           </p>
         </motion.div>
 
         {/* Step Indicator */}
-        <div className="flex items-center justify-center gap-3 mb-12">
+        <div className="flex items-center justify-center gap-2 mb-10">
           {['Profile', 'Choose', 'Apply'].map((s, i) => {
             const active = i === (['profile', 'select', 'form'] as const).indexOf(step)
             const done = i < (['profile', 'select', 'form'] as const).indexOf(step)
             return (
-              <div key={s} className="flex items-center gap-3">
-                <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all ${
-                  done ? 'bg-green-600 text-white' : active ? 'bg-gold-500 text-dark' : 'bg-white/10 text-gray-500'
+              <div key={s} className="flex items-center gap-2">
+                <div className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-semibold transition-all ${
+                  done ? 'bg-[#635bff] text-white' : active ? 'bg-[#635bff] text-white' : 'bg-[#f6f9fc] dark:bg-[#2c2c2e] text-[#697386] dark:text-[#8e8e93] border border-[#e3e8ee] dark:border-[#38383a]'
                 }`}>
-                  {done ? <CheckCircle className="w-4 h-4" /> : i + 1}
+                  {done ? <CheckCircle className="w-3.5 h-3.5" /> : i + 1}
                 </div>
-                <span className={`text-sm ${active ? 'text-white font-medium' : 'text-gray-500'}`}>{s}</span>
-                {i < 2 && <div className="w-12 h-0.5 bg-white/10" />}
+                <span className={`text-xs font-medium ${active ? 'text-[#0a2540] dark:text-white' : 'text-[#697386] dark:text-[#8e8e93]'}`}>{s}</span>
+                {i < 2 && <div className="w-8 h-px bg-[#e3e8ee] dark:bg-[#38383a]" />}
               </div>
             )
           })}
@@ -532,19 +553,19 @@ function ApplyContent() {
         <AnimatePresence mode="wait">
           {/* STEP 1: Profile Selection */}
           {step === 'profile' && (
-            <motion.div key="profile" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
-              <div className="grid md:grid-cols-3 gap-6">
+            <motion.div key="profile" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+              <div className="grid md:grid-cols-3 gap-4">
                 {profiles.map(p => (
                   <button
                     key={p.key}
                     onClick={() => { setProfile(p.key); setStep('select') }}
-                    className={`glass-card rounded-2xl p-8 text-left border border-white/10 ${p.border} transition-all duration-300 group`}
+                    className="card p-6 text-left hover:border-[#635bff] transition-all group"
                   >
-                    <div className={`w-14 h-14 rounded-2xl bg-dark-200 flex items-center justify-center mb-5 ${p.color} group-hover:scale-110 transition-transform`}>
-                      <p.icon className="w-7 h-7" />
+                    <div className="w-11 h-11 rounded-lg bg-[#f6f9fc] dark:bg-[#2c2c2e] flex items-center justify-center mb-4 group-hover:bg-[#635bff] group-hover:text-white transition-colors">
+                      <p.icon className="w-5 h-5 text-[#635bff] group-hover:text-white transition-colors" />
                     </div>
-                    <h3 className="text-white font-bold text-xl mb-2">{p.label}</h3>
-                    <p className="text-gray-400 text-sm">{p.desc}</p>
+                    <h3 className="font-semibold text-[#0a2540] dark:text-white mb-1">{p.label}</h3>
+                    <p className="text-sm text-[#425466] dark:text-[#ebebf5]">{p.desc}</p>
                   </button>
                 ))}
               </div>
@@ -553,27 +574,28 @@ function ApplyContent() {
 
           {/* STEP 2: Select Field/Job/Category */}
           {step === 'select' && profile === 'student' && (
-            <motion.div key="student-select" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
+            <motion.div key="student-select" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
               <div className="flex items-center gap-3 mb-6">
-                <button onClick={() => setStep('profile')} className="flex items-center gap-1 text-gray-400 hover:text-white text-sm transition-colors">
+                <button onClick={() => setStep('profile')} className="flex items-center gap-1 text-[#635bff] hover:text-[#4b45c6] text-sm font-medium transition-colors">
                   <ArrowLeft className="w-4 h-4" /> Back
                 </button>
-                <h2 className="text-white font-bold text-xl">Select your study field</h2>
+                <h2 className="font-semibold text-[#0a2540] dark:text-white">Select your study field</h2>
               </div>
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {STUDY_FIELDS.map(f => (
                   <button
                     key={f.id}
                     onClick={() => { setSelectedField(f.name); setStep('form') }}
-                    className="glass-card rounded-xl p-5 text-left hover:border-primary-500/60 border border-white/10 transition-all group"
+                    className="card p-5 text-left hover:border-[#635bff] transition-all group"
                   >
-                    <div className="text-3xl mb-3">{f.icon}</div>
-                    <h4 className="text-white font-semibold text-sm mb-2">{f.name}</h4>
-                    <div className="space-y-1 text-xs text-gray-500">
-                      <div>💰 {f.tuition}</div>
-                      <div>⏱️ {f.duration}</div>
-                      <div>📈 {f.salary} avg</div>
-                      <div className="flex gap-1">{f.countries.map((c,i) => <span key={i}>{c}</span>)}</div>
+                    <div className="w-10 h-10 rounded-lg bg-[#f6f9fc] dark:bg-[#2c2c2e] flex items-center justify-center mb-3">
+                      {React.createElement(f.icon as React.ElementType, { className: 'w-5 h-5 text-[#635bff]' })}
+                    </div>
+                    <h4 className="font-medium text-sm text-[#0a2540] dark:text-white mb-2">{f.name}</h4>
+                    <div className="space-y-1 text-xs text-[#697386] dark:text-[#8e8e93]">
+                      <div className="flex items-center gap-1.5"><DollarSign className="w-3 h-3" /> {f.tuition}</div>
+                      <div className="flex items-center gap-1.5"><Clock className="w-3 h-3" /> {f.duration}</div>
+                      <div className="flex items-center gap-1.5"><TrendingUp className="w-3 h-3" /> {f.salary} avg</div>
                     </div>
                   </button>
                 ))}
@@ -582,27 +604,28 @@ function ApplyContent() {
           )}
 
           {step === 'select' && profile === 'worker' && (
-            <motion.div key="worker-select" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
+            <motion.div key="worker-select" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
               <div className="flex items-center gap-3 mb-6">
-                <button onClick={() => setStep('profile')} className="flex items-center gap-1 text-gray-400 hover:text-white text-sm transition-colors">
+                <button onClick={() => setStep('profile')} className="flex items-center gap-1 text-[#635bff] hover:text-[#4b45c6] text-sm font-medium transition-colors">
                   <ArrowLeft className="w-4 h-4" /> Back
                 </button>
-                <h2 className="text-white font-bold text-xl">Select your profession</h2>
+                <h2 className="font-semibold text-[#0a2540] dark:text-white">Select your profession</h2>
               </div>
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {PROFESSIONS.map(p => (
                   <button
                     key={p.id}
                     onClick={() => { setSelectedJob(p.name); setStep('form') }}
-                    className="glass-card rounded-xl p-5 text-left hover:border-gold-500/60 border border-white/10 transition-all"
+                    className="card p-5 text-left hover:border-[#635bff] transition-all"
                   >
-                    <div className="text-3xl mb-3">{p.icon}</div>
-                    <h4 className="text-white font-semibold text-sm mb-2">{p.name}</h4>
-                    <div className="space-y-1 text-xs text-gray-500">
-                      <div>💰 {p.salary}</div>
-                      <div>📊 Demand: <span className={p.demand === 'Very High' ? 'text-green-400' : 'text-yellow-400'}>{p.demand}</span></div>
-                      <div>⏱️ {p.hours}</div>
-                      <div className="flex gap-1">{p.countries.map((c,i) => <span key={i}>{c}</span>)}</div>
+                    <div className="w-10 h-10 rounded-lg bg-[#f6f9fc] dark:bg-[#2c2c2e] flex items-center justify-center mb-3">
+                      {React.createElement(p.icon as React.ElementType, { className: 'w-5 h-5 text-[#635bff]' })}
+                    </div>
+                    <h4 className="font-medium text-sm text-[#0a2540] dark:text-white mb-2">{p.name}</h4>
+                    <div className="space-y-1 text-xs text-[#697386] dark:text-[#8e8e93]">
+                      <div className="flex items-center gap-1.5"><DollarSign className="w-3 h-3" /> {p.salary}</div>
+                      <div className="flex items-center gap-1.5"><BarChart3 className="w-3 h-3" /> Demand: <span className={p.demand === 'Very High' ? 'text-[#0d9488]' : 'text-[#f59e0b]'}>{p.demand}</span></div>
+                      <div className="flex items-center gap-1.5"><Clock className="w-3 h-3" /> {p.hours}</div>
                     </div>
                   </button>
                 ))}
@@ -611,23 +634,25 @@ function ApplyContent() {
           )}
 
           {step === 'select' && profile === 'visitor' && (
-            <motion.div key="visitor-select" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
+            <motion.div key="visitor-select" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
               <div className="flex items-center gap-3 mb-6">
-                <button onClick={() => setStep('profile')} className="flex items-center gap-1 text-gray-400 hover:text-white text-sm transition-colors">
+                <button onClick={() => setStep('profile')} className="flex items-center gap-1 text-[#635bff] hover:text-[#4b45c6] text-sm font-medium transition-colors">
                   <ArrowLeft className="w-4 h-4" /> Back
                 </button>
-                <h2 className="text-white font-bold text-xl">Select visit category</h2>
+                <h2 className="font-semibold text-[#0a2540] dark:text-white">Select visit category</h2>
               </div>
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {VISITOR_CATEGORIES.map(c => (
                   <button
                     key={c.id}
                     onClick={() => { setSelectedCategory(c.name); setStep('form') }}
-                    className="glass-card rounded-xl p-6 text-left hover:border-green-500/60 border border-white/10 transition-all"
+                    className="card p-5 text-left hover:border-[#635bff] transition-all"
                   >
-                    <div className="text-3xl mb-3">{c.icon}</div>
-                    <h4 className="text-white font-semibold mb-2">{c.name}</h4>
-                    <p className="text-gray-400 text-sm">{c.desc}</p>
+                    <div className="w-10 h-10 rounded-lg bg-[#f6f9fc] dark:bg-[#2c2c2e] flex items-center justify-center mb-3">
+                      {React.createElement(c.icon as React.ElementType, { className: 'w-5 h-5 text-[#635bff]' })}
+                    </div>
+                    <h4 className="font-medium text-sm text-[#0a2540] dark:text-white mb-1">{c.name}</h4>
+                    <p className="text-xs text-[#697386] dark:text-[#8e8e93]">{c.desc}</p>
                   </button>
                 ))}
               </div>
@@ -636,22 +661,22 @@ function ApplyContent() {
 
           {/* STEP 3: Form */}
           {step === 'form' && (
-            <motion.div key="form" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
-              <div className="flex items-center gap-3 mb-8">
-                <button onClick={() => setStep('select')} className="flex items-center gap-1 text-gray-400 hover:text-white text-sm transition-colors">
+            <motion.div key="form" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+              <div className="flex items-center gap-3 mb-6">
+                <button onClick={() => setStep('select')} className="flex items-center gap-1 text-[#635bff] hover:text-[#4b45c6] text-sm font-medium transition-colors">
                   <ArrowLeft className="w-4 h-4" /> Back
                 </button>
                 <div>
-                  <h2 className="text-white font-bold text-xl">
+                  <h2 className="font-semibold text-[#0a2540] dark:text-white">
                     {profile === 'student' && `Student Application — ${selectedField}`}
                     {profile === 'worker' && `Worker Application — ${selectedJob}`}
                     {profile === 'visitor' && `Visitor Application — ${selectedCategory}`}
                   </h2>
-                  <p className="text-gray-500 text-sm">Fill all required fields and upload your documents.</p>
+                  <p className="text-xs text-[#697386] dark:text-[#8e8e93]">Fill all required fields and upload your documents.</p>
                 </div>
               </div>
 
-              <div className="glass-card rounded-2xl p-8">
+              <div className="card p-6 md:p-8">
                 {profile === 'student' && <StudentForm selectedField={selectedField} />}
                 {profile === 'worker' && <WorkerForm selectedJob={selectedJob} />}
                 {profile === 'visitor' && <VisitorForm selectedCategory={selectedCategory} />}
@@ -668,7 +693,7 @@ export default function ApplyPage() {
   return (
     <>
       <Navbar />
-      <Suspense fallback={<div className="min-h-screen bg-hero pt-28 flex items-center justify-center"><Loader2 className="w-8 h-8 text-gold-400 animate-spin" /></div>}>
+      <Suspense fallback={<div className="min-h-screen bg-white pt-28 flex items-center justify-center"><Loader2 className="w-8 h-8 text-[#635bff] animate-spin" /></div>}>
         <ApplyContent />
       </Suspense>
       <Footer />
