@@ -14,6 +14,7 @@ exports.validateApplication = [
   body('profile').isIn(['student', 'worker', 'visitor']).withMessage('Invalid profile'),
   body('destination').isIn(['germany', 'portugal', 'multiple']).withMessage('Invalid destination'),
   body('budget').optional().trim(),
+  body('currency').optional().trim().isLength({ max: 10 }).withMessage('Invalid currency'),
 ]
 
 // ── Submit Application ─────────────────────────────────────────────────────────
@@ -26,7 +27,7 @@ exports.submitApplication = async (req, res) => {
 
   const {
     fullName, email, phone, whatsapp, profile, destination,
-    budget, field, profession, category, educationLevel,
+    budget, currency, field, profession, category, educationLevel,
     targetDegree, country, city, experience, workHours,
     expectedSalary, idNumber, motivationLetter, purpose, duration,
     signature,
@@ -48,17 +49,17 @@ exports.submitApplication = async (req, res) => {
     await db.query(
       `INSERT INTO applications (
         id, full_name, email, phone, whatsapp, profile, destination,
-        budget, field, profession, category, education_level, target_degree,
+        budget, currency, field, profession, category, education_level, target_degree,
         country, city, experience, work_hours, expected_salary, id_number,
         motivation_letter, purpose, duration, signature, documents,
         status, created_at, updated_at
       ) VALUES (
-        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,
-        'pending', $25, $25
+        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,
+        'pending', $26, $26
       )`,
       [
         id, fullName, email, phone, whatsapp, profile, destination,
-        budget, field || null, profession || null, category || null,
+        budget, currency || 'EUR', field || null, profession || null, category || null,
         educationLevel || null, targetDegree || null,
         country || null, city || null,
         experience ? parseInt(experience) : null,
@@ -73,7 +74,7 @@ exports.submitApplication = async (req, res) => {
     // Fire-and-forget Telegram notification
     const application = {
       id, fullName, email, phone, whatsapp, profile, destination,
-      budget, field, profession, category, idNumber,
+      budget, currency, field, profession, category, idNumber,
       createdAt: now.toISOString(),
     }
 

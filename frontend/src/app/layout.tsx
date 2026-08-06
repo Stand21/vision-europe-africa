@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     siteName: 'Vision Europe Africa',
   },
   robots: { index: true, follow: true },
-  themeColor: '#1a56db',
+  themeColor: '#635bff',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

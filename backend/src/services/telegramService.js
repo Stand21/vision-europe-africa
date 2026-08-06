@@ -5,13 +5,21 @@ let bot = null
 
 function getBot() {
   if (!bot && process.env.TELEGRAM_BOT_TOKEN) {
-    bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: false })
+    // Polling mode lets the bot receive the inline Approve/Reject button callbacks.
+    bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: true })
   }
   return bot
 }
 
 const PROFILE_EMOJI = { student: '🎓', worker: '👷', visitor: '✈️' }
 const DEST_EMOJI = { germany: '🇩🇪', portugal: '🇵🇹', multiple: '🌍' }
+
+const CURRENCY_SYMBOLS = {
+  EUR: '€', USD: '$', GBP: '£', CHF: 'Fr',
+  XOF: 'CFA', XAF: 'CFA', NGN: '₦', GHS: '₵',
+  KES: 'KSh', TZS: 'TSh', UGX: 'USh', ZAR: 'R',
+  CDF: 'FC', MAD: 'DH', DZD: 'DA', EGP: 'E£',
+}
 
 /**
  * Send a new application notification to the Telegram admin group.
@@ -26,12 +34,13 @@ async function sendApplicationNotification(application, dashboardUrl) {
 
   const {
     id, fullName, profile, email, phone, whatsapp,
-    destination, budget, field, profession, category,
+    destination, budget, currency, field, profession, category,
     idNumber, createdAt, documentsCount,
   } = application
 
   const profileEmoji = PROFILE_EMOJI[profile] || '📋'
   const destEmoji = DEST_EMOJI[destination] || '🌍'
+  const budgetLabel = budget ? `${CURRENCY_SYMBOLS[currency] || (currency ? `${currency} ` : '€')}${budget}` : 'N/A'
 
   const message = `
 ${profileEmoji} *NOUVEAU DOSSIER — Vision Europe Africa*
@@ -44,7 +53,7 @@ ${profileEmoji} *NOUVEAU DOSSIER — Vision Europe Africa*
 ${profileEmoji} *Profil:* ${profile?.toUpperCase()}
 ${destEmoji} *Destination:* ${destination?.toUpperCase()}
 ${field ? `📚 *Filière:* ${field}` : ''}${profession ? `\n💼 *Métier:* ${profession}` : ''}${category ? `\n🏷️ *Catégorie:* ${category}` : ''}
-💰 *Budget:* €${budget}
+💰 *Budget:* ${budgetLabel}
 🪪 *N° pièce d'identité:* ${idNumber || 'N/A'}
 📎 *Documents joints:* ${documentsCount || 0} fichier(s)
 
@@ -98,19 +107,42 @@ async function sendStatusUpdate(application, newStatus) {
 
 /**
  * Handle callback queries (approve/reject buttons).
+ *
+ * `updateStatusFn(id, status)` must update the application status in the DB
+ * and is wired to the admin controller in src/index.js.
  */
 function setupCallbackHandler(updateStatusFn) {
   const instance = getBot()
   if (!instance) return
 
-  // For webhook-based bots use setWebHook instead of polling
-  // instance.on('callback_query', async (query) => {
-  //   const [action, appId] = query.data.split('_')
-  //   if (action === 'approve' || action === 'reject') {
-  //     await updateStatusFn(appId, action === 'approve' ? 'approved' : 'rejected')
-  //     await instance.answerCallbackQuery(query.id, { text: `Application ${action}d!` })
-  //   }
-  // })
+  instance.on('callback_query', async (query) => {
+    const [action, appId] = String(query.data || '').split('_')
+    if (action !== 'approve' && action !== 'reject') return
+
+    const newStatus = action === 'approve' ? 'approved' : 'rejected'
+    try {
+      const ok = await updateStatusFn(appId, newStatus)
+      await instance.answerCallbackQuery(query.id, {
+        text: ok ? `Application ${action}d ✅` : 'Application not found',
+      })
+      if (ok) {
+        const safeName = query.message?.chat?.id
+          ? await (async () => {
+              const db = require('../config/database')
+              const { rows } = await db.query('SELECT full_name FROM applications WHERE id = $1', [appId])
+              return rows.length ? rows[0].full_name : null
+            })()
+          : null
+        await instance.sendMessage(
+          query.message?.chat?.id,
+          `${action === 'approve' ? '✅' : '❌'} ${safeName ? `Dossier de *${safeName}* ` : ''}${newStatus.toUpperCase()} depuis le bot.`,
+          { parse_mode: 'Markdown' }
+        )
+      }
+    } catch (err) {
+      logger.error('Telegram callback error:', err.message)
+    }
+  })
 }
 
 module.exports = {

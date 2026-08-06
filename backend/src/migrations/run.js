@@ -15,6 +15,11 @@ async function runMigrations() {
       await db.query(sql)
       logger.info(`✅ Migration complete: ${file}`)
     } catch (err) {
+      // Ignore "already exists" / "duplicate" errors — migrations are idempotent.
+      if (err.message.includes('already exists') || err.message.includes('duplicate')) {
+        logger.info(`↪️  Already applied (skipped): ${file}`)
+        continue
+      }
       logger.error(`❌ Migration failed: ${file}`, err.message)
       process.exit(1)
     }

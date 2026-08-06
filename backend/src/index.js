@@ -101,6 +101,25 @@ async function start() {
     await db.connect()
     logger.info('✅ Database connected')
 
+    // Wire Telegram inline Approve/Reject buttons to the database.
+    // No-op when TELEGRAM_BOT_TOKEN is not configured.
+    const telegramService = require('./services/telegramService')
+    telegramService.setupCallbackHandler(async (id, status) => {
+      try {
+        const { rows } = await db.query(
+          'UPDATE applications SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *',
+          [status, id]
+        )
+        if (!rows.length) return false
+        telegramService.sendStatusUpdate(rows[0], status).catch(() => {})
+        logger.info(`Application ${id} status updated to ${status} via Telegram`)
+        return true
+      } catch (err) {
+        logger.error('Telegram status update error:', err)
+        return false
+      }
+    })
+
     app.listen(PORT, () => {
       logger.info(`🚀 Vision Europe Africa API running on port ${PORT}`)
       logger.info(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`)

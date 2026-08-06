@@ -1,5 +1,7 @@
 const express = require('express')
 const router = express.Router()
+const currenciesController = require('../controllers/currenciesController')
+const testimonialsController = require('../controllers/testimonialsController')
 
 router.get('/destinations', (req, res) => {
   res.json([
@@ -18,11 +20,7 @@ router.get('/destinations', (req, res) => {
   ])
 })
 
-router.get('/testimonials', (req, res) => {
-  res.json([
-    { name: 'Amara Diallo', country: 'Kinshasa, DRC', destination: 'Germany', role: 'Software Engineer', rating: 5, text: 'Vision Europe Africa changed my life. I now work in Berlin!' },
-    { name: 'Marie-Claire', country: 'Cameroon', destination: 'Portugal', role: 'Student', rating: 5, text: 'Obtained my student visa for Lisbon in 3 months. Excellent service!' },
-  ])
-})
+router.get('/currencies', currenciesController.listPublic)
+router.get('/testimonials', testimonialsController.listPublic)
 
 module.exports = router

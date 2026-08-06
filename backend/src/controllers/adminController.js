@@ -66,7 +66,7 @@ exports.getApplications = async (req, res) => {
   const offset = (parseInt(page) - 1) * parseInt(limit)
 
   let query = `SELECT id, full_name as "fullName", email, phone, whatsapp,
-    profile, destination, budget, field, profession, category,
+    profile, destination, budget, currency, field, profession, category,
     education_level as "educationLevel", target_degree as "targetDegree",
     country, city, experience, work_hours as "workHours", expected_salary as "expectedSalary",
     id_number as "idNumber", motivation_letter as "motivationLetter",
@@ -84,7 +84,7 @@ exports.getApplications = async (req, res) => {
     params.push(`%${search.toLowerCase()}%`); i++
   }
 
-  const countQuery = query.replace(/SELECT.*FROM/, 'SELECT COUNT(*) FROM')
+  const countQuery = query.replace(/SELECT[\s\S]*?FROM/, 'SELECT COUNT(*) FROM')
   query += ` ORDER BY created_at DESC LIMIT $${i++} OFFSET $${i++}`
   params.push(parseInt(limit), offset)
 

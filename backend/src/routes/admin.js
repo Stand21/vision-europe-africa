@@ -2,6 +2,8 @@ const express = require('express')
 const router = express.Router()
 const { authenticate, requireRole } = require('../middleware/auth')
 const adminController = require('../controllers/adminController')
+const currenciesController = require('../controllers/currenciesController')
+const testimonialsController = require('../controllers/testimonialsController')
 
 // POST /api/admin/login
 router.post('/login', adminController.login)
@@ -28,5 +30,17 @@ router.delete('/applications/:id', requireRole('superadmin'), async (req, res) =
     res.status(500).json({ error: 'Delete failed' })
   }
 })
+
+// ── Currencies management ──────────────────────────────────────────────────────
+router.get('/currencies', currenciesController.list)
+router.post('/currencies', currenciesController.create)
+router.patch('/currencies/:code', currenciesController.update)
+router.delete('/currencies/:code', currenciesController.remove)
+
+// ── Testimonials management ────────────────────────────────────────────────────
+router.get('/testimonials', testimonialsController.list)
+router.post('/testimonials', testimonialsController.create)
+router.patch('/testimonials/:id', testimonialsController.update)
+router.delete('/testimonials/:id', testimonialsController.remove)
 
 module.exports = router

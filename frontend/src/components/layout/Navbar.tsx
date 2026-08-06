@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, ChevronDown, Globe, Moon, Sun } from 'lucide-react'
+import { Menu, X, ChevronDown, Globe, Moon, Sun, Sparkles } from 'lucide-react'
 import { useTranslation } from '@/hooks/useTranslation'
 import type { Language } from '@/i18n/translations'
 
@@ -19,11 +19,29 @@ export default function Navbar() {
   const [mobileOpen,  setMobileOpen]  = useState(false)
   const [langOpen,    setLangOpen]    = useState(false)
   const [darkMode,    setDarkMode]    = useState(false)
+  const [active,      setActive]      = useState('')
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
-    window.addEventListener('scroll', onScroll)
+    window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    const ids = ['destinations', 'services', 'testimonials', 'faq', 'contact']
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) setActive(e.target.id)
+        })
+      },
+      { rootMargin: '-45% 0px -45% 0px' }
+    )
+    ids.forEach((id) => {
+      const el = document.getElementById(id)
+      if (el) observer.observe(el)
+    })
+    return () => observer.disconnect()
   }, [])
 
   useEffect(() => {
@@ -36,11 +54,11 @@ export default function Navbar() {
   }, [darkMode])
 
   const navLinks = [
-    { href: '/#destinations', label: t('nav.destinations') },
-    { href: '/#services',     label: t('nav.services')      },
-    { href: '/#testimonials', label: 'Témoignages'          },
-    { href: '/#faq',          label: 'FAQ'                  },
-    { href: '/#contact',      label: t('nav.contact')       },
+    { href: '/#destinations', id: 'destinations', label: t('nav.destinations') },
+    { href: '/#services',     id: 'services',     label: t('nav.services')      },
+    { href: '/#testimonials', id: 'testimonials', label: 'Témoignages'          },
+    { href: '/#faq',          id: 'faq',          label: 'FAQ'                  },
+    { href: '/#contact',      id: 'contact',      label: t('nav.contact')       },
   ]
 
   const currentLang = LANGUAGES.find(l => l.code === language) ?? LANGUAGES[0]
@@ -52,33 +70,44 @@ export default function Navbar() {
       transition={{ duration: 0.6, ease: 'easeOut' }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-white/90 dark:bg-[#1c1c1e]/90 backdrop-blur-md border-b border-[#e3e8ee] dark:border-[#38383a] py-3'
-          : 'bg-white dark:bg-[#000000] py-4'
+          ? 'glass-strong py-3'
+          : 'bg-white/60 dark:bg-black/40 backdrop-blur-md py-4'
       }`}
     >
       <div className="container-custom flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-9 h-9 rounded-lg bg-[#635bff] flex items-center justify-center">
+          <div className="w-9 h-9 rounded-xl bg-brand-gradient shadow-glow flex items-center justify-center group-hover:scale-105 transition-transform">
             <Globe className="w-5 h-5 text-white" />
           </div>
           <div className="hidden sm:block">
-            <div className="font-semibold text-[#0a2540] dark:text-white text-base leading-none">
-              Vision <span className="text-[#635bff]">Europe</span>
+            <div className="font-bold text-[#0a2540] dark:text-white text-base leading-none tracking-tight">
+              Vision <span className="gradient-text">Europe</span>
             </div>
-            <div className="text-xs text-[#697386] dark:text-[#8e8e93] tracking-wider">Africa</div>
+            <div className="text-[10px] text-[#697386] dark:text-[#8e8e93] tracking-[0.2em] uppercase mt-0.5">Africa</div>
           </div>
         </Link>
 
         {/* Desktop nav */}
-        <div className="hidden lg:flex items-center gap-6">
-          {navLinks.map(({ href, label }) => (
+        <div className="hidden lg:flex items-center gap-1">
+          {navLinks.map(({ href, id, label }) => (
             <Link
               key={href}
               href={href}
-              className="text-sm font-medium text-[#425466] dark:text-[#ebebf5] hover:text-[#0a2540] dark:hover:text-white transition-colors duration-150"
+              className={`relative px-4 py-2 rounded-full text-sm font-medium transition-colors duration-150 ${
+                active === id
+                  ? 'text-[#635bff] dark:text-[#a5a3ff]'
+                  : 'text-[#425466] dark:text-[#ebebf5] hover:text-[#0a2540] dark:hover:text-white'
+              }`}
             >
               {label}
+              {active === id && (
+                <motion.span
+                  layoutId="nav-pill"
+                  className="absolute inset-0 rounded-full bg-[#635bff]/10 dark:bg-[#635bff]/40 -z-10"
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                />
+              )}
             </Link>
           ))}
         </div>
@@ -89,7 +118,7 @@ export default function Navbar() {
           {/* Dark mode toggle */}
           <button
             onClick={() => setDarkMode(!darkMode)}
-            className="p-2 rounded-lg border border-[#e3e8ee] dark:border-[#38383a] text-[#425466] dark:text-[#ebebf5] hover:border-[#cbd5e1] dark:hover:border-[#48484a] hover:text-[#0a2540] dark:hover:text-white transition-all"
+            className="p-2 rounded-xl border border-[#e3e8ee] dark:border-[#38383a] text-[#425466] dark:text-[#ebebf5] hover:border-[#cbd5e1] dark:hover:border-[#48484a] hover:text-[#0a2540] dark:hover:text-white transition-all"
             aria-label="Toggle dark mode"
           >
             {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -99,7 +128,7 @@ export default function Navbar() {
           <div className="relative">
             <button
               onClick={() => setLangOpen(!langOpen)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#e3e8ee] dark:border-[#38383a] text-sm text-[#425466] dark:text-[#ebebf5] hover:border-[#cbd5e1] dark:hover:border-[#48484a] hover:text-[#0a2540] dark:hover:text-white transition-all"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-[#e3e8ee] dark:border-[#38383a] text-sm text-[#425466] dark:text-[#ebebf5] hover:border-[#cbd5e1] dark:hover:border-[#48484a] hover:text-[#0a2540] dark:hover:text-white transition-all"
             >
               <span className="text-base">{currentLang.flag}</span>
               <span className="hidden sm:inline text-xs">{currentLang.label}</span>
@@ -112,7 +141,7 @@ export default function Navbar() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 6, scale: 0.96 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute right-0 top-full mt-2 w-40 bg-white dark:bg-[#1c1c1e] rounded-xl border border-[#e3e8ee] dark:border-[#38383a] overflow-hidden shadow-sm dark:shadow-lg"
+                  className="absolute right-0 top-full mt-2 w-40 glass-strong rounded-2xl overflow-hidden"
                 >
                   {LANGUAGES.map(lang => (
                     <button
@@ -135,14 +164,18 @@ export default function Navbar() {
           </div>
 
           {/* CTA */}
-          <Link href="/apply" className="hidden sm:inline-flex btn-primary text-sm px-4 py-2 rounded-lg font-medium">
+          <Link
+            href="/apply"
+            className="hidden sm:inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full btn-gradient text-sm font-semibold"
+          >
+            <Sparkles className="w-4 h-4" />
             {t('nav.apply')}
           </Link>
 
           {/* Mobile toggle */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="lg:hidden p-2 rounded-lg border border-[#e3e8ee] dark:border-[#38383a] text-[#425466] dark:text-[#ebebf5]"
+            className="lg:hidden p-2 rounded-xl border border-[#e3e8ee] dark:border-[#38383a] text-[#425466] dark:text-[#ebebf5]"
             aria-label="Menu"
           >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -158,7 +191,7 @@ export default function Navbar() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="lg:hidden bg-white dark:bg-[#1c1c1e] border-t border-[#e3e8ee] dark:border-[#38383a]"
+            className="lg:hidden glass-strong border-t border-[#e3e8ee] dark:border-[#38383a]"
           >
             <div className="container-custom py-4 flex flex-col gap-1">
               {navLinks.map(({ href, label }) => (
@@ -166,7 +199,7 @@ export default function Navbar() {
                   key={href}
                   href={href}
                   onClick={() => setMobileOpen(false)}
-                  className="px-4 py-3 text-sm text-[#425466] dark:text-[#ebebf5] hover:text-[#0a2540] dark:hover:text-white hover:bg-[#f6f9fc] dark:hover:bg-[#2c2c2e] rounded-lg transition-all"
+                  className="px-4 py-3 text-sm text-[#425466] dark:text-[#ebebf5] hover:text-[#0a2540] dark:hover:text-white hover:bg-[#f6f9fc] dark:hover:bg-[#2c2c2e] rounded-xl transition-all"
                 >
                   {label}
                 </Link>
@@ -174,8 +207,9 @@ export default function Navbar() {
               <Link
                 href="/apply"
                 onClick={() => setMobileOpen(false)}
-                className="btn-primary mt-3 justify-center"
+                className="btn-gradient mt-3 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold"
               >
+                <Sparkles className="w-4 h-4" />
                 {t('nav.apply')}
               </Link>
             </div>

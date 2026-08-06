@@ -6,23 +6,31 @@ import Image from 'next/image'
 import CountUp from 'react-countup'
 import { useInView } from 'react-intersection-observer'
 import {
-  ArrowRight, Star, CheckCircle, Clock, Shield,
-  ChevronDown, GraduationCap, Briefcase, Plane,
-  MapPin, Users, Award, ChevronRight, TrendingUp,
-  Rocket, Globe, Code, Stethoscope, BarChart3,
-  Truck, Building2, Megaphone, Brain, Wallet,
-  Car, Wrench, Warehouse, Factory, Lock,
-  Settings, HardHat, Mail, Phone, MapPin as MapPinIcon,
-  Send, Plane as PlaneIcon, BookOpen, Briefcase as BriefcaseIcon,
-  Users as UsersIcon, Home, Heart, Landmark, Ship,
-  PlaneTakeoff, Luggage, Camera, Music, Utensils,
-  ShoppingBag, Dumbbell, Palette, Gamepad2, BookMarked,
-  Calculator, FlaskConical, Atom, Dna, Microscope,
-  Palette as PaletteIcon, PenTool, Search
+  ArrowRight, ArrowUpRight, Star, CheckCircle, Clock, Shield,
+  ChevronDown, GraduationCap, Briefcase, Plane, MapPin, Users,
+  Award, ChevronRight, Rocket, Globe, Send, PlaneTakeoff, Landmark,
+  Ship, Play, X, Quote, Sparkles, BadgeCheck, BookOpen, Search
 } from 'lucide-react'
+import axios from 'axios'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import { useTranslation } from '@/hooks/useTranslation'
+
+// ── Media (Unsplash) ───────────────────────────────────────────────────────────
+const MEDIA = {
+  germany: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Brandenburger_Tor_nachts_2012-07.jpg/1920px-Brandenburger_Tor_nachts_2012-07.jpg',
+  portugal: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Yellow_tram_in_Lisbon%2C_Portugal.jpg/1920px-Yellow_tram_in_Lisbon%2C_Portugal.jpg',
+  student: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Students_of_the_University_OF_Ilorin._23.jpg/1920px-Students_of_the_University_OF_Ilorin._23.jpg',
+  worker: 'https://upload.wikimedia.org/wikipedia/commons/d/d2/African_Undergraduate_Young_doctor_checking_on_a_patient.jpg',
+  visitor: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Tourists_learning_african_food_making_in_kisoro_uganda.jpg/1920px-Tourists_learning_african_food_making_in_kisoro_uganda.jpg',
+}
+
+const AVATARS = [
+  'https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/African_man_smiling.jpg/500px-African_man_smiling.jpg',
+  'https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Smiling_woman%2C_The_Gambia_%28March_2005%29.jpg/500px-Smiling_woman%2C_The_Gambia_%28March_2005%29.jpg',
+  'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/African_Woman_smiling.jpg/500px-African_Woman_smiling.jpg',
+  'https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/An_Excited_Ghanian_Young_Man.jpg/500px-An_Excited_Ghanian_Young_Man.jpg',
+]
 
 // ── Loading Screen ────────────────────────────────────────────────────────────
 function LoadingScreen({ onComplete }: { onComplete: () => void }) {
@@ -43,13 +51,13 @@ function LoadingScreen({ onComplete }: { onComplete: () => void }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <div className="w-12 h-12 rounded-xl bg-[#635bff] flex items-center justify-center mb-4">
-          <Globe className="w-6 h-6 text-white" />
+        <div className="w-14 h-14 rounded-2xl bg-brand-gradient shadow-glow flex items-center justify-center mb-4">
+          <Globe className="w-7 h-7 text-white" />
         </div>
-        <div className="text-lg font-semibold text-[#0a2540]">
-          Vision <span className="text-[#635bff]">Europe</span> Africa
+        <div className="text-lg font-bold text-[#0a2540] dark:text-white tracking-tight">
+          Vision <span className="gradient-text">Europe</span> Africa
         </div>
-        <div className="text-sm text-[#697386] mt-1">Your Gateway to Europe</div>
+        <div className="text-sm text-[#697386] dark:text-[#8e8e93] mt-1">Your Gateway to Europe</div>
         <div className="loading-bar mt-6">
           <div className="loading-bar-fill" />
         </div>
@@ -71,184 +79,171 @@ function HeroSection() {
   ]
 
   return (
-    <section className="relative overflow-hidden">
-      {/* Background image - centered */}
-      <div className="absolute inset-0 bg-[url('/images/hero-bg.jpg')] bg-center bg-cover opacity-50"></div>
-      <div className="relative z-10 container-custom pt-20 pb-16 md:pt-28 md:pb-24">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          
+    <section className="relative overflow-hidden bg-[#0a2540]">
+      {/* Background image */}
+      <div className="absolute inset-0">
+        <img src="/images/hero-bg.jpg" alt="" className="w-full h-full object-cover opacity-50" loading="eager" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a2540]/80 via-[#0a2540]/85 to-[#0a2540]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0a2540]/95 via-[#0a2540]/40 to-transparent" />
+      </div>
+
+      {/* Ambient glow */}
+      <div className="aurora-blob w-96 h-96 bg-[#635bff]/40 -top-24 -left-24 animate-pulse-glow" />
+      <div className="aurora-blob w-80 h-80 bg-[#22d3ee]/20 bottom-10 right-10 animate-pulse-glow" />
+      <div className="absolute inset-0 grid-pattern opacity-30" />
+
+      <div className="relative z-10 container-custom pt-32 pb-16 md:pt-40 md:pb-24">
+        <div className="grid lg:grid-cols-2 gap-14 lg:gap-16 items-center">
+
           {/* Left */}
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f6f9fc] dark:bg-[#1c1c1e] border border-[#e3e8ee] dark:border-[#38383a] text-sm text-[#635bff] font-medium mb-6">
-              <Shield className="w-4 h-4" />
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-sm text-white font-medium mb-6"
+            >
+              <Shield className="w-4 h-4 text-[#a5a3ff]" />
               {t('hero.badge')}
-            </div>
+              <Sparkles className="w-3.5 h-3.5 text-[#22d3ee]" />
+            </motion.div>
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#0a2540] dark:text-white leading-tight mb-5">
+            <motion.h1
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.05 }}
+              className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-[1.08] mb-6 tracking-tight"
+            >
               {t('hero.title')}
               <br />
-              <span className="text-[#635bff]">{t('hero.titleHighlight')}</span>
-            </h1>
+              <span className="gradient-text-animated">{t('hero.titleHighlight')}</span>
+            </motion.h1>
 
-            <p className="text-lg text-[#425466] dark:text-[#ebebf5] leading-relaxed mb-8 max-w-xl">
+            <motion.p
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-lg text-[#c7c7cc] leading-relaxed mb-9 max-w-xl"
+            >
               {t('hero.subtitle')}
-            </p>
+            </motion.p>
 
-            <div className="flex flex-col sm:flex-row gap-3">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.15 }}
+              className="flex flex-col sm:flex-row gap-4"
+            >
               <button
                 onClick={() => window.location.href = '/apply'}
-                className="text-base"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  padding: '10px 20px',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                  borderRadius: '4px',
-                  background: '#635bff',
-                  color: '#ffffff',
-                  border: 'none',
-                  textDecoration: 'none',
-                  lineHeight: 1.5,
-                  fontFamily: 'inherit',
-                  letterSpacing: 0,
-                  boxShadow: '0 1px 3px rgba(60, 66, 87, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)',
-                  transition: 'all 0.15s ease',
-                  cursor: 'pointer'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = '#4b45c6'
-                  e.currentTarget.style.boxShadow = '0 2px 6px rgba(99, 91, 255, 0.25)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = '#635bff'
-                  e.currentTarget.style.boxShadow = '0 1px 3px rgba(60, 66, 87, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)'
-                }}
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full btn-gradient text-sm font-semibold"
               >
                 {t('hero.cta_primary')}
                 <ArrowRight className="w-4 h-4" />
               </button>
               <button
                 onClick={() => document.getElementById('destinations')?.scrollIntoView({ behavior: 'smooth' })}
-                className="text-base"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  padding: '10px 20px',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                  borderRadius: '4px',
-                  background: '#ffffff',
-                  color: '#0a2540',
-                  border: '1px solid #e3e8ee',
-                  textDecoration: 'none',
-                  lineHeight: 1.5,
-                  fontFamily: 'inherit',
-                  letterSpacing: 0,
-                  boxShadow: '0 1px 3px rgba(60, 66, 87, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)',
-                  transition: 'all 0.15s ease',
-                  cursor: 'pointer'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = '#f6f9fc'
-                  e.currentTarget.style.borderColor = '#cbd5e1'
-                  e.currentTarget.style.boxShadow = '0 2px 6px rgba(60, 66, 87, 0.1)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = '#ffffff'
-                  e.currentTarget.style.borderColor = '#e3e8ee'
-                  e.currentTarget.style.boxShadow = '0 1px 3px rgba(60, 66, 87, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)'
-                }}
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full glass text-sm font-semibold text-white hover:bg-white/15 transition-all"
               >
                 {t('hero.cta_secondary')}
                 <ChevronDown className="w-4 h-4" />
               </button>
-            </div>
+            </motion.div>
 
             {/* Trust flags */}
-            <div className="flex items-center gap-4 mt-8">
-              <div className="flex -space-x-2">
-                {[UsersIcon, Globe, Globe, Globe, Globe].map((Icon, i) => (
-                  <div key={i} className="w-8 h-8 rounded-full border-2 border-white dark:border-[#1c1c1e] bg-[#f6f9fc] dark:bg-[#2c2c2e] flex items-center justify-center">
-                    <Icon className="w-4 h-4 text-[#635bff]" />
-                  </div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="flex items-center gap-4 mt-10"
+            >
+              <div className="flex -space-x-3">
+                {AVATARS.map((src, i) => (
+                  <img
+                    key={i}
+                    src={src}
+                    alt=""
+                    className="w-9 h-9 rounded-full border-2 border-[#0a2540] object-cover"
+                    loading="lazy"
+                  />
                 ))}
+                <div className="w-9 h-9 rounded-full border-2 border-[#0a2540] bg-brand-gradient flex items-center justify-center text-[10px] font-bold text-white">
+                  +5k
+                </div>
               </div>
-              <p className="text-sm text-[#425466] dark:text-[#ebebf5]">
-                <span className="font-semibold text-[#0a2540] dark:text-white">5,000+</span> candidats de 30+ pays africains
+              <p className="text-sm text-[#c7c7cc]">
+                <span className="font-semibold text-white">5,000+</span> candidats de 30+ pays africains
               </p>
-            </div>
+            </motion.div>
           </div>
 
           {/* Right — destination cards */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
             className="relative"
           >
-            <div className="grid grid-cols-1 gap-4">
+            <div className="absolute -inset-6 bg-brand-gradient opacity-20 blur-3xl rounded-full" />
+
+            <div className="grid grid-cols-1 gap-5 relative">
               {/* Germany card */}
-              <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl border border-[#e3e8ee] dark:border-[#38383a] p-5 shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-center gap-4 mb-3">
-                  <div className="w-12 h-12 rounded-xl bg-[#f6f9fc] dark:bg-[#2c2c2e] flex items-center justify-center flex-shrink-0">
-                    <Landmark className="w-6 h-6 text-[#635bff]" />
+              <div className="glass-card rounded-3xl p-6">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#635bff] to-[#8b5cf6] flex items-center justify-center flex-shrink-0 shadow-glow">
+                    <Landmark className="w-6 h-6 text-white" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <div className="font-semibold text-[#0a2540] dark:text-white">Germany</div>
+                      <div className="font-semibold text-white">Germany</div>
                       <div className="text-right">
-                        <div className="font-semibold text-[#635bff] text-sm">€45k+</div>
-                        <div className="text-xs text-[#697386] dark:text-[#8e8e93]">avg salary/yr</div>
+                        <div className="font-semibold text-[#a5a3ff] text-sm">€45k+</div>
+                        <div className="text-xs text-white/50">avg salary/yr</div>
                       </div>
                     </div>
-                    <div className="text-xs text-[#425466] dark:text-[#ebebf5] mt-0.5">Excellence & Opportunity</div>
+                    <div className="text-xs text-white/60 mt-0.5">Excellence & Opportunity</div>
                   </div>
                 </div>
                 <div className="flex gap-2 flex-wrap">
-                  {['Work Visa','Student','Opportunity Card'].map(tag => (
-                    <span key={tag} className="text-xs px-2.5 py-1 rounded-md bg-[#f6f9fc] dark:bg-[#2c2c2e] text-[#425466] dark:text-[#ebebf5] border border-[#e3e8ee] dark:border-[#38383a]">{tag}</span>
+                  {['Work Visa', 'Student', 'Opportunity Card'].map(tag => (
+                    <span key={tag} className="text-xs px-3 py-1.5 rounded-full bg-white/10 text-white/80 border border-white/15">{tag}</span>
                   ))}
                 </div>
               </div>
 
               {/* Portugal card */}
-              <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl border border-[#e3e8ee] dark:border-[#38383a] p-5 shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-center gap-4 mb-3">
-                  <div className="w-12 h-12 rounded-xl bg-[#f6f9fc] dark:bg-[#2c2c2e] flex items-center justify-center flex-shrink-0">
-                    <Ship className="w-6 h-6 text-[#0d9488]" />
+              <div className="glass-card rounded-3xl p-6">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#22d3ee] to-[#0d9488] flex items-center justify-center flex-shrink-0 shadow-glow">
+                    <Ship className="w-6 h-6 text-white" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <div className="font-semibold text-[#0a2540] dark:text-white">Portugal</div>
+                      <div className="font-semibold text-white">Portugal</div>
                       <div className="text-right">
-                        <div className="font-semibold text-[#0d9488] text-sm">D7 Visa</div>
-                        <div className="text-xs text-[#697386] dark:text-[#8e8e93]">affordable entry</div>
+                        <div className="font-semibold text-[#22d3ee] text-sm">D7 Visa</div>
+                        <div className="text-xs text-white/50">affordable entry</div>
                       </div>
                     </div>
-                    <div className="text-xs text-[#425466] dark:text-[#ebebf5] mt-0.5">Your First Step in EU</div>
+                    <div className="text-xs text-white/60 mt-0.5">Your First Step in EU</div>
                   </div>
                 </div>
                 <div className="flex gap-2 flex-wrap">
-                  {['Student Visa','D7','NHR Tax','EU Path'].map(tag => (
-                    <span key={tag} className="text-xs px-2.5 py-1 rounded-md bg-[#f6f9fc] dark:bg-[#2c2c2e] text-[#425466] dark:text-[#ebebf5] border border-[#e3e8ee] dark:border-[#38383a]">{tag}</span>
+                  {['Student Visa', 'D7', 'NHR Tax', 'EU Path'].map(tag => (
+                    <span key={tag} className="text-xs px-3 py-1.5 rounded-full bg-white/10 text-white/80 border border-white/15">{tag}</span>
                   ))}
                 </div>
               </div>
 
               {/* Mini stats */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white dark:bg-[#1c1c1e] rounded-xl border border-[#e3e8ee] dark:border-[#38383a] p-4 text-center shadow-sm">
-                  <div className="text-2xl font-bold text-[#0a2540] dark:text-white">97%</div>
-                  <div className="text-xs text-[#697386] dark:text-[#8e8e93] mt-1">Success Rate</div>
+              <div className="grid grid-cols-2 gap-5">
+                <div className="glass rounded-2xl p-5 text-center">
+                  <div className="text-2xl font-extrabold text-white">97%</div>
+                  <div className="text-xs text-white/50 mt-1">Success Rate</div>
                 </div>
-                <div className="bg-white dark:bg-[#1c1c1e] rounded-xl border border-[#e3e8ee] dark:border-[#38383a] p-4 text-center shadow-sm">
-                  <div className="text-2xl font-bold text-[#0a2540] dark:text-white">48h</div>
-                  <div className="text-xs text-[#697386] dark:text-[#8e8e93] mt-1">Response Time</div>
+                <div className="glass rounded-2xl p-5 text-center">
+                  <div className="text-2xl font-extrabold text-white">48h</div>
+                  <div className="text-xs text-white/50 mt-1">Response Time</div>
                 </div>
               </div>
             </div>
@@ -264,12 +259,12 @@ function HeroSection() {
           className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16"
         >
           {stats.map(({ value, suffix, label, icon: Icon }, i) => (
-            <div key={i} className="bg-white dark:bg-[#1c1c1e] rounded-xl border border-[#e3e8ee] dark:border-[#38383a] p-5 text-center shadow-sm">
-              <Icon className="w-5 h-5 text-[#635bff] mx-auto mb-2" />
-              <div className="text-2xl font-bold text-[#0a2540] dark:text-white">
+            <div key={i} className="glass rounded-2xl p-5 text-center">
+              <Icon className="w-5 h-5 text-[#a5a3ff] mx-auto mb-2" />
+              <div className="text-2xl font-extrabold text-white">
                 {inView ? <CountUp end={value} duration={2} delay={i * 0.1} /> : '0'}{suffix}
               </div>
-              <div className="text-sm text-[#697386] dark:text-[#8e8e93] mt-1">{label}</div>
+              <div className="text-sm text-white/50 mt-1">{label}</div>
             </div>
           ))}
         </motion.div>
@@ -282,22 +277,25 @@ function HeroSection() {
 function TrustBar() {
   const items = [
     { icon: Shield, label: 'Accompagnement certifié' },
-    { icon: CheckCircle, label: 'Dossiers complets' },
+    { icon: BadgeCheck, label: 'Dossiers complets' },
     { icon: Clock, label: 'Réponse sous 48h' },
     { icon: Send, label: 'Suivi Telegram' },
     { icon: Globe, label: '100% en ligne' },
   ]
+
+  const doubled = [...items, ...items]
+
   return (
-    <div className="bg-[#f6f9fc] dark:bg-[#1c1c1e] py-6 border-y border-[#e3e8ee] dark:border-[#38383a]">
-      <div className="container-custom">
-        <div className="flex flex-wrap items-center justify-center gap-6">
-          {items.map((item, i) => (
-            <div key={i} className="flex items-center gap-2 text-sm text-[#425466] dark:text-[#ebebf5]">
+    <div className="bg-white dark:bg-black py-6 border-y border-[#e3e8ee] dark:border-[#38383a] marquee-mask overflow-hidden">
+      <div className="marquee-track">
+        {doubled.map((item, i) => (
+          <div key={i} className="flex items-center gap-3 px-8 whitespace-nowrap">
+            <span className="w-9 h-9 rounded-xl bg-[#635bff]/10 flex items-center justify-center flex-shrink-0">
               <item.icon className="w-4 h-4 text-[#635bff]" />
-              {item.label}
-            </div>
-          ))}
-        </div>
+            </span>
+            <span className="text-sm font-medium text-[#425466] dark:text-[#ebebf5]">{item.label}</span>
+          </div>
+        ))}
       </div>
     </div>
   )
@@ -309,7 +307,7 @@ function ProfileSection() {
 
   const profiles = [
     {
-      key: 'student', image: '/images/student.jpg',
+      key: 'student', image: MEDIA.student, chip: GraduationCap,
       title: t('profiles.student.title'),
       description: t('profiles.student.description'),
       badge: t('profiles.student.badge'),
@@ -317,7 +315,7 @@ function ProfileSection() {
       features: ['Universités gratuites (Allemagne)', 'Visa étudiant D', 'Compte bloqué', 'Bourse DAAD'],
     },
     {
-      key: 'worker', image: '/images/worker.jpg',
+      key: 'worker', image: MEDIA.worker, chip: Briefcase,
       title: t('profiles.worker.title'),
       description: t('profiles.worker.description'),
       badge: t('profiles.worker.badge'),
@@ -325,7 +323,7 @@ function ProfileSection() {
       features: ['Offres d\'emploi vérifiées', 'Validation de diplômes', 'Visa travailleur', 'Formation linguistique'],
     },
     {
-      key: 'visitor', image: '/images/visitor.jpg',
+      key: 'visitor', image: MEDIA.visitor, chip: Plane,
       title: t('profiles.visitor.title'),
       description: t('profiles.visitor.description'),
       badge: t('profiles.visitor.badge'),
@@ -341,48 +339,60 @@ function ProfileSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className="text-center mb-14"
         >
-          <div className="section-eyebrow justify-center" style={{ display: 'flex', justifyContent: 'center' }}>
-            Nos services
-          </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-[#0a2540] dark:text-white mb-3">
+          <div className="section-kicker justify-center">Nos services</div>
+          <h2 className="section-title text-[#0a2540] dark:text-white mt-4 mb-3">
             {t('profiles.title')}
           </h2>
           <p className="text-[#425466] dark:text-[#ebebf5] max-w-xl mx-auto">{t('profiles.subtitle')}</p>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 gap-7">
           {profiles.map((p, i) => (
             <motion.div
               key={p.key}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: i * 0.1 }}
+              transition={{ duration: 0.5, delay: i * 0.1 }}
             >
               <Link
                 href={p.href}
-                className="block bg-white dark:bg-[#1c1c1e] rounded-2xl border border-[#e3e8ee] dark:border-[#38383a] p-6 shadow-sm hover:shadow-md hover:border-[#cbd5e1] dark:hover:border-[#48484a] transition-all group"
+                className="group block bg-white dark:bg-[#1c1c1e] rounded-3xl border border-[#e3e8ee] dark:border-[#38383a] overflow-hidden shadow-sm lift hover:border-[#635bff]/40 dark:hover:border-[#635bff]/40"
               >
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-lg bg-[#f6f9fc] dark:bg-[#2c2c2e] flex items-center justify-center">
-                    <Image src={p.image} width={40} height={40} alt={p.title} className="w-10 h-10 object-cover" />
+                <div className="relative h-44 overflow-hidden">
+                  <Image
+                    src={p.image}
+                    alt={p.title}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a2540]/70 via-transparent to-transparent" />
+                  <div className="absolute top-4 right-4">
+                    <span className="badge badge-primary backdrop-blur">{p.badge}</span>
                   </div>
-                  <span className="badge badge-primary">{p.badge}</span>
+                  <div className="absolute bottom-4 left-5 w-11 h-11 rounded-2xl bg-brand-gradient shadow-glow flex items-center justify-center">
+                    <p.chip className="w-5 h-5 text-white" />
+                  </div>
                 </div>
-                <h3 className="text-lg font-semibold text-[#0a2540] dark:text-white mb-2">{p.title}</h3>
-                <p className="text-sm text-[#425466] dark:text-[#ebebf5] leading-relaxed mb-4">{p.description}</p>
-                <ul className="space-y-2 mb-5">
-                  {p.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm text-[#425466] dark:text-[#ebebf5]">
-                      <CheckCircle className="w-4 h-4 text-[#635bff] flex-shrink-0" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <div className="flex items-center gap-1 text-sm font-medium text-[#635bff]">
-                  Postuler <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <div className="p-6">
+                  <h3 className="text-lg font-bold text-[#0a2540] dark:text-white mb-2">{p.title}</h3>
+                  <p className="text-sm text-[#425466] dark:text-[#ebebf5] leading-relaxed mb-4">{p.description}</p>
+                  <ul className="space-y-2 mb-6">
+                    {p.features.map((f) => (
+                      <li key={f} className="flex items-center gap-2 text-sm text-[#425466] dark:text-[#ebebf5]">
+                        <span className="w-5 h-5 rounded-full bg-[#635bff]/10 flex items-center justify-center flex-shrink-0">
+                          <CheckCircle className="w-3 h-3 text-[#635bff]" />
+                        </span>
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#635bff] group-hover:gap-2.5 transition-all">
+                    Postuler <ArrowRight className="w-4 h-4" />
+                  </div>
                 </div>
               </Link>
             </motion.div>
@@ -399,7 +409,8 @@ function DestinationsSection() {
 
   const destinations = [
     {
-      icon: <Landmark className="w-10 h-10 text-[#635bff]" />, code: 'DE',
+      image: MEDIA.germany, icon: <Landmark className="w-6 h-6 text-white" />,
+      code: 'DE',
       name: t('destinations.germany.name'),
       tagline: t('destinations.germany.tagline'),
       description: t('destinations.germany.description'),
@@ -408,7 +419,8 @@ function DestinationsSection() {
       statLabel: '€45,000', statSub: 'Salaire moyen/an',
     },
     {
-      icon: <Ship className="w-10 h-10 text-[#0d9488]" />, code: 'PT',
+      image: MEDIA.portugal, icon: <Ship className="w-6 h-6 text-white" />,
+      code: 'PT',
       name: t('destinations.portugal.name'),
       tagline: t('destinations.portugal.tagline'),
       description: t('destinations.portugal.description'),
@@ -419,64 +431,79 @@ function DestinationsSection() {
   ]
 
   return (
-    <section id="destinations" className="section-padding relative overflow-hidden">
+    <section id="destinations" className="section-padding relative bg-[#f6f9fc] dark:bg-[#1c1c1e] overflow-hidden">
       {/* Background image */}
-      <div className="absolute inset-0 bg-[url('/images/destinations-bg.jpg')] bg-center bg-cover opacity-50"></div>
+      <div className="absolute inset-0 bg-[url('/images/destinations-bg.jpg')] bg-center bg-cover opacity-20" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#f6f9fc]/70 via-transparent to-[#f6f9fc]/70 dark:from-[#1c1c1e]/70 dark:via-transparent dark:to-[#1c1c1e]/70" />
+      <div className="aurora-blob w-96 h-96 bg-[#635bff]/10 top-10 -right-24" />
       <div className="relative z-10 container-custom">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-12"
+          className="text-center mb-14"
         >
-          <div className="section-eyebrow" style={{ display: 'flex', justifyContent: 'center' }}>
-            <MapPin className="w-4 h-4" />
+          <div className="section-kicker justify-center">
+            <MapPin className="w-3.5 h-3.5" />
             {t('destinations.title')}
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-[#0a2540] dark:text-white mb-3">
-            Premier <span className="text-[#635bff]">Destinations</span>
+          <h2 className="section-title text-[#0a2540] dark:text-white mt-4 mb-3">
+            {t('destinations.title')}
           </h2>
           <p className="text-[#425466] dark:text-[#ebebf5] max-w-2xl mx-auto">{t('destinations.subtitle')}</p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-7">
           {destinations.map((dest, i) => (
             <motion.div
               key={dest.code}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="bg-white dark:bg-[#1c1c1e] rounded-2xl border border-[#e3e8ee] dark:border-[#38383a] p-6 shadow-sm hover:shadow-md transition-all"
+              className="group relative rounded-3xl overflow-hidden min-h-[460px] shadow-lg"
             >
-              <div className="flex items-start justify-between mb-4">
-                <div className="w-14 h-14 rounded-xl bg-[#f6f9fc] dark:bg-[#2c2c2e] flex items-center justify-center">
-                  {dest.icon}
+              <Image
+                src={dest.image}
+                alt={dest.name}
+                fill
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a2540] via-[#0a2540]/55 to-[#0a2540]/10" />
+
+              <div className="relative z-10 flex flex-col justify-end h-full p-7">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-11 h-11 rounded-2xl bg-brand-gradient shadow-glow flex items-center justify-center">
+                    {dest.icon}
+                  </div>
+                  <span className="badge glass text-white backdrop-blur">Premium Destination</span>
                 </div>
-                <span className="badge badge-primary">Premium Destination</span>
-              </div>
-              <h3 className="text-xl font-semibold text-[#0a2540] dark:text-white mb-1">{dest.name}</h3>
-              <p className="text-sm text-[#635bff] font-medium mb-3">{dest.tagline}</p>
-              <p className="text-sm text-[#425466] dark:text-[#ebebf5] leading-relaxed mb-5">{dest.description}</p>
-              <ul className="space-y-2 mb-6">
-                {(Array.isArray(dest.highlights) ? dest.highlights : []).map((h: string) => (
-                  <li key={h} className="flex items-center gap-2 text-sm text-[#425466] dark:text-[#ebebf5]">
-                    <CheckCircle className="w-4 h-4 text-[#635bff] flex-shrink-0" />
-                    {h}
-                  </li>
-                ))}
-              </ul>
-              <div className="flex items-center justify-between pt-4 border-t border-[#e3e8ee] dark:border-[#38383a]">
-                <Link
-                  href={dest.cta}
-                  className="inline-flex items-center gap-2 font-medium text-[#635bff] hover:text-[#4b45c6] transition-colors text-sm"
-                >
-                  Postuler maintenant <ArrowRight className="w-4 h-4" />
-                </Link>
-                <div className="text-right">
-                  <div className="font-semibold text-[#0a2540] dark:text-white">{dest.statLabel}</div>
-                  <div className="text-xs text-[#697386] dark:text-[#8e8e93]">{dest.statSub}</div>
+                <h3 className="text-2xl font-extrabold text-white mb-1">{dest.name}</h3>
+                <p className="text-sm text-[#a5a3ff] font-medium mb-4">{dest.tagline}</p>
+                <p className="text-sm text-white/70 leading-relaxed mb-6 max-w-md">{dest.description}</p>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-7">
+                  {(Array.isArray(dest.highlights) ? dest.highlights : []).slice(0, 4).map((h: string) => (
+                    <li key={h} className="flex items-center gap-2 text-sm text-white/80">
+                      <span className="w-5 h-5 rounded-full bg-white/15 flex items-center justify-center flex-shrink-0">
+                        <CheckCircle className="w-3 h-3 text-[#22d3ee]" />
+                      </span>
+                      {h}
+                    </li>
+                  ))}
+                </ul>
+                <div className="flex items-center justify-between pt-5 border-t border-white/15">
+                  <Link
+                    href={dest.cta}
+                    className="inline-flex items-center gap-2 rounded-full btn-gradient px-5 py-2.5 text-sm font-semibold"
+                  >
+                    Postuler maintenant <ArrowRight className="w-4 h-4" />
+                  </Link>
+                  <div className="text-right">
+                    <div className="font-bold text-white">{dest.statLabel}</div>
+                    <div className="text-xs text-white/50">{dest.statSub}</div>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -497,40 +524,43 @@ function ProcessSection() {
   ]
 
   return (
-    <section className="section-padding bg-white dark:bg-black">
-      <div className="container-custom">
+    <section className="section-padding bg-white dark:bg-black relative overflow-hidden">
+      <div className="aurora-blob w-80 h-80 bg-[#8b5cf6]/10 -bottom-24 -left-24" />
+      <div className="container-custom relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className="text-center mb-14"
         >
-          <div className="section-eyebrow" style={{ display: 'flex', justifyContent: 'center' }}>
-            Comment ça marche
-          </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-[#0a2540] dark:text-white mb-3">
+          <div className="section-kicker justify-center">Comment ça marche</div>
+          <h2 className="section-title text-[#0a2540] dark:text-white mt-4 mb-3">
             {t('process.title')}
           </h2>
           <p className="text-[#425466] dark:text-[#ebebf5]">{t('process.subtitle')}</p>
         </motion.div>
 
         <div className="relative max-w-3xl mx-auto">
-          <div className="space-y-4">
+          <div className="absolute left-[22px] top-2 bottom-2 w-px bg-gradient-to-b from-[#635bff] via-[#8b5cf6] to-[#22d3ee] opacity-40" />
+          <div className="space-y-5">
             {(Array.isArray(steps) ? steps : []).map((step, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 14 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.1 }}
-                className="flex gap-4 items-start"
+                transition={{ duration: 0.45, delay: i * 0.08 }}
+                className="relative flex gap-5 items-start pl-0"
               >
-                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#f6f9fc] dark:bg-[#2c2c2e] border border-[#e3e8ee] dark:border-[#38383a] flex items-center justify-center">
-                  {stepIcons[i] && React.createElement(stepIcons[i], { className: 'w-5 h-5 text-[#635bff]' })}
+                <div className="relative z-10 flex-shrink-0 w-11 h-11 rounded-2xl bg-brand-gradient shadow-glow flex items-center justify-center">
+                  {stepIcons[i] && React.createElement(stepIcons[i], { className: 'w-5 h-5 text-white' })}
                 </div>
-                <div className="flex-1 bg-white dark:bg-[#1c1c1e] rounded-xl border border-[#e3e8ee] dark:border-[#38383a] p-5 shadow-sm">
-                  <div className="text-xs font-semibold text-[#635bff] uppercase tracking-wider mb-1">Étape {i + 1}</div>
-                  <h4 className="font-semibold text-[#0a2540] dark:text-white mb-1">{step.title}</h4>
+                <div className="flex-1 bg-white dark:bg-[#1c1c1e] rounded-2xl border border-[#e3e8ee] dark:border-[#38383a] p-6 shadow-sm hover:shadow-md hover:border-[#635bff]/30 transition-all group">
+                  <div className="flex items-center gap-3 mb-1">
+                    <span className="text-xs font-bold text-[#635bff] uppercase tracking-widest">Étape {i + 1}</span>
+                    <span className="text-[#635bff]/30 font-bold text-sm transition-all group-hover:translate-x-1">→</span>
+                  </div>
+                  <h4 className="font-bold text-[#0a2540] dark:text-white mb-1">{step.title}</h4>
                   <p className="text-sm text-[#425466] dark:text-[#ebebf5]">{step.desc}</p>
                 </div>
               </motion.div>
@@ -542,38 +572,11 @@ function ProcessSection() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="text-center mt-10"
+          className="text-center mt-12"
         >
           <button
             onClick={() => window.location.href = '/apply'}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              padding: '10px 20px',
-              fontSize: '14px',
-              fontWeight: 500,
-              borderRadius: '4px',
-              background: '#635bff',
-              color: '#ffffff',
-              border: 'none',
-              textDecoration: 'none',
-              lineHeight: 1.5,
-              fontFamily: 'inherit',
-              letterSpacing: 0,
-              boxShadow: '0 1px 3px rgba(60, 66, 87, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)',
-              transition: 'all 0.15s ease',
-              cursor: 'pointer'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = '#4b45c6'
-              e.currentTarget.style.boxShadow = '0 2px 6px rgba(99, 91, 255, 0.25)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = '#635bff'
-              e.currentTarget.style.boxShadow = '0 1px 3px rgba(60, 66, 87, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)'
-            }}
+            className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full btn-gradient text-sm font-semibold"
           >
             Commencer ma demande <ArrowRight className="w-4 h-4" />
           </button>
@@ -584,53 +587,82 @@ function ProcessSection() {
 }
 
 // ── Testimonials ───────────────────────────────────────────────────────────────
+const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
+
+const STATIC_TESTIMONIALS = [
+  {
+    id: '1', name: 'Amara Diallo', country: 'Kinshasa, RD Congo', destination: 'Berlin',
+    role: 'Software Engineer',
+    text: 'Vision Europe Africa a changé ma vie. L\'équipe m\'a guidé étape par étape pour le visa travail allemand. Je gagne maintenant €55,000/an à Berlin !',
+    rating: 5,
+    photoUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=80&q=70',
+    videoUrl: null,
+  },
+  {
+    id: '2', name: 'Marie-Claire Nkosi', country: 'Cameroun', destination: 'Lisbonne',
+    role: 'Étudiante en Médecine',
+    text: 'J\'ai obtenu mon visa étudiant pour Lisbonne en 3 mois. L\'équipe est très professionnelle et disponible. Je recommande fortement !',
+    rating: 5,
+    photoUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=80&q=70',
+    videoUrl: null,
+  },
+  {
+    id: '3', name: 'Jean-Baptiste Kabila', country: 'Kinshasa, RD Congo', destination: 'Hambourg',
+    role: 'Logisticien',
+    text: 'Professionnel, transparent et efficace. Ils ont géré tous mes documents et j\'ai reçu mon permis de travail allemand plus vite que prévu.',
+    rating: 5,
+    photoUrl: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=80&q=70',
+    videoUrl: null,
+  },
+  {
+    id: '4', name: 'Fatou Sow', country: 'Sénégal', destination: 'Porto',
+    role: 'Étudiante en Commerce',
+    text: 'Le processus était clair et sans surprise. Vision Europe Africa m\'a accompagnée du premier contact jusqu\'à mon arrivée à Porto.',
+    rating: 5,
+    photoUrl: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=80&q=70',
+    videoUrl: null,
+  },
+  {
+    id: '5', name: 'Christian Mbeki', country: 'Côte d\'Ivoire', destination: 'Munich',
+    role: 'Spécialiste IT',
+    text: 'J\'étais sceptique, mais l\'équipe s\'est montrée extrêmement compétente. Mon dossier Opportunity Card a été accepté du premier coup !',
+    rating: 5,
+    photoUrl: 'https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?w=80&q=70',
+    videoUrl: null,
+  },
+  {
+    id: '6', name: 'Adaeze Okafor', country: 'Nigeria', destination: 'Lisbonne',
+    role: 'Infirmière',
+    text: 'Ils m\'ont trouvé un poste d\'infirmière à Lisbonne avec prise en charge du visa. En 4 mois j\'étais déjà en train de travailler au Portugal !',
+    rating: 5,
+    photoUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&q=70',
+    videoUrl: null,
+  },
+]
+
+function toEmbedUrl(url: string): string | null {
+  const trimmed = url.trim()
+  // YouTube
+  const yt = trimmed.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{6,})/)
+  if (yt) return `https://www.youtube.com/embed/${yt[1]}`
+  // Vimeo
+  const vm = trimmed.match(/vimeo\.com\/(?:video\/)?(\d+)/)
+  if (vm) return `https://player.vimeo.com/video/${vm[1]}`
+  // Raw .mp4
+  if (/\.(mp4|webm|ogv)(\?.*)?$/.test(trimmed)) return trimmed
+  return null
+}
+
 function TestimonialsSection() {
   const { t } = useTranslation()
+  const [testimonials, setTestimonials] = useState(STATIC_TESTIMONIALS)
+  const [video, setVideo] = useState<string | null>(null)
 
-  const testimonials = [
-    {
-      name: 'Amara Diallo', country: 'Kinshasa, RD Congo', destination: 'Berlin',
-      role: 'Software Engineer',
-      text: 'Vision Europe Africa a changé ma vie. L\'équipe m\'a guidé étape par étape pour le visa travail allemand. Je gagne maintenant €55,000/an à Berlin !',
-      stars: 5,
-      avatar: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=80&q=70',
-    },
-    {
-      name: 'Marie-Claire Nkosi', country: 'Cameroun', destination: 'Lisbonne',
-      role: 'Étudiante en Médecine',
-      text: 'J\'ai obtenu mon visa étudiant pour Lisbonne en 3 mois. L\'équipe est très professionnelle et disponible. Je recommande fortement !',
-      stars: 5,
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&q=70',
-    },
-    {
-      name: 'Jean-Baptiste Kabila', country: 'Kinshasa, RD Congo', destination: 'Hambourg',
-      role: 'Logisticien',
-      text: 'Professionnel, transparent et efficace. Ils ont géré tous mes documents et j\'ai reçu mon permis de travail allemand plus vite que prévu.',
-      stars: 5,
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&q=70',
-    },
-    {
-      name: 'Fatou Sow', country: 'Sénégal', destination: 'Porto',
-      role: 'Étudiante en Commerce',
-      text: 'Le processus était clair et sans surprise. Vision Europe Africa m\'a accompagnée du premier contact jusqu\'à mon arrivée à Porto.',
-      stars: 5,
-      avatar: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=80&q=70',
-    },
-    {
-      name: 'Christian Mbeki', country: 'Côte d\'Ivoire', destination: 'Munich',
-      role: 'Spécialiste IT',
-      text: 'J\'étais sceptique, mais l\'équipe s\'est montrée extrêmement compétente. Mon dossier Opportunity Card a été accepté du premier coup !',
-      stars: 5,
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&q=70',
-    },
-    {
-      name: 'Adaeze Okafor', country: 'Nigeria', destination: 'Lisbonne',
-      role: 'Infirmière',
-      text: 'Ils m\'ont trouvé un poste d\'infirmière à Lisbonne avec prise en charge du visa. En 4 mois j\'étais déjà en train de travailler au Portugal !',
-      stars: 5,
-      avatar: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=80&q=70',
-    },
-  ]
+  useEffect(() => {
+    axios.get(`${API}/testimonials`)
+      .then(r => { if (Array.isArray(r.data) && r.data.length) setTestimonials(r.data) })
+      .catch(() => {})
+  }, [])
 
   return (
     <section id="testimonials" className="section-padding bg-[#f6f9fc] dark:bg-[#1c1c1e]">
@@ -639,53 +671,121 @@ function TestimonialsSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className="text-center mb-14"
         >
-          <div className="section-eyebrow" style={{ display: 'flex', justifyContent: 'center' }}>
-            <Users className="w-4 h-4" />
+          <div className="section-kicker justify-center">
+            <Users className="w-3.5 h-3.5" />
             {t('testimonials.title')}
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-[#0a2540] dark:text-white mb-3">
-            Ils ont réussi <span className="text-[#635bff]">leur projet</span>
+          <h2 className="section-title text-[#0a2540] dark:text-white mt-4 mb-3">
+            Ils ont réussi <span className="gradient-text">leur projet</span>
           </h2>
           <p className="text-[#425466] dark:text-[#ebebf5] max-w-2xl mx-auto">{t('testimonials.subtitle')}</p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {testimonials.map((item, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: i * 0.05 }}
-              className="bg-white dark:bg-[#1c1c1e] rounded-xl border border-[#e3e8ee] dark:border-[#38383a] p-5 shadow-sm"
-            >
-              <div className="flex items-center gap-1 mb-3">
-                {Array.from({ length: item.stars }).map((_, s) => (
-                  <Star key={s} className="w-4 h-4 text-[#f59e0b] fill-[#f59e0b]" />
-                ))}
-              </div>
-              <p className="text-sm text-[#425466] dark:text-[#ebebf5] leading-relaxed mb-4">&ldquo;{item.text}&rdquo;</p>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <img
-                    src={item.avatar}
-                    alt={item.name}
-                    className="w-9 h-9 rounded-full object-cover border border-[#e3e8ee] dark:border-[#38383a]"
-                    loading="lazy"
-                  />
-                  <div>
-                    <div className="font-medium text-sm text-[#0a2540] dark:text-white">{item.name}</div>
-                    <div className="text-xs text-[#697386] dark:text-[#8e8e93]">{item.role} · {item.country}</div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {testimonials.map((item, i) => {
+            const embedUrl = item.videoUrl ? toEmbedUrl(item.videoUrl) : null
+            return (
+              <motion.div
+                key={item.id || i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.45, delay: i * 0.05 }}
+                className="bg-white dark:bg-[#1c1c1e] rounded-3xl border border-[#e3e8ee] dark:border-[#38383a] p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all flex flex-col"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: item.rating }).map((_, s) => (
+                      <Star key={s} className="w-4 h-4 text-[#f59e0b] fill-[#f59e0b]" />
+                    ))}
                   </div>
+                  <Quote className="w-7 h-7 text-[#635bff]/20" />
                 </div>
-                <div className="text-xs font-medium text-[#635bff]">{item.destination}</div>
-              </div>
-            </motion.div>
-          ))}
+                <p className="text-sm text-[#425466] dark:text-[#ebebf5] leading-relaxed mb-5 flex-1">&ldquo;{item.text}&rdquo;</p>
+
+                {embedUrl && (
+                  <button
+                    onClick={() => setVideo(embedUrl)}
+                    className="relative w-full aspect-video rounded-2xl overflow-hidden mb-5 group"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#635bff]/40 to-[#0a2540]/70" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-14 h-14 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-glow group-hover:scale-110 transition-transform">
+                        <Play className="w-6 h-6 text-[#635bff] ml-0.5" />
+                      </div>
+                    </div>
+                    <div className="absolute inset-x-0 bottom-0 p-3 text-xs text-white/80 bg-gradient-to-t from-black/60 to-transparent">
+                      Voir le témoignage vidéo ▶
+                    </div>
+                  </button>
+                )}
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    {item.photoUrl ? (
+                      <img
+                        src={item.photoUrl}
+                        alt={item.name}
+                        className="w-10 h-10 rounded-full object-cover border-2 border-[#635bff]/30"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-brand-gradient flex items-center justify-center text-white text-sm font-semibold">
+                        {item.name.charAt(0)}
+                      </div>
+                    )}
+                    <div>
+                      <div className="font-semibold text-sm text-[#0a2540] dark:text-white">{item.name}</div>
+                      <div className="text-xs text-[#697386] dark:text-[#8e8e93]">{item.role} · {item.country}</div>
+                    </div>
+                  </div>
+                  <div className="text-xs font-bold text-[#635bff] bg-[#635bff]/10 px-3 py-1.5 rounded-full">{item.destination}</div>
+                </div>
+              </motion.div>
+            )
+          })}
         </div>
       </div>
+
+      {/* Video modal */}
+      <AnimatePresence>
+        {video && (
+          <motion.div
+            className="fixed inset-0 z-[60] flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setVideo(null)}
+          >
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+            <motion.div
+              className="relative w-full max-w-3xl z-10"
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.95 }}
+              onClick={e => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setVideo(null)}
+                className="absolute -top-10 right-0 text-white/80 hover:text-white text-sm flex items-center gap-1"
+              >
+                Fermer <X className="w-4 h-4" />
+              </button>
+              <div className="aspect-video rounded-2xl overflow-hidden bg-black shadow-2xl">
+                <iframe
+                  src={video}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  title="Témoignage vidéo"
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   )
 }
@@ -713,12 +813,12 @@ function FAQSection() {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <div className="section-eyebrow" style={{ display: 'flex', justifyContent: 'center' }}>
-            <Shield className="w-4 h-4" />
+          <div className="section-kicker justify-center">
+            <Shield className="w-3.5 h-3.5" />
             {t('faq.title')}
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-[#0a2540] dark:text-white mb-3">
-            Questions <span className="text-[#635bff]">fréquentes</span>
+          <h2 className="section-title text-[#0a2540] dark:text-white mt-4 mb-3">
+            Questions <span className="gradient-text">fréquentes</span>
           </h2>
           <p className="text-[#425466] dark:text-[#ebebf5]">{t('faq.subtitle')}</p>
         </motion.div>
@@ -731,17 +831,28 @@ function FAQSection() {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.05 }}
-              className="bg-white dark:bg-[#1c1c1e] rounded-xl border border-[#e3e8ee] dark:border-[#38383a] overflow-hidden shadow-sm"
+              className={`bg-white dark:bg-[#1c1c1e] rounded-2xl border overflow-hidden transition-all ${
+                open === i ? 'border-[#635bff]/40 shadow-glow' : 'border-[#e3e8ee] dark:border-[#38383a] shadow-sm'
+              }`}
             >
               <button
                 className="w-full flex items-center justify-between p-5 text-left"
                 onClick={() => setOpen(open === i ? null : i)}
                 aria-expanded={open === i}
               >
-                <span className="font-medium text-sm text-[#0a2540] dark:text-white pr-4">{faq.q}</span>
-                <ChevronDown
-                  className={`w-5 h-5 text-[#635bff] flex-shrink-0 transition-transform ${open === i ? 'rotate-180' : ''}`}
-                />
+                <span className="flex items-center gap-3 font-medium text-sm text-[#0a2540] dark:text-white pr-4">
+                  <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 transition-colors ${
+                    open === i ? 'bg-brand-gradient text-white' : 'bg-[#635bff]/10 text-[#635bff]'
+                  }`}>
+                    {i + 1}
+                  </span>
+                  {faq.q}
+                </span>
+                <span className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${
+                  open === i ? 'bg-brand-gradient rotate-180' : 'bg-[#635bff]/10'
+                }`}>
+                  <ChevronDown className={`w-4 h-4 ${open === i ? 'text-white' : 'text-[#635bff]'}`} />
+                </span>
               </button>
               <AnimatePresence>
                 {open === i && (
@@ -751,7 +862,7 @@ function FAQSection() {
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <div className="px-5 pb-5 text-sm text-[#425466] dark:text-[#ebebf5] leading-relaxed border-t border-[#e3e8ee] dark:border-[#38383a] pt-4">
+                    <div className="px-5 pb-5 pl-[52px] text-sm text-[#425466] dark:text-[#ebebf5] leading-relaxed">
                       {faq.a}
                     </div>
                   </motion.div>
@@ -771,103 +882,54 @@ function CTASection() {
     <section className="section-padding bg-[#f6f9fc] dark:bg-[#1c1c1e]">
       <div className="container-custom">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="bg-white dark:bg-[#1c1c1e] rounded-2xl border border-[#e3e8ee] dark:border-[#38383a] p-8 md:p-12 text-center shadow-sm"
+          className="relative rounded-3xl overflow-hidden bg-[#0a2540] p-10 md:p-16 text-center shadow-2xl"
         >
-          <div className="w-14 h-14 rounded-xl bg-[#f6f9fc] dark:bg-[#2c2c2e] flex items-center justify-center mx-auto mb-5">
-            <Rocket className="w-7 h-7 text-[#635bff]" />
-          </div>
-          <h2 className="text-2xl md:text-3xl font-bold text-[#0a2540] dark:text-white mb-3">
-            Prêt à commencer votre voyage ?
-          </h2>
-          <p className="text-[#425466] dark:text-[#ebebf5] max-w-xl mx-auto mb-6">
-            Des milliers d'Africains ont réalisé leur rêve européen grâce à nous. Soumettez votre candidature en moins de 10 minutes.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <button
-              onClick={() => window.location.href = '/apply'}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                padding: '10px 20px',
-                fontSize: '14px',
-                fontWeight: 500,
-                borderRadius: '4px',
-                background: '#635bff',
-                color: '#ffffff',
-                border: 'none',
-                textDecoration: 'none',
-                lineHeight: 1.5,
-                fontFamily: 'inherit',
-                letterSpacing: 0,
-                boxShadow: '0 1px 3px rgba(60, 66, 87, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)',
-                transition: 'all 0.15s ease',
-                cursor: 'pointer'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#4b45c6'
-                e.currentTarget.style.boxShadow = '0 2px 6px rgba(99, 91, 255, 0.25)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = '#635bff'
-                e.currentTarget.style.boxShadow = '0 1px 3px rgba(60, 66, 87, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)'
-              }}
-            >
-              Commencer maintenant <ArrowRight className="w-4 h-4" />
-            </button>
-            <a
-              href="https://t.me/visioneuropeafrica"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                padding: '10px 20px',
-                fontSize: '14px',
-                fontWeight: 500,
-                borderRadius: '4px',
-                background: '#ffffff',
-                color: '#0a2540',
-                border: '1px solid #e3e8ee',
-                textDecoration: 'none',
-                lineHeight: 1.5,
-                fontFamily: 'inherit',
-                letterSpacing: 0,
-                boxShadow: '0 1px 3px rgba(60, 66, 87, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)',
-                transition: 'all 0.15s ease',
-                cursor: 'pointer'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#f6f9fc'
-                e.currentTarget.style.borderColor = '#cbd5e1'
-                e.currentTarget.style.boxShadow = '0 2px 6px rgba(60, 66, 87, 0.1)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = '#ffffff'
-                e.currentTarget.style.borderColor = '#e3e8ee'
-                e.currentTarget.style.boxShadow = '0 1px 3px rgba(60, 66, 87, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)'
-              }}
-            >
-              <Send className="w-4 h-4" />
-              Contacter sur Telegram
-            </a>
-          </div>
-          <div className="flex items-center justify-center gap-6 mt-8 text-sm text-[#425466] dark:text-[#ebebf5] flex-wrap">
-            <span className="flex items-center gap-2">
-              <Shield className="w-4 h-4 text-[#635bff]" /> 100% Légal
-            </span>
-            <span className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-[#635bff]" /> Réponse en 48h
-            </span>
-            <span className="flex items-center gap-2">
-              <Star className="w-4 h-4 text-[#f59e0b]" /> 97% de succès
-            </span>
+          <div className="absolute inset-0 bg-brand-gradient opacity-25" />
+          <div className="aurora-blob w-72 h-72 bg-[#8b5cf6]/50 -top-20 -right-16 animate-pulse-glow" />
+          <div className="aurora-blob w-72 h-72 bg-[#22d3ee]/30 -bottom-20 -left-16 animate-pulse-glow" />
+          <div className="absolute inset-0 grid-pattern opacity-30" />
+
+          <div className="relative z-10">
+            <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur border border-white/15 flex items-center justify-center mx-auto mb-6">
+              <Rocket className="w-8 h-8 text-white" />
+            </div>
+            <h2 className="text-2xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">
+              Prêt à commencer votre <span className="gradient-text-animated">voyage ?</span>
+            </h2>
+            <p className="text-white/70 max-w-xl mx-auto mb-8">
+              Des milliers d'Africains ont réalisé leur rêve européen grâce à nous. Soumettez votre candidature en moins de 10 minutes.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                onClick={() => window.location.href = '/apply'}
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-white text-[#0a2540] text-sm font-bold hover:bg-[#f6f9fc] transition-all shadow-lg"
+              >
+                Commencer maintenant <ArrowRight className="w-4 h-4" />
+              </button>
+              <a
+                href="https://t.me/visioneuropeafrica"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full glass text-white text-sm font-bold hover:bg-white/15 transition-all"
+              >
+                <Send className="w-4 h-4" />
+                Contacter sur Telegram
+              </a>
+            </div>
+            <div className="flex items-center justify-center gap-6 mt-9 text-sm text-white/70 flex-wrap">
+              <span className="flex items-center gap-2">
+                <Shield className="w-4 h-4 text-[#a5a3ff]" /> 100% Légal
+              </span>
+              <span className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-[#a5a3ff]" /> Réponse en 48h
+              </span>
+              <span className="flex items-center gap-2">
+                <Star className="w-4 h-4 text-[#f59e0b]" /> 97% de succès
+              </span>
+            </div>
           </div>
         </motion.div>
       </div>
@@ -883,13 +945,13 @@ function WhatsAppFloat() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat WhatsApp"
-      className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full flex items-center justify-center shadow-sm bg-[#25D366] hover:bg-[#20bd5a] transition-colors"
+      className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-glow-lg bg-[#25D366] hover:bg-[#20bd5a] transition-colors"
       initial={{ scale: 0 }}
       animate={{ scale: 1 }}
       transition={{ delay: 2.5, type: 'spring' }}
-      whileHover={{ scale: 1.05 }}
+      whileHover={{ scale: 1.08 }}
     >
-      <Send className="w-5 h-5 text-white" />
+      <Send className="w-6 h-6 text-white" />
     </motion.a>
   )
 }

@@ -1,28 +1,6 @@
 version: '3.9'
 
 services:
-  # ── PostgreSQL Database ──────────────────────────────────────────────────────
-  postgres:
-    image: postgres:16-alpine
-    container_name: vea_postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: vision_europe_africa
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-strongpassword}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ../backend/migrations:/docker-entrypoint-initdb.d
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - vea_network
-
   # ── Backend API ──────────────────────────────────────────────────────────────
   backend:
     build:
@@ -30,17 +8,13 @@ services:
       dockerfile: Dockerfile
     container_name: vea_backend
     restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
     environment:
+      # Project is configured to use an external Neon Postgres via
+      # the `DATABASE_URL` environment variable. Provide this variable
+      # (e.g. in a .env file or CI/CD) before starting the stack.
+      DATABASE_URL: ${DATABASE_URL}
       NODE_ENV: production
       PORT: 5000
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: vision_europe_africa
-      DB_USER: postgres
-      DB_PASSWORD: ${DB_PASSWORD:-strongpassword}
       JWT_SECRET: ${JWT_SECRET:-change_this_in_production}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
       TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID}

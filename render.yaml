@@ -13,9 +13,7 @@ services:
       - key: PORT
         value: 10000
       - key: DATABASE_URL
-        fromDatabase:
-          name: vea-database
-          property: connectionString
+        sync: false
       - key: JWT_SECRET
         generateValue: true
       - key: TELEGRAM_BOT_TOKEN
@@ -43,9 +41,5 @@ services:
       - key: NEXT_PUBLIC_API_URL
         sync: false
 
-databases:
+# Neon provides the production PostgreSQL database.
   # ── PostgreSQL ────────────────────────────────────────────
-  - name: vea-database
-    plan: free
-    databaseName: vision_europe_africa
-    user: vea_user
