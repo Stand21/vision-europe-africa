@@ -60,7 +60,7 @@
   --bg-tertiary: #2c2c2e;
   --text-primary: #ffffff;
   --text-secondary: #ebebf5;
-  --text-tertiary: #8e8e93;
+  --text-tertiary: #9ca3af;
   --border-color: #38383a;
   --border-hover: #48484a;
   --gray-50: #1c1c1e;
@@ -84,11 +84,10 @@
   color: var(--text-primary);
 }
 
-.dark .card,
-.dark .card-elevated,
 .dark .stat-card {
   background: var(--bg-secondary);
-  border-color: var(--border-color);
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-md);
 }
 
 .dark .btn-secondary {
@@ -160,7 +159,7 @@
 .dark .table-premium th {
   background: var(--bg-secondary);
   border-bottom-color: var(--border-color);
-  color: var(--text-tertiary);
+  color: #9ca3af;
 }
 
 .dark .table-premium td {
@@ -671,6 +670,11 @@ p {
   border: 1px solid rgba(255, 255, 255, 0.14);
 }
 
+.dark .glass {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
 .glass-strong {
   background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(20px);
@@ -818,21 +822,33 @@ p {
     padding: 10px 14px;
     font-size: 14px;
     border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.04);
-    color: #ffffff;
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
     transition: all 0.15s ease;
     outline: none;
     font-family: inherit;
   }
 
+  .dark .input-premium {
+    background: var(--bg-tertiary);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+  }
+
   .input-premium:focus {
-    border-color: rgba(99, 91, 255, 0.6);
+    border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.2);
   }
 
-  .input-premium::placeholder { color: #6b7280; }
-  .input-premium option { color: #0a2540; }
+  .input-premium::placeholder {
+    color: var(--text-tertiary);
+  }
+
+  .input-premium option {
+    color: var(--text-primary);
+    background: var(--bg-primary);
+  }
 }
 
 .btn-gold {
@@ -869,7 +885,7 @@ p {
   background: rgba(15, 22, 37, 0.72);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 /* Application journey: intentionally scoped to the application page. */

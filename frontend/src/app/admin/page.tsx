@@ -115,7 +115,7 @@ function AdminLogin({ onLogin }: { onLogin: (token: string) => void }) {
             <Shield className="w-8 h-8 text-white" />
           </div>
           <h1 className="font-display text-2xl font-bold text-white">Admin Portal</h1>
-          <p className="text-gray-500 text-sm mt-1">Vision Europe Africa — Secure Access</p>
+          <p className="text-gray-400 text-sm mt-1">Vision Europe Africa — Secure Access</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
@@ -146,7 +146,7 @@ function AdminLogin({ onLogin }: { onLogin: (token: string) => void }) {
           </button>
         </form>
 
-        <p className="text-center text-gray-600 text-xs mt-6">
+        <p className="text-center text-gray-400 text-xs mt-6">
           Protected by enterprise-grade security. All access is logged.
         </p>
       </motion.div>
@@ -271,14 +271,14 @@ function CurrencyManager({ token }: { token: string }) {
                   </td>
                 </tr>
               ))}
-              {currencies.length === 0 && (
-                <tr><td colSpan={5} className="text-center text-gray-500 py-6">Aucune devise</td></tr>
-              )}
+                 {currencies.length === 0 && (
+                  <tr><td colSpan={5} className="text-center text-gray-400 py-6">Aucune devise</td></tr>
+                )}
             </tbody>
           </table>
         </div>
       )}
-      <p className="text-xs text-gray-500">
+      <p className="text-xs text-gray-400">
         Les devises actives apparaissent automatiquement dans le formulaire de candidature.
       </p>
     </div>
@@ -372,7 +372,7 @@ function TestimonialsManager({ token }: { token: string }) {
           </label>
           <div className="flex gap-2">
             {editingId && (
-              <button onClick={cancelEdit} className="px-4 py-2.5 rounded-xl border border-white/10 text-gray-400 hover:text-white text-sm transition-colors">
+               <button onClick={cancelEdit} className="px-4 py-2.5 rounded-xl border border-white/20 text-gray-400 hover:text-white text-sm transition-colors">
                 Annuler
               </button>
             )}
@@ -403,12 +403,12 @@ function TestimonialsManager({ token }: { token: string }) {
                         ) : null}
                         {t.name}
                       </div>
-                      <div className="text-gray-500 text-xs">{t.role || '—'}</div>
+                       <div className="text-gray-400 text-xs">{t.role || '—'}</div>
                     </td>
                     <td className="text-sm text-gray-400">{t.destination || '—'}</td>
                     <td className="text-sm text-gold-400">{'★'.repeat(t.rating || 0)}</td>
                     <td className="text-sm">
-                      {t.videoUrl ? <span className="flex items-center gap-1 text-blue-400"><Video className="w-3.5 h-3.5" /> Vidéo</span> : <span className="text-gray-500">—</span>}
+                         {t.videoUrl ? <span className="flex items-center gap-1 text-blue-400"><Video className="w-3.5 h-3.5" /> Vidéo</span> : <span className="text-gray-400">—</span>}
                     </td>
                     <td>
                       <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${t.isActive ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
@@ -432,8 +432,8 @@ function TestimonialsManager({ token }: { token: string }) {
                     </td>
                   </tr>
                 ))}
-                {items.length === 0 && (
-                  <tr><td colSpan={6} className="text-center text-gray-500 py-6">Aucun témoignage</td></tr>
+                 {items.length === 0 && (
+                  <tr><td colSpan={6} className="text-center text-gray-400 py-6">Aucun témoignage</td></tr>
                 )}
               </tbody>
             </table>
@@ -551,7 +551,7 @@ function Dashboard({ token }: { token: string }) {
           </div>
           <div>
             <div className="text-white font-bold text-sm">Vision Europe Africa</div>
-            <div className="text-gray-500 text-xs">Admin Portal</div>
+             <div className="text-gray-400 text-xs">Admin Portal</div>
           </div>
         </div>
 
@@ -581,7 +581,7 @@ function Dashboard({ token }: { token: string }) {
       {/* Main */}
       <main className="flex-1 overflow-auto">
         {/* Topbar */}
-        <div className="sticky top-0 z-10 glass-dark border-b border-white/10 px-8 py-4 flex items-center justify-between">
+        <div className="sticky top-0 z-10 glass-dark border-b border-white/20 px-8 py-4 flex items-center justify-between">
           <h1 className="text-white font-bold capitalize">{activeTab === 'testimonials' ? 'Témoignages' : activeTab}</h1>
           <div className="flex items-center gap-3">
             <button onClick={() => fetchData(true)} className="relative p-2 rounded-lg glass text-gray-400 hover:text-white transition-colors" title="Actualiser">
@@ -618,10 +618,10 @@ function Dashboard({ token }: { token: string }) {
                   <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="stat-card">
                     <div className="flex items-center justify-between mb-3">
                       <s.icon className={`w-5 h-5 ${s.color}`} />
-                      <span className="text-xs text-gray-500">{s.delta}</span>
+                       <span className="text-xs text-gray-400">{s.delta}</span>
                     </div>
                     <div className="text-3xl font-bold text-white font-display">{s.value.toLocaleString()}</div>
-                    <div className="text-gray-500 text-sm mt-1">{s.label}</div>
+                     <div className="text-gray-400 text-sm mt-1">{s.label}</div>
                   </motion.div>
                 ))}
               </div>
@@ -692,7 +692,7 @@ function Dashboard({ token }: { token: string }) {
               {/* Filters */}
               <div className="flex flex-wrap gap-3 items-center">
                 <div className="relative flex-1 min-w-48">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     value={search}
                     onChange={e => { setSearch(e.target.value); setPage(1) }}
@@ -732,7 +732,7 @@ function Dashboard({ token }: { token: string }) {
                         <tr key={a.id}>
                           <td>
                             <div className="font-medium text-white text-sm">{a.fullName}</div>
-                            <div className="text-gray-500 text-xs">{a.email}</div>
+                             <div className="text-gray-400 text-xs">{a.email}</div>
                           </td>
                           <td><span className="capitalize text-sm">{a.profile}</span></td>
                           <td className="text-sm text-gray-400">{a.field || a.profession || '—'}</td>
@@ -763,7 +763,7 @@ function Dashboard({ token }: { token: string }) {
 
                 {/* Pagination */}
                 <div className="flex items-center justify-between px-4 py-3 border-t border-white/10">
-                  <span className="text-gray-500 text-xs">{filtered.length} results</span>
+                   <span className="text-gray-400 text-xs">{filtered.length} results</span>
                   <div className="flex items-center gap-2">
                     <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="p-1.5 rounded-lg glass disabled:opacity-30 hover:bg-white/10 transition-colors text-gray-400">
                       <ChevronLeft className="w-4 h-4" />
@@ -841,7 +841,7 @@ function Dashboard({ token }: { token: string }) {
                 ['Applied', new Date(selectedApp.createdAt).toLocaleDateString()],
               ].map(([k, v]) => (
                 <div key={k} className="flex justify-between">
-                  <span className="text-gray-500">{k}</span>
+                   <span className="text-gray-400">{k}</span>
                   <span className="text-white font-medium capitalize">{v}</span>
                 </div>
               ))}
@@ -905,6 +905,15 @@ const MOCK_STATS: Stats = {
 // ── Admin Root ─────────────────────────────────────────────────────────────────
 export default function AdminPage() {
   const [token, setToken] = useState<string | null>(null)
+
+  useEffect(() => {
+    const root = document.documentElement
+    const hadDark = root.classList.contains('dark')
+    if (!hadDark) root.classList.add('dark')
+    return () => {
+      if (!hadDark) root.classList.remove('dark')
+    }
+  }, [])
 
   useEffect(() => {
     const saved = Cookies.get('admin_token')
