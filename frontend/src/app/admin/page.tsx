@@ -7,7 +7,7 @@ import {
   Search, Filter, Eye, Check, X, MessageSquare, Bell,
   ChevronLeft, ChevronRight, BarChart2, PieChart, Globe2,
   Loader2, Shield, Lock, Plus, Pencil, Trash2, RefreshCw,
-  Star, Video, ExternalLink
+  Star, Video, ExternalLink, Menu
 } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -365,7 +365,7 @@ function TestimonialsManager({ token }: { token: string }) {
           <input value={form.videoUrl} onChange={set('videoUrl')} placeholder="URL vidéo (YouTube/Vimeo)" className="input-premium text-sm lg:col-span-2" />
         </div>
         <textarea value={form.text} onChange={set('text')} rows={2} placeholder="Texte du témoignage..." className="input-premium text-sm w-full" />
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <label className="flex items-center gap-2 text-sm text-gray-300">
             <input type="checkbox" checked={form.isActive} onChange={set('isActive')} className="accent-gold-400" />
             Actif (visible sur le site)
@@ -447,6 +447,7 @@ function TestimonialsManager({ token }: { token: string }) {
 // ── Dashboard Page ─────────────────────────────────────────────────────────────
 function Dashboard({ token }: { token: string }) {
   const [activeTab, setActiveTab] = useState('dashboard')
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const [applications, setApplications] = useState<Application[]>([])
   const [stats, setStats] = useState<Stats | null>(null)
   const [loading, setLoading] = useState(true)
@@ -543,23 +544,30 @@ function Dashboard({ token }: { token: string }) {
 
   return (
     <div className="min-h-screen flex bg-dark">
+      {/* Mobile sidebar overlay */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
+
       {/* Sidebar */}
-      <aside className="admin-sidebar w-64 flex-shrink-0 flex flex-col py-6 px-4">
-        <div className="flex items-center gap-3 px-4 mb-8">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-600 to-primary-800 flex items-center justify-center">
-            <span className="text-white font-bold">V</span>
+      <aside className={`admin-sidebar fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-auto lg:z-auto ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="flex items-center justify-between px-4 mb-8 lg:hidden">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-600 to-primary-800 flex items-center justify-center">
+              <span className="text-white font-bold">V</span>
+            </div>
+            <div className="text-white font-bold text-sm">Menu</div>
           </div>
-          <div>
-            <div className="text-white font-bold text-sm">Vision Europe Africa</div>
-             <div className="text-gray-400 text-xs">Admin Portal</div>
-          </div>
+          <button onClick={() => setSidebarOpen(false)} className="p-2 rounded-lg text-gray-400 hover:text-white">
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         <nav className="flex-1 space-y-1">
           {navItems.map(item => (
             <button
               key={item.id}
-              onClick={() => { setActiveTab(item.id); if (item.id === 'applications') setNewApps(0) }}
+              onClick={() => { setActiveTab(item.id); if (item.id === 'applications') setNewApps(0); setSidebarOpen(false) }}
               className={`admin-nav-item w-full ${activeTab === item.id ? 'active' : ''}`}
             >
               <item.icon className="w-4 h-4" />
@@ -579,15 +587,20 @@ function Dashboard({ token }: { token: string }) {
       </aside>
 
       {/* Main */}
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto min-w-0">
         {/* Topbar */}
-        <div className="sticky top-0 z-10 glass-dark border-b border-white/20 px-8 py-4 flex items-center justify-between">
-          <h1 className="text-white font-bold capitalize">{activeTab === 'testimonials' ? 'Témoignages' : activeTab}</h1>
+        <div className="sticky top-0 z-10 glass-dark border-b border-white/20 px-4 md:px-6 lg:px-8 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
+            <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 -ml-2 rounded-lg text-gray-400 hover:text-white">
+              <Menu className="w-5 h-5" />
+            </button>
+            <h1 className="text-white font-bold capitalize text-lg md:text-xl">{activeTab === 'testimonials' ? 'Témoignages' : activeTab}</h1>
+          </div>
+          <div className="flex items-center gap-2 md:gap-3">
             <button onClick={() => fetchData(true)} className="relative p-2 rounded-lg glass text-gray-400 hover:text-white transition-colors" title="Actualiser">
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             </button>
-            <button className="relative p-2 rounded-lg glass text-gray-400 hover:text-white transition-colors" title="Notifications">
+            <button className="relative p-2 rounded-lg glass text-gray-400 hover:text-white transition-colors hidden sm:flex" title="Notifications">
               <Bell className="w-4 h-4" />
               {newApps > 0 && <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500" />}
             </button>
@@ -597,7 +610,7 @@ function Dashboard({ token }: { token: string }) {
           </div>
         </div>
 
-        <div className="p-8">
+        <div className="p-4 md:p-6 lg:p-8">
           {loading && (
             <div className="flex items-center justify-center py-20">
               <Loader2 className="w-8 h-8 text-gold-400 animate-spin" />
@@ -608,7 +621,7 @@ function Dashboard({ token }: { token: string }) {
           {!loading && activeTab === 'dashboard' && stats && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
               {/* Stat Cards */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                 {[
                   { label: 'Total Applications', value: stats.total, icon: FileText, color: 'text-primary-400', delta: '+12%' },
                   { label: 'Pending Review', value: stats.pending, icon: Clock, color: 'text-yellow-400', delta: '+5' },
@@ -626,41 +639,41 @@ function Dashboard({ token }: { token: string }) {
                 ))}
               </div>
 
-              {/* Charts Row */}
-              <div className="grid lg:grid-cols-2 gap-6">
-                <div className="stat-card rounded-2xl p-6">
-                  <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
-                    <BarChart2 className="w-4 h-4 text-primary-400" /> Monthly Applications
-                  </h3>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <BarChart data={stats.monthly}>
-                      <XAxis dataKey="month" stroke="#6b7280" tick={{ fontSize: 11 }} />
-                      <YAxis stroke="#6b7280" tick={{ fontSize: 11 }} />
-                      <Tooltip contentStyle={{ background: '#0f1625', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }} />
-                      <Bar dataKey="applications" fill="#1a56db" radius={[4,4,0,0]} />
-                      <Bar dataKey="approved" fill="#c9a227" radius={[4,4,0,0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
+               {/* Charts Row */}
+               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+                 <div className="stat-card rounded-2xl p-4 md:p-6">
+                   <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
+                     <BarChart2 className="w-4 h-4 text-primary-400" /> Monthly Applications
+                   </h3>
+                   <ResponsiveContainer width="100%" height={180}>
+                     <BarChart data={stats.monthly}>
+                       <XAxis dataKey="month" stroke="#6b7280" tick={{ fontSize: 11 }} />
+                       <YAxis stroke="#6b7280" tick={{ fontSize: 11 }} />
+                       <Tooltip contentStyle={{ background: '#0f1625', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }} />
+                       <Bar dataKey="applications" fill="#1a56db" radius={[4,4,0,0]} />
+                       <Bar dataKey="approved" fill="#c9a227" radius={[4,4,0,0]} />
+                     </BarChart>
+                   </ResponsiveContainer>
+                 </div>
 
-                <div className="stat-card rounded-2xl p-6">
-                  <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
-                    <PieChart className="w-4 h-4 text-gold-400" /> Applications by Profile
-                  </h3>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <RePieChart>
-                      <Pie data={stats.byProfile} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" paddingAngle={4}>
-                        {stats.byProfile.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-                      </Pie>
-                      <Tooltip contentStyle={{ background: '#0f1625', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }} />
-                      <Legend wrapperStyle={{ color: '#9ca3af', fontSize: 12 }} />
-                    </RePieChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
+                 <div className="stat-card rounded-2xl p-4 md:p-6">
+                   <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
+                     <PieChart className="w-4 h-4 text-gold-400" /> Applications by Profile
+                   </h3>
+                   <ResponsiveContainer width="100%" height={180}>
+                     <RePieChart>
+                       <Pie data={stats.byProfile} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" paddingAngle={4}>
+                         {stats.byProfile.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                       </Pie>
+                       <Tooltip contentStyle={{ background: '#0f1625', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }} />
+                       <Legend wrapperStyle={{ color: '#9ca3af', fontSize: 12 }} />
+                     </RePieChart>
+                   </ResponsiveContainer>
+                 </div>
+               </div>
 
-              {/* Recent Applications */}
-              <div className="stat-card rounded-2xl p-6">
+               {/* Recent Applications */}
+               <div className="stat-card rounded-2xl p-4 md:p-6">
                 <h3 className="text-white font-semibold mb-4">Recent Applications</h3>
                 <div className="overflow-x-auto">
                   <table className="table-premium">
@@ -690,8 +703,8 @@ function Dashboard({ token }: { token: string }) {
           {!loading && activeTab === 'applications' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
               {/* Filters */}
-              <div className="flex flex-wrap gap-3 items-center">
-                <div className="relative flex-1 min-w-48">
+              <div className="flex flex-col xl:flex-row gap-3 items-stretch xl:items-center">
+                <div className="relative flex-1 min-w-0">
                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     value={search}
@@ -700,22 +713,24 @@ function Dashboard({ token }: { token: string }) {
                     className="input-premium pl-9 text-sm"
                   />
                 </div>
-                <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="input-premium w-auto text-sm bg-dark-200">
-                  <option value="all">All Status</option>
-                  <option value="pending">Pending</option>
-                  <option value="reviewing">Reviewing</option>
-                  <option value="approved">Approved</option>
-                  <option value="rejected">Rejected</option>
-                </select>
-                <select value={profileFilter} onChange={e => setProfileFilter(e.target.value)} className="input-premium w-auto text-sm bg-dark-200">
-                  <option value="all">All Profiles</option>
-                  <option value="student">Student</option>
-                  <option value="worker">Worker</option>
-                  <option value="visitor">Visitor</option>
-                </select>
-                <button onClick={exportCSV} className="flex items-center gap-2 px-4 py-2.5 rounded-xl glass text-sm text-gray-300 hover:text-white transition-colors">
-                  <Download className="w-4 h-4" /> Export CSV
-                </button>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="input-premium w-auto text-sm bg-dark-200">
+                    <option value="all">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="reviewing">Reviewing</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                  </select>
+                  <select value={profileFilter} onChange={e => setProfileFilter(e.target.value)} className="input-premium w-auto text-sm bg-dark-200">
+                    <option value="all">All Profiles</option>
+                    <option value="student">Student</option>
+                    <option value="worker">Worker</option>
+                    <option value="visitor">Visitor</option>
+                  </select>
+                  <button onClick={exportCSV} className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl glass text-sm text-gray-300 hover:text-white transition-colors">
+                    <Download className="w-4 h-4" /> Export CSV
+                  </button>
+                </div>
               </div>
 
               {/* Table */}
@@ -789,7 +804,7 @@ function Dashboard({ token }: { token: string }) {
           {!loading && activeTab === 'settings' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
               <CurrencyManager token={token} />
-              <div className="stat-card rounded-2xl p-6 space-y-4 max-w-2xl">
+              <div className="stat-card rounded-2xl p-4 md:p-6 space-y-4 max-w-2xl">
                 <h3 className="text-white font-semibold">Admin Settings</h3>
                 <div className="space-y-3">
                   <div>
@@ -819,7 +834,7 @@ function Dashboard({ token }: { token: string }) {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="relative glass-dark rounded-2xl p-8 w-full max-w-lg max-h-[80vh] overflow-y-auto z-10"
+            className="relative glass-dark rounded-2xl p-4 md:p-6 lg:p-8 w-full max-w-lg mx-4 max-h-[85vh] md:max-h-[80vh] overflow-y-auto z-10"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6">

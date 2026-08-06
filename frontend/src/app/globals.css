@@ -536,12 +536,25 @@ p {
   color: var(--text-primary);
 }
 
+@media (max-width: 1023px) {
+  .admin-sidebar {
+    border-right: none;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
+  }
+}
+
 .stat-card {
-  padding: 24px;
+  padding: 16px;
   border-radius: var(--radius-lg);
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
+}
+
+@media (min-width: 768px) {
+  .stat-card {
+    padding: 24px;
+  }
 }
 
 .table-premium {
