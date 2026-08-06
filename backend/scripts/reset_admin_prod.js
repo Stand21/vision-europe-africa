@@ -1,3 +1,5 @@
+const path = require('path')
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') })
 const { Client } = require('pg');
 const bcrypt = require('bcryptjs');
 
@@ -15,6 +17,8 @@ async function main() {
   const email = process.argv[3] || 'admin@visioneuropeafrica.com';
 
   const hash = bcrypt.hashSync(password, 12);
+  console.log('🔑 Using password:', password);
+  console.log('🔐 Generated hash:', hash);
   const client = new Client({ connectionString: dbUrl });
 
   try {
