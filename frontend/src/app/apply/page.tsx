@@ -464,11 +464,14 @@ function ApplyContent() {
                 2. {profile === 'student' ? 'Filière d\'études' : profile === 'worker' ? 'Métier' : 'Catégorie de visite'} <span className="text-[#ef4444]">*</span>
               </h2>
               {profile === 'student' && (
-                <SelectCards
-                  items={STUDY_FIELDS.map(f => ({ ...f, sub: `${f.tuition} · ${f.salary}` }))}
-                  value={selectedField}
-                  onChange={setSelectedField}
-                />
+                <Field label="Filière d'études" required>
+                  <select value={selectedField} onChange={e => setSelectedField(e.target.value)} className={inputClass}>
+                    <option value="">Sélectionnez une filière</option>
+                    {STUDY_FIELDS.map(f => (
+                      <option key={f.id} value={f.id}>{f.name}</option>
+                    ))}
+                  </select>
+                </Field>
               )}
               {profile === 'worker' && (
                 <SelectCards
