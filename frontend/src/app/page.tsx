@@ -18,18 +18,18 @@ import { useTranslation } from '@/hooks/useTranslation'
 
 // ── Media (Unsplash) ───────────────────────────────────────────────────────────
 const MEDIA = {
-  germany: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Brandenburger_Tor_nachts_2012-07.jpg/1920px-Brandenburger_Tor_nachts_2012-07.jpg',
-  portugal: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Yellow_tram_in_Lisbon%2C_Portugal.jpg/1920px-Yellow_tram_in_Lisbon%2C_Portugal.jpg',
-  student: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Students_of_the_University_OF_Ilorin._23.jpg/1920px-Students_of_the_University_OF_Ilorin._23.jpg',
-  worker: 'https://upload.wikimedia.org/wikipedia/commons/d/d2/African_Undergraduate_Young_doctor_checking_on_a_patient.jpg',
-  visitor: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Tourists_learning_african_food_making_in_kisoro_uganda.jpg/1920px-Tourists_learning_african_food_making_in_kisoro_uganda.jpg',
+  germany: '/images/germany.jpg',
+  portugal: '/images/portugal.jpg',
+  student: '/images/student.jpg',
+  worker: '/images/worker.jpg',
+  visitor: '/images/visitor.jpg',
 }
 
 const AVATARS = [
-  'https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/African_man_smiling.jpg/500px-African_man_smiling.jpg',
-  'https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Smiling_woman%2C_The_Gambia_%28March_2005%29.jpg/500px-Smiling_woman%2C_The_Gambia_%28March_2005%29.jpg',
-  'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/African_Woman_smiling.jpg/500px-African_Woman_smiling.jpg',
-  'https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/An_Excited_Ghanian_Young_Man.jpg/500px-An_Excited_Ghanian_Young_Man.jpg',
+  '/images/avatar-1.jpg',
+  '/images/avatar-2.jpg',
+  '/images/avatar-3.jpg',
+  '/images/avatar-4.jpg',
 ]
 
 // ── Loading Screen ────────────────────────────────────────────────────────────
@@ -236,14 +236,14 @@ function HeroSection() {
               </div>
 
               {/* Mini stats */}
-              <div className="grid grid-cols-2 gap-5">
-                <div className="glass rounded-2xl p-5 text-center">
-                  <div className="text-2xl font-extrabold text-white">97%</div>
-                  <div className="text-xs text-white/50 mt-1">Success Rate</div>
+              <div className="grid grid-cols-2 gap-3 sm:gap-5 mt-5 sm:mt-5">
+                <div className="glass rounded-2xl p-4 sm:p-5 text-center">
+                  <div className="text-xl sm:text-2xl font-extrabold text-white">97%</div>
+                  <div className="text-xs text-white/50 mt-0.5 sm:mt-1">Success Rate</div>
                 </div>
-                <div className="glass rounded-2xl p-5 text-center">
-                  <div className="text-2xl font-extrabold text-white">48h</div>
-                  <div className="text-xs text-white/50 mt-1">Response Time</div>
+                <div className="glass rounded-2xl p-4 sm:p-5 text-center">
+                  <div className="text-xl sm:text-2xl font-extrabold text-white">48h</div>
+                  <div className="text-xs text-white/50 mt-0.5 sm:mt-1">Response Time</div>
                 </div>
               </div>
             </div>
@@ -251,23 +251,23 @@ function HeroSection() {
         </div>
 
         {/* Stats bar */}
-        <motion.div
-          ref={ref}
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16"
-        >
-          {stats.map(({ value, suffix, label, icon: Icon }, i) => (
-            <div key={i} className="glass rounded-2xl p-5 text-center">
-              <Icon className="w-5 h-5 text-[#a5a3ff] mx-auto mb-2" />
-              <div className="text-2xl font-extrabold text-white">
-                {inView ? <CountUp end={value} duration={2} delay={i * 0.1} /> : '0'}{suffix}
-              </div>
-              <div className="text-sm text-white/50 mt-1">{label}</div>
-            </div>
-          ))}
-        </motion.div>
+             <motion.div
+               ref={ref}
+               initial={{ opacity: 0, y: 20 }}
+               animate={inView ? { opacity: 1, y: 0 } : {}}
+               transition={{ duration: 0.5 }}
+               className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-10 sm:mt-16"
+             >
+               {stats.map(({ value, suffix, label, icon: Icon }, i) => (
+                 <div key={i} className="glass rounded-2xl p-3 sm:p-5 text-center">
+                   <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-[#a5a3ff] mx-auto mb-1 sm:mb-2" />
+                   <div className="text-xl sm:text-2xl font-extrabold text-white">
+                     {inView ? <CountUp end={value} duration={2} delay={i * 0.1} /> : '0'}{suffix}
+                   </div>
+                   <div className="text-xs sm:text-sm text-white/50 mt-0.5 sm:mt-1">{label}</div>
+                 </div>
+               ))}
+             </motion.div>
       </div>
     </section>
   )
@@ -377,7 +377,7 @@ function ProfileSection() {
                     <p.chip className="w-5 h-5 text-white" />
                   </div>
                 </div>
-                <div className="p-6">
+                 <div className="p-5 sm:p-6">
                   <h3 className="text-lg font-bold text-[#0a2540] dark:text-white mb-2">{p.title}</h3>
                   <p className="text-sm text-[#425466] dark:text-[#ebebf5] leading-relaxed mb-4">{p.description}</p>
                   <ul className="space-y-2 mb-6">
@@ -462,7 +462,7 @@ function DestinationsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="group relative rounded-3xl overflow-hidden min-h-[460px] shadow-lg"
+               className="group relative rounded-3xl overflow-hidden min-h-[340px] sm:min-h-[400px] md:min-h-[460px] shadow-lg"
             >
               <Image
                 src={dest.image}
@@ -473,7 +473,7 @@ function DestinationsSection() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a2540] via-[#0a2540]/55 to-[#0a2540]/10" />
 
-              <div className="relative z-10 flex flex-col justify-end h-full p-7">
+               <div className="relative z-10 flex flex-col justify-end h-full p-5 sm:p-7">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-11 h-11 rounded-2xl bg-brand-gradient shadow-glow flex items-center justify-center">
                     {dest.icon}
@@ -493,12 +493,12 @@ function DestinationsSection() {
                     </li>
                   ))}
                 </ul>
-                <div className="flex items-center justify-between pt-5 border-t border-white/15">
+                <div className="flex items-center justify-between pt-4 sm:pt-5 border-t border-white/15">
                   <Link
                     href={dest.cta}
-                    className="inline-flex items-center gap-2 rounded-full btn-gradient px-5 py-2.5 text-sm font-semibold"
+                    className="inline-flex items-center gap-2 rounded-full btn-gradient px-4 py-2 text-xs sm:text-sm font-semibold"
                   >
-                    Postuler maintenant <ArrowRight className="w-4 h-4" />
+                    Postuler maintenant <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </Link>
                   <div className="text-right">
                     <div className="font-bold text-white">{dest.statLabel}</div>
@@ -552,14 +552,14 @@ function ProcessSection() {
                 transition={{ duration: 0.45, delay: i * 0.08 }}
                 className="relative flex gap-5 items-start pl-0"
               >
-                <div className="relative z-10 flex-shrink-0 w-11 h-11 rounded-2xl bg-brand-gradient shadow-glow flex items-center justify-center">
+                 <div className="relative z-10 flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-brand-gradient shadow-glow flex items-center justify-center">
                   {stepIcons[i] && React.createElement(stepIcons[i], { className: 'w-5 h-5 text-white' })}
                 </div>
-                <div className="flex-1 bg-white dark:bg-[#1c1c1e] rounded-2xl border border-[#e3e8ee] dark:border-[#38383a] p-6 shadow-sm hover:shadow-md hover:border-[#635bff]/30 transition-all group">
-                  <div className="flex items-center gap-3 mb-1">
-                    <span className="text-xs font-bold text-[#635bff] uppercase tracking-widest">Étape {i + 1}</span>
-                    <span className="text-[#635bff]/30 font-bold text-sm transition-all group-hover:translate-x-1">→</span>
-                  </div>
+                 <div className="flex-1 bg-white dark:bg-[#1c1c1e] rounded-2xl border border-[#e3e8ee] dark:border-[#38383a] p-4 sm:p-6 shadow-sm hover:shadow-md hover:border-[#635bff]/30 transition-all group">
+                 <div className="flex items-center gap-2 sm:gap-3 mb-1">
+                   <span className="text-xs font-bold text-[#635bff] uppercase tracking-widest">Étape {i + 1}</span>
+                   <span className="text-[#635bff]/30 font-bold text-sm transition-all group-hover:translate-x-1">→</span>
+                 </div>
                   <h4 className="font-bold text-[#0a2540] dark:text-white mb-1">{step.title}</h4>
                   <p className="text-sm text-[#425466] dark:text-[#ebebf5]">{step.desc}</p>
                 </div>
@@ -693,7 +693,7 @@ function TestimonialsSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.45, delay: i * 0.05 }}
-                className="bg-white dark:bg-[#1c1c1e] rounded-3xl border border-[#e3e8ee] dark:border-[#38383a] p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all flex flex-col"
+                 className="bg-white dark:bg-[#1c1c1e] rounded-3xl border border-[#e3e8ee] dark:border-[#38383a] p-4 sm:p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all flex flex-col"
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-1">
@@ -835,25 +835,25 @@ function FAQSection() {
                 open === i ? 'border-[#635bff]/40 shadow-glow' : 'border-[#e3e8ee] dark:border-[#38383a] shadow-sm'
               }`}
             >
-              <button
-                className="w-full flex items-center justify-between p-5 text-left"
-                onClick={() => setOpen(open === i ? null : i)}
-                aria-expanded={open === i}
-              >
-                <span className="flex items-center gap-3 font-medium text-sm text-[#0a2540] dark:text-white pr-4">
-                  <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 transition-colors ${
+               <button
+                 className="w-full flex items-center justify-between p-4 sm:p-5 text-left gap-3"
+                 onClick={() => setOpen(open === i ? null : i)}
+                 aria-expanded={open === i}
+               >
+                 <span className="flex items-center gap-2 sm:gap-3 font-medium text-sm text-[#0a2540] dark:text-white min-w-0">
+                   <span className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 transition-colors ${
                     open === i ? 'bg-brand-gradient text-white' : 'bg-[#635bff]/10 text-[#635bff]'
                   }`}>
-                    {i + 1}
-                  </span>
-                  {faq.q}
-                </span>
-                <span className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${
-                  open === i ? 'bg-brand-gradient rotate-180' : 'bg-[#635bff]/10'
-                }`}>
-                  <ChevronDown className={`w-4 h-4 ${open === i ? 'text-white' : 'text-[#635bff]'}`} />
-                </span>
-              </button>
+                     {i + 1}
+                   </span>
+                   <span className="truncate">{faq.q}</span>
+                 </span>
+                 <span className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${
+                   open === i ? 'bg-brand-gradient rotate-180' : 'bg-[#635bff]/10'
+                 }`}>
+                   <ChevronDown className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${open === i ? 'text-white' : 'text-[#635bff]'}`} />
+                 </span>
+               </button>
               <AnimatePresence>
                 {open === i && (
                   <motion.div
@@ -862,7 +862,7 @@ function FAQSection() {
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <div className="px-5 pb-5 pl-[52px] text-sm text-[#425466] dark:text-[#ebebf5] leading-relaxed">
+                     <div className="px-4 pb-4 pl-9 sm:pl-12 text-sm text-[#425466] dark:text-[#ebebf5] leading-relaxed">
                       {faq.a}
                     </div>
                   </motion.div>
@@ -919,7 +919,7 @@ function CTASection() {
                 Contacter sur Telegram
               </a>
             </div>
-            <div className="flex items-center justify-center gap-6 mt-9 text-sm text-white/70 flex-wrap">
+             <div className="flex items-center justify-center gap-4 sm:gap-6 mt-7 sm:mt-9 text-xs sm:text-sm text-white/70 flex-wrap">
               <span className="flex items-center gap-2">
                 <Shield className="w-4 h-4 text-[#a5a3ff]" /> 100% Légal
               </span>
