@@ -32,40 +32,6 @@ const AVATARS = [
   '/images/avatar-4.jpg',
 ]
 
-// ── Loading Screen ────────────────────────────────────────────────────────────
-function LoadingScreen({ onComplete }: { onComplete: () => void }) {
-  useEffect(() => {
-    const t = setTimeout(onComplete, 2000)
-    return () => clearTimeout(t)
-  }, [onComplete])
-
-  return (
-    <motion.div
-      className="loading-screen"
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
-    >
-      <motion.div
-        className="flex flex-col items-center"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-      >
-        <div className="w-14 h-14 rounded-2xl bg-brand-gradient shadow-glow flex items-center justify-center mb-4">
-          <Globe className="w-7 h-7 text-white" />
-        </div>
-        <div className="text-lg font-bold text-[#0a2540] dark:text-white tracking-tight">
-          Vision <span className="gradient-text">Europe</span> Africa
-        </div>
-        <div className="text-sm text-[#697386] dark:text-[#8e8e93] mt-1">Your Gateway to Europe</div>
-        <div className="loading-bar mt-6">
-          <div className="loading-bar-fill" />
-        </div>
-      </motion.div>
-    </motion.div>
-  )
-}
-
 // ── Hero ──────────────────────────────────────────────────────────────────────
 function HeroSection() {
   const { t } = useTranslation()
@@ -134,13 +100,13 @@ function HeroSection() {
               transition={{ duration: 0.6, delay: 0.15 }}
               className="flex flex-col sm:flex-row gap-4"
             >
-              <button
-                onClick={() => window.location.href = '/apply'}
+              <Link
+                href="/apply"
                 className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full btn-gradient text-sm font-semibold"
               >
                 {t('hero.cta_primary')}
                 <ArrowRight className="w-4 h-4" />
-              </button>
+              </Link>
               <button
                 onClick={() => document.getElementById('destinations')?.scrollIntoView({ behavior: 'smooth' })}
                 className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full glass text-sm font-semibold text-white hover:bg-white/15 transition-all"
@@ -541,7 +507,7 @@ function ProcessSection() {
         </motion.div>
 
         <div className="relative max-w-3xl mx-auto">
-          <div className="absolute left-[22px] top-2 bottom-2 w-px bg-gradient-to-b from-[#635bff] via-[#8b5cf6] to-[#22d3ee] opacity-40" />
+          <div className="absolute left-5 sm:left-[22px] top-2 bottom-2 w-px bg-gradient-to-b from-[#635bff] via-[#8b5cf6] to-[#22d3ee] opacity-40" />
           <div className="space-y-5">
             {(Array.isArray(steps) ? steps : []).map((step, i) => (
               <motion.div
@@ -574,12 +540,12 @@ function ProcessSection() {
           viewport={{ once: true }}
           className="text-center mt-12"
         >
-          <button
-            onClick={() => window.location.href = '/apply'}
+          <Link
+            href="/apply"
             className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full btn-gradient text-sm font-semibold"
           >
             Commencer ma demande <ArrowRight className="w-4 h-4" />
-          </button>
+          </Link>
         </motion.div>
       </div>
     </section>
@@ -903,12 +869,12 @@ function CTASection() {
               Des milliers d'Africains ont réalisé leur rêve européen grâce à nous. Soumettez votre candidature en moins de 10 minutes.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onClick={() => window.location.href = '/apply'}
+              <Link
+                href="/apply"
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-white text-[#0a2540] text-sm font-bold hover:bg-[#f6f9fc] transition-all shadow-lg"
               >
                 Commencer maintenant <ArrowRight className="w-4 h-4" />
-              </button>
+              </Link>
               <a
                 href="https://t.me/visioneuropeafrica"
                 target="_blank"
@@ -945,7 +911,7 @@ function WhatsAppFloat() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat WhatsApp"
-      className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-glow-lg bg-[#25D366] hover:bg-[#20bd5a] transition-colors"
+      className="whatsapp-float fixed z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-glow-lg bg-[#25D366] hover:bg-[#20bd5a] transition-colors"
       initial={{ scale: 0 }}
       animate={{ scale: 1 }}
       transition={{ delay: 2.5, type: 'spring' }}
@@ -958,31 +924,21 @@ function WhatsAppFloat() {
 
 // ── Page ───────────────────────────────────────────────────────────────────────
 export default function HomePage() {
-  const [loading, setLoading] = useState(true)
-
   return (
-    <>
-      <AnimatePresence>
-        {loading && <LoadingScreen onComplete={() => setLoading(false)} />}
-      </AnimatePresence>
-
-      {!loading && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-          <Navbar />
-          <main>
-            <HeroSection />
-            <TrustBar />
-            <ProfileSection />
-            <DestinationsSection />
-            <ProcessSection />
-            <TestimonialsSection />
-            <FAQSection />
-            <CTASection />
-          </main>
-          <Footer />
-          <WhatsAppFloat />
-        </motion.div>
-      )}
-    </>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+      <Navbar />
+      <main>
+        <HeroSection />
+        <TrustBar />
+        <ProfileSection />
+        <DestinationsSection />
+        <ProcessSection />
+        <TestimonialsSection />
+        <FAQSection />
+        <CTASection />
+      </main>
+      <Footer />
+      <WhatsAppFloat />
+    </motion.div>
   )
 }

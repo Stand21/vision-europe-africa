@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, ChevronDown, Globe, Moon, Sun, Sparkles } from 'lucide-react'
@@ -13,6 +13,8 @@ const LANGUAGES: { code: Language; label: string; flag: string }[] = [
   { code: 'de', label: 'Deutsch',   flag: '🇩🇪' },
 ]
 
+const DARK_COOKIE = 'vea_dark'
+
 export default function Navbar() {
   const { t, language, changeLanguage } = useTranslation()
   const [scrolled,    setScrolled]    = useState(false)
@@ -20,6 +22,7 @@ export default function Navbar() {
   const [langOpen,    setLangOpen]    = useState(false)
   const [darkMode,    setDarkMode]    = useState(false)
   const [active,      setActive]      = useState('')
+  const navRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -44,20 +47,66 @@ export default function Navbar() {
     return () => observer.disconnect()
   }, [])
 
+  // Initial dark mode: cookie > system preference
+  useEffect(() => {
+    const saved = document.cookie.match(new RegExp(`${DARK_COOKIE}=([^;]*)`))
+    if (saved) {
+      setDarkMode(saved[1] === '1')
+    } else {
+      setDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches)
+    }
+  }, [])
+
+  // Keep <html class="dark"> in sync and persist the preference
   useEffect(() => {
     const root = window.document.documentElement
-    if (darkMode) {
-      root.classList.add('dark')
-    } else {
-      root.classList.remove('dark')
-    }
+    root.classList.toggle('dark', darkMode)
+    document.cookie = `${DARK_COOKIE}=${darkMode ? '1' : '0'}; path=/; max-age=31536000`
   }, [darkMode])
+
+  // Lock body scroll while the mobile menu is open
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [mobileOpen])
+
+  // Close menus on outside click
+  useEffect(() => {
+    const onPointerDown = (e: PointerEvent) => {
+      if (navRef.current && !navRef.current.contains(e.target as Node)) {
+        setMobileOpen(false)
+        setLangOpen(false)
+      }
+    }
+    document.addEventListener('pointerdown', onPointerDown)
+    return () => document.removeEventListener('pointerdown', onPointerDown)
+  }, [])
+
+  // Close menus on Escape
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMobileOpen(false)
+        setLangOpen(false)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
+  // Close the mobile menu when switching to desktop
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)')
+    const onChange = (e: MediaQueryListEvent) => { if (e.matches) setMobileOpen(false) }
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
 
   const navLinks = [
     { href: '/#destinations', id: 'destinations', label: t('nav.destinations') },
     { href: '/#services',     id: 'services',     label: t('nav.services')      },
-    { href: '/#testimonials', id: 'testimonials', label: 'Témoignages'          },
-    { href: '/#faq',          id: 'faq',          label: 'FAQ'                  },
+    { href: '/#testimonials', id: 'testimonials', label: t('nav.testimonials')  },
+    { href: '/#faq',          id: 'faq',          label: t('nav.faq')           },
     { href: '/#contact',      id: 'contact',      label: t('nav.contact')       },
   ]
 
@@ -65,6 +114,7 @@ export default function Navbar() {
 
   return (
     <motion.nav
+      ref={navRef}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
@@ -118,7 +168,7 @@ export default function Navbar() {
           {/* Dark mode toggle */}
           <button
             onClick={() => setDarkMode(!darkMode)}
-            className="p-2 rounded-xl border border-[#e3e8ee] dark:border-[#38383a] text-[#425466] dark:text-[#ebebf5] hover:border-[#cbd5e1] dark:hover:border-[#48484a] hover:text-[#0a2540] dark:hover:text-white transition-all"
+            className="p-2.5 rounded-xl border border-[#e3e8ee] dark:border-[#38383a] text-[#425466] dark:text-[#ebebf5] hover:border-[#cbd5e1] dark:hover:border-[#48484a] hover:text-[#0a2540] dark:hover:text-white transition-all"
             aria-label="Toggle dark mode"
           >
             {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -128,7 +178,8 @@ export default function Navbar() {
           <div className="relative">
             <button
               onClick={() => setLangOpen(!langOpen)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-[#e3e8ee] dark:border-[#38383a] text-sm text-[#425466] dark:text-[#ebebf5] hover:border-[#cbd5e1] dark:hover:border-[#48484a] hover:text-[#0a2540] dark:hover:text-white transition-all"
+              aria-expanded={langOpen}
+              className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl border border-[#e3e8ee] dark:border-[#38383a] text-sm text-[#425466] dark:text-[#ebebf5] hover:border-[#cbd5e1] dark:hover:border-[#48484a] hover:text-[#0a2540] dark:hover:text-white transition-all"
             >
               <span className="text-base">{currentLang.flag}</span>
               <span className="hidden sm:inline text-xs">{currentLang.label}</span>
@@ -175,8 +226,9 @@ export default function Navbar() {
           {/* Mobile toggle */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="lg:hidden p-2 rounded-xl border border-[#e3e8ee] dark:border-[#38383a] text-[#425466] dark:text-[#ebebf5]"
+            className="lg:hidden p-2.5 rounded-xl border border-[#e3e8ee] dark:border-[#38383a] text-[#425466] dark:text-[#ebebf5]"
             aria-label="Menu"
+            aria-expanded={mobileOpen}
           >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -191,17 +243,22 @@ export default function Navbar() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="lg:hidden glass-strong border-t border-[#e3e8ee] dark:border-[#38383a]"
+            className="lg:hidden glass-strong border-t border-[#e3e8ee] dark:border-[#38383a] max-h-[calc(100dvh-4.5rem)] overflow-y-auto"
           >
             <div className="container-custom py-4 flex flex-col gap-1">
-              {navLinks.map(({ href, label }) => (
+              {navLinks.map(({ href, id, label }) => (
                 <Link
                   key={href}
                   href={href}
                   onClick={() => setMobileOpen(false)}
-                  className="px-4 py-3 text-sm text-[#425466] dark:text-[#ebebf5] hover:text-[#0a2540] dark:hover:text-white hover:bg-[#f6f9fc] dark:hover:bg-[#2c2c2e] rounded-xl transition-all"
+                  className={`px-4 py-3 text-sm rounded-xl transition-all flex items-center justify-between ${
+                    active === id
+                      ? 'text-[#635bff] dark:text-[#a5a3ff] bg-[#635bff]/10 font-medium'
+                      : 'text-[#425466] dark:text-[#ebebf5] hover:text-[#0a2540] dark:hover:text-white hover:bg-[#f6f9fc] dark:hover:bg-[#2c2c2e]'
+                  }`}
                 >
                   {label}
+                  {active === id && <span className="w-1.5 h-1.5 rounded-full bg-[#635bff]" />}
                 </Link>
               ))}
               <Link

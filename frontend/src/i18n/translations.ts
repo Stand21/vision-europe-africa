@@ -8,6 +8,8 @@ export const translations = {
       contact: 'Contact',
       apply: 'Apply Now',
       admin: 'Admin',
+      testimonials: 'Testimonials',
+      faq: 'FAQ',
     },
     hero: {
       badge: 'Trusted by 5,000+ Applicants',
@@ -103,6 +105,8 @@ export const translations = {
       contact: 'Contact',
       apply: 'Postuler',
       admin: 'Admin',
+      testimonials: 'Témoignages',
+      faq: 'FAQ',
     },
     hero: {
       badge: 'Approuvé par plus de 5 000 candidats',
@@ -198,6 +202,8 @@ export const translations = {
       contact: 'Contacto',
       apply: 'Candidatar',
       admin: 'Admin',
+      testimonials: 'Testemunhos',
+      faq: 'FAQ',
     },
     hero: {
       badge: 'Aprovado por mais de 5.000 candidatos',
@@ -293,6 +299,8 @@ export const translations = {
       contact: 'Kontakt',
       apply: 'Jetzt bewerben',
       admin: 'Admin',
+      testimonials: 'Erfahrungsberichte',
+      faq: 'FAQ',
     },
     hero: {
       badge: 'Vertrauen von über 5.000 Bewerbern',

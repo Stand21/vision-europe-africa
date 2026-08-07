@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Toaster } from 'react-hot-toast'
 import Script from 'next/script'
 import './globals.css'
@@ -15,6 +15,9 @@ export const metadata: Metadata = {
     siteName: 'Vision Europe Africa',
   },
   robots: { index: true, follow: true },
+}
+
+export const viewport: Viewport = {
   themeColor: '#635bff',
 }
 
@@ -24,6 +27,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var d=document.documentElement,c=('; '+document.cookie).match(/; vea_dark=([^;]*)/);d.classList.toggle('dark',c?c[1]==='1':window.matchMedia('(prefers-color-scheme: dark)').matches)}catch(e){}`,
+          }}
+        />
       </head>
       <body className="antialiased">
         {/* Iconify — loaded once for the whole app */}

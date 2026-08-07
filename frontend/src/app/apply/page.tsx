@@ -236,7 +236,7 @@ function BudgetField({ label, register, name, placeholder, required, currencies,
         <select
           value={currency}
           onChange={e => setCurrency(e.target.value)}
-          className="input w-32 flex-shrink-0"
+          className="input w-24 sm:w-32 flex-shrink-0"
           aria-label="Currency"
         >
           {currencies.map(c => (
@@ -630,9 +630,11 @@ function ApplyContent() {
 
           {/* Submit */}
           {profile && (
-            <button type="submit" disabled={submitting} className="application-submit btn-primary w-full justify-center">
-              {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> Envoi en cours...</> : <>Envoyer ma candidature <CheckCircle className="w-4 h-4" /></>}
-            </button>
+            <div className="sticky bottom-0 z-10 -mx-1 rounded-2xl border border-[#e3e8ee] dark:border-[#38383a] bg-white/95 dark:bg-[#0b1020]/95 backdrop-blur px-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-lg md:static md:mx-0 md:rounded-none md:border-0 md:bg-transparent md:p-0 md:shadow-none">
+              <button type="submit" disabled={submitting} className="application-submit btn-primary w-full justify-center">
+                {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> Envoi en cours...</> : <>Envoyer ma candidature <CheckCircle className="w-4 h-4" /></>}
+              </button>
+            </div>
           )}
         </form>
       </div>

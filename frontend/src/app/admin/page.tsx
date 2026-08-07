@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 import {
   LayoutDashboard, Users, FileText, Settings, LogOut,
   TrendingUp, CheckCircle, Clock, XCircle, Download,
@@ -581,7 +582,11 @@ function Dashboard({ token }: { token: string }) {
           ))}
         </nav>
 
-        <button onClick={logout} className="admin-nav-item w-full mt-4 text-red-400 hover:bg-red-900/20">
+        <Link href="/" onClick={() => setSidebarOpen(false)} className="admin-nav-item w-full mt-2 text-gray-300 hover:bg-white/10">
+          <Globe2 className="w-4 h-4" /> Voir le site
+        </Link>
+
+        <button onClick={logout} className="admin-nav-item w-full mt-1 text-red-400 hover:bg-red-900/20">
           <LogOut className="w-4 h-4" /> Logout
         </button>
       </aside>
@@ -597,6 +602,13 @@ function Dashboard({ token }: { token: string }) {
             <h1 className="text-white font-bold capitalize text-lg md:text-xl">{activeTab === 'testimonials' ? 'Témoignages' : activeTab}</h1>
           </div>
           <div className="flex items-center gap-2 md:gap-3">
+            <Link
+              href="/"
+              className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg glass text-gray-400 hover:text-white transition-colors text-sm"
+              title="Voir le site public"
+            >
+              <Globe2 className="w-4 h-4" /> Site
+            </Link>
             <button onClick={() => fetchData(true)} className="relative p-2 rounded-lg glass text-gray-400 hover:text-white transition-colors" title="Actualiser">
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             </button>
