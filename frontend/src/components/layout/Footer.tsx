@@ -127,13 +127,13 @@ export default function Footer() {
               <h3 className="text-xl font-bold text-white mb-1">Restez informé</h3>
               <p className="text-sm text-white/80">Recevez nos conseils et opportunités directement par email.</p>
             </div>
-            <div className="flex w-full md:w-auto gap-3">
+            <div className="flex flex-col sm:flex-row w-full md:w-auto gap-3">
               <input
                 type="email"
                 placeholder="votre@email.com"
-                className="flex-1 md:w-72 px-5 py-3 rounded-full bg-white/15 backdrop-blur border border-white/25 text-white text-sm placeholder-white/70 focus:outline-none focus:border-white/60 transition-colors"
+                className="w-full sm:w-auto sm:flex-1 md:w-72 px-5 py-3 rounded-full bg-white/15 backdrop-blur border border-white/25 text-white text-sm placeholder-white/70 focus:outline-none focus:border-white/60 transition-colors"
               />
-              <button className="px-6 py-3 rounded-full bg-white text-[#0a2540] text-sm font-semibold flex items-center gap-2 hover:bg-[#f6f9fc] transition-colors shadow-lg">
+              <button className="w-full sm:w-auto px-6 py-3 rounded-full bg-white text-[#0a2540] text-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#f6f9fc] transition-colors shadow-lg">
                 S'inscrire <ArrowRight className="w-4 h-4" />
               </button>
             </div>
