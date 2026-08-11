@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, ChevronDown, Globe, Moon, Sun, Sparkles } from 'lucide-react'
+import { Menu, X, ChevronDown, Moon, Sun, Sparkles } from 'lucide-react'
 import { useTranslation } from '@/hooks/useTranslation'
 import type { Language } from '@/i18n/translations'
 
@@ -126,16 +126,12 @@ export default function Navbar() {
     >
       <div className="container-custom flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-9 h-9 rounded-xl bg-brand-gradient shadow-glow flex items-center justify-center group-hover:scale-105 transition-transform">
-            <Globe className="w-5 h-5 text-white" />
-          </div>
-          <div className="hidden sm:block">
-            <div className="font-bold text-[#0a2540] dark:text-white text-base leading-none tracking-tight">
-              Vision <span className="gradient-text">Europe</span>
-            </div>
-            <div className="text-[10px] text-[#697386] dark:text-[#8e8e93] tracking-[0.2em] uppercase mt-0.5">Africa</div>
-          </div>
+        <Link href="/" className="flex items-center">
+          <img
+            src="/images/logo-transparent.png"
+            alt="Vision Europe Africa"
+            className="h-9 sm:h-11 w-auto object-contain invert dark:invert-0"
+          />
         </Link>
 
         {/* Desktop nav */}

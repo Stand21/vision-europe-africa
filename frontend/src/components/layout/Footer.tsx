@@ -18,16 +18,12 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-11 h-11 rounded-xl bg-brand-gradient shadow-glow flex items-center justify-center">
-                <Globe className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <div className="font-bold text-white text-lg tracking-tight">
-                  Vision <span className="gradient-text">Europe</span> Africa
-                </div>
-                <div className="text-[10px] text-[#8e8e93] tracking-[0.2em] uppercase">{t('footer.tagline')}</div>
-              </div>
+            <div className="flex items-start gap-3 mb-5">
+              <img
+                src="/images/logo-transparent.png"
+                alt="Vision Europe Africa"
+                className="h-14 w-auto object-contain"
+              />
             </div>
             <p className="text-sm text-[#c7c7cc] leading-relaxed max-w-md mb-6">
               Nous aidons les étudiants et travailleurs africains à réaliser leur rêve européen grâce à des voies d'immigration légales et transparentes vers l'Allemagne et le Portugal.
