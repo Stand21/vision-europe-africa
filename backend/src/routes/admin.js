@@ -4,6 +4,7 @@ const { authenticate, requireRole } = require('../middleware/auth')
 const adminController = require('../controllers/adminController')
 const currenciesController = require('../controllers/currenciesController')
 const testimonialsController = require('../controllers/testimonialsController')
+const destinationsController = require('../controllers/destinationsController')
 
 // POST /api/admin/login
 router.post('/login', adminController.login)
@@ -42,5 +43,11 @@ router.get('/testimonials', testimonialsController.list)
 router.post('/testimonials', testimonialsController.create)
 router.patch('/testimonials/:id', testimonialsController.update)
 router.delete('/testimonials/:id', testimonialsController.remove)
+
+// ── Destinations management ────────────────────────────────────────────────────
+router.get('/destinations', destinationsController.list)
+router.post('/destinations', destinationsController.create)
+router.patch('/destinations/:id', destinationsController.update)
+router.delete('/destinations/:id', destinationsController.remove)
 
 module.exports = router

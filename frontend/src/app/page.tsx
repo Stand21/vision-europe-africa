@@ -34,7 +34,7 @@ const AVATARS = [
 
 // ── Hero ──────────────────────────────────────────────────────────────────────
 function HeroSection() {
-  const { t } = useTranslation()
+  const { t, tList } = useTranslation()
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.2 })
 
   const stats = [
@@ -138,7 +138,7 @@ function HeroSection() {
                 </div>
               </div>
               <p className="text-sm text-[#c7c7cc]">
-                <span className="font-semibold text-white">5,000+</span> candidats de 30+ pays africains
+                <span className="font-semibold text-white">5,000+</span> {t('hero.candidatesLabel')}
               </p>
             </motion.div>
           </div>
@@ -161,17 +161,17 @@ function HeroSection() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <div className="font-semibold text-white">Germany</div>
+                      <div className="font-semibold text-white">{t('destinations.germany.name')}</div>
                       <div className="text-right">
                         <div className="font-semibold text-[#a5a3ff] text-sm">€45k+</div>
-                        <div className="text-xs text-white/50">avg salary/yr</div>
+                        <div className="text-xs text-white/50">{t('hero.avgSalary')}</div>
                       </div>
                     </div>
-                    <div className="text-xs text-white/60 mt-0.5">Excellence & Opportunity</div>
+                    <div className="text-xs text-white/60 mt-0.5">{t('destinations.germany.tagline')}</div>
                   </div>
                 </div>
                 <div className="flex gap-2 flex-wrap">
-                  {['Work Visa', 'Student', 'Opportunity Card'].map(tag => (
+                  {tList('hero.germanyTags').map(tag => (
                     <span key={tag} className="text-xs px-3 py-1.5 rounded-full bg-white/10 text-white/80 border border-white/15">{tag}</span>
                   ))}
                 </div>
@@ -185,17 +185,17 @@ function HeroSection() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <div className="font-semibold text-white">Portugal</div>
+                      <div className="font-semibold text-white">{t('destinations.portugal.name')}</div>
                       <div className="text-right">
                         <div className="font-semibold text-[#22d3ee] text-sm">D7 Visa</div>
-                        <div className="text-xs text-white/50">affordable entry</div>
+                        <div className="text-xs text-white/50">{t('destinations.portugal.statSub')}</div>
                       </div>
                     </div>
-                    <div className="text-xs text-white/60 mt-0.5">Your First Step in EU</div>
+                    <div className="text-xs text-white/60 mt-0.5">{t('destinations.portugal.tagline')}</div>
                   </div>
                 </div>
                 <div className="flex gap-2 flex-wrap">
-                  {['Student Visa', 'D7', 'NHR Tax', 'EU Path'].map(tag => (
+                  {tList('hero.portugalTags').map(tag => (
                     <span key={tag} className="text-xs px-3 py-1.5 rounded-full bg-white/10 text-white/80 border border-white/15">{tag}</span>
                   ))}
                 </div>
@@ -205,11 +205,11 @@ function HeroSection() {
               <div className="grid grid-cols-2 gap-3 sm:gap-5 mt-5 sm:mt-5">
                 <div className="glass rounded-2xl p-4 sm:p-5 text-center">
                   <div className="text-xl sm:text-2xl font-extrabold text-white">97%</div>
-                  <div className="text-xs text-white/50 mt-0.5 sm:mt-1">Success Rate</div>
+                  <div className="text-xs text-white/50 mt-0.5 sm:mt-1">{t('hero.successRate')}</div>
                 </div>
                 <div className="glass rounded-2xl p-4 sm:p-5 text-center">
                   <div className="text-xl sm:text-2xl font-extrabold text-white">48h</div>
-                  <div className="text-xs text-white/50 mt-0.5 sm:mt-1">Response Time</div>
+                  <div className="text-xs text-white/50 mt-0.5 sm:mt-1">{t('hero.responseTime')}</div>
                 </div>
               </div>
             </div>
@@ -241,13 +241,11 @@ function HeroSection() {
 
 // ── Trust Bar ──────────────────────────────────────────────────────────────────
 function TrustBar() {
-  const items = [
-    { icon: Shield, label: 'Accompagnement certifié' },
-    { icon: BadgeCheck, label: 'Dossiers complets' },
-    { icon: Clock, label: 'Réponse sous 48h' },
-    { icon: Send, label: 'Suivi Telegram' },
-    { icon: Globe, label: '100% en ligne' },
-  ]
+  const { t, tList } = useTranslation()
+  const items = tList('trust').map((label, i) => ({
+    icon: [Shield, BadgeCheck, Clock, Send, Globe][i],
+    label,
+  }))
 
   const doubled = [...items, ...items]
 
@@ -269,7 +267,7 @@ function TrustBar() {
 
 // ── Profiles / Services ────────────────────────────────────────────────────────
 function ProfileSection() {
-  const { t } = useTranslation()
+  const { t, tList } = useTranslation()
 
   const profiles = [
     {
@@ -278,7 +276,7 @@ function ProfileSection() {
       description: t('profiles.student.description'),
       badge: t('profiles.student.badge'),
       href: '/apply?profile=student',
-      features: ['Universités gratuites (Allemagne)', 'Visa étudiant D', 'Compte bloqué', 'Bourse DAAD'],
+      features: tList('profiles.student.features'),
     },
     {
       key: 'worker', image: MEDIA.worker, chip: Briefcase,
@@ -286,7 +284,7 @@ function ProfileSection() {
       description: t('profiles.worker.description'),
       badge: t('profiles.worker.badge'),
       href: '/apply?profile=worker',
-      features: ['Offres d\'emploi vérifiées', 'Validation de diplômes', 'Visa travailleur', 'Formation linguistique'],
+      features: tList('profiles.worker.features'),
     },
     {
       key: 'visitor', image: MEDIA.visitor, chip: Plane,
@@ -294,7 +292,7 @@ function ProfileSection() {
       description: t('profiles.visitor.description'),
       badge: t('profiles.visitor.badge'),
       href: '/apply?profile=visitor',
-      features: ['Visa Schengen type C', 'Dossier optimisé', 'Simulation consulaire', 'Assurance voyage'],
+      features: tList('profiles.visitor.features'),
     },
   ]
 
@@ -307,7 +305,7 @@ function ProfileSection() {
           viewport={{ once: true }}
           className="text-center mb-14"
         >
-          <div className="section-kicker justify-center">Nos services</div>
+          <div className="section-kicker justify-center">{t('profiles.kicker')}</div>
           <h2 className="section-title text-[#0a2540] dark:text-white mt-4 mb-3">
             {t('profiles.title')}
           </h2>
@@ -357,7 +355,7 @@ function ProfileSection() {
                     ))}
                   </ul>
                   <div className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#635bff] group-hover:gap-2.5 transition-all">
-                    Postuler <ArrowRight className="w-4 h-4" />
+                    {t('profiles.apply')} <ArrowRight className="w-4 h-4" />
                   </div>
                 </div>
               </Link>
@@ -370,31 +368,64 @@ function ProfileSection() {
 }
 
 // ── Destinations ───────────────────────────────────────────────────────────────
+const FALLBACK_DESTINATIONS: {
+  code: string
+  image?: string
+  icon: React.ReactNode
+  name: string
+  tagline: string
+  description: string
+  highlights: string[]
+  cta: string
+  statLabel: string
+  statSub: string
+}[] = [
+  {
+    image: MEDIA.germany, icon: <Landmark className="w-6 h-6 text-white" />,
+    code: 'DE',
+    name: 'Germany',
+    tagline: 'Excellence & Opportunity',
+    description: 'Europe\'s economic powerhouse offers world-class universities, high salaries, and an exceptional quality of life. The Opportunity Card makes it easier than ever to relocate.',
+    highlights: ['Avg. salary €45,000/year', 'Free/low-cost universities', 'Strong job market', 'Excellent healthcare'],
+    cta: '/apply?profile=student&destination=germany',
+    statLabel: '€45,000', statSub: 'Avg. salary/year',
+  },
+  {
+    image: MEDIA.portugal, icon: <Ship className="w-6 h-6 text-white" />,
+    code: 'PT',
+    name: 'Portugal',
+    tagline: 'Your First Step Into Europe',
+    description: 'The most accessible gateway to the EU. Affordable living, welcoming culture, growing tech scene, and a clear path to EU citizenship.',
+    highlights: ['Affordable cost of living', 'D7 & Student visas', 'Portuguese-friendly for Africans', 'Path to EU citizenship'],
+    cta: '/apply?profile=student&destination=portugal',
+    statLabel: 'D7 Visa', statSub: 'Affordable entry',
+  },
+]
+
 function DestinationsSection() {
   const { t } = useTranslation()
+  const [destinations, setDestinations] = useState(FALLBACK_DESTINATIONS)
 
-  const destinations = [
-    {
-      image: MEDIA.germany, icon: <Landmark className="w-6 h-6 text-white" />,
-      code: 'DE',
-      name: t('destinations.germany.name'),
-      tagline: t('destinations.germany.tagline'),
-      description: t('destinations.germany.description'),
-      highlights: t('destinations.germany.highlights') as unknown as string[],
-      cta: '/apply?profile=student&destination=germany',
-      statLabel: '€45,000', statSub: 'Salaire moyen/an',
-    },
-    {
-      image: MEDIA.portugal, icon: <Ship className="w-6 h-6 text-white" />,
-      code: 'PT',
-      name: t('destinations.portugal.name'),
-      tagline: t('destinations.portugal.tagline'),
-      description: t('destinations.portugal.description'),
-      highlights: t('destinations.portugal.highlights') as unknown as string[],
-      cta: '/apply?profile=student&destination=portugal',
-      statLabel: 'D7 Visa', statSub: 'Entrée accessible',
-    },
-  ]
+  useEffect(() => {
+    axios.get(`${API}/destinations`)
+      .then(r => {
+        if (Array.isArray(r.data) && r.data.length) {
+          setDestinations(r.data.map((d: any) => ({
+            code: d.code,
+            image: d.image || (d.code.toUpperCase() === 'DE' ? MEDIA.germany : MEDIA.portugal),
+            icon: d.code.toUpperCase() === 'DE' ? <Landmark className="w-6 h-6 text-white" /> : <Ship className="w-6 h-6 text-white" />,
+            name: d.name,
+            tagline: d.tagline || '',
+            description: d.description || '',
+            highlights: Array.isArray(d.highlights) ? d.highlights : [],
+            cta: `/apply?profile=student&destination=${d.code.toLowerCase()}`,
+            statLabel: d.statLabel || '',
+            statSub: d.statSub || '',
+          })))
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   return (
     <section id="destinations" className="section-padding relative bg-[#f6f9fc] dark:bg-[#1c1c1e] overflow-hidden">
@@ -444,7 +475,7 @@ function DestinationsSection() {
                   <div className="w-11 h-11 rounded-2xl bg-brand-gradient shadow-glow flex items-center justify-center">
                     {dest.icon}
                   </div>
-                  <span className="badge glass text-white backdrop-blur">Premium Destination</span>
+                  <span className="badge glass text-white backdrop-blur">{t('destinations.premium')}</span>
                 </div>
                 <h3 className="text-2xl font-extrabold text-white mb-1">{dest.name}</h3>
                 <p className="text-sm text-[#a5a3ff] font-medium mb-4">{dest.tagline}</p>
@@ -464,7 +495,7 @@ function DestinationsSection() {
                     href={dest.cta}
                     className="inline-flex items-center gap-2 rounded-full btn-gradient px-4 py-2 text-xs sm:text-sm font-semibold"
                   >
-                    Postuler maintenant <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    {t('destinations.cta')} <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </Link>
                   <div className="text-right">
                     <div className="font-bold text-white">{dest.statLabel}</div>
@@ -482,8 +513,8 @@ function DestinationsSection() {
 
 // ── Process ───────────────────────────────────────────────────────────────────
 function ProcessSection() {
-  const { t } = useTranslation()
-  const steps = t('process.steps') as unknown as { title: string; desc: string }[]
+  const { t, tValue } = useTranslation()
+  const steps = tValue<{ title: string; desc: string }[]>('process.steps') ?? []
 
   const stepIcons = [
     Users, BookOpen, Search, CheckCircle, PlaneTakeoff,
@@ -499,7 +530,7 @@ function ProcessSection() {
           viewport={{ once: true }}
           className="text-center mb-14"
         >
-          <div className="section-kicker justify-center">Comment ça marche</div>
+          <div className="section-kicker justify-center">{t('process.kicker')}</div>
           <h2 className="section-title text-[#0a2540] dark:text-white mt-4 mb-3">
             {t('process.title')}
           </h2>
@@ -523,7 +554,7 @@ function ProcessSection() {
                 </div>
                  <div className="flex-1 bg-white dark:bg-[#1c1c1e] rounded-2xl border border-[#e3e8ee] dark:border-[#38383a] p-4 sm:p-6 shadow-sm hover:shadow-md hover:border-[#635bff]/30 transition-all group">
                  <div className="flex items-center gap-2 sm:gap-3 mb-1">
-                   <span className="text-xs font-bold text-[#635bff] uppercase tracking-widest">Étape {i + 1}</span>
+                   <span className="text-xs font-bold text-[#635bff] uppercase tracking-widest">{t('process.step')} {i + 1}</span>
                    <span className="text-[#635bff]/30 font-bold text-sm transition-all group-hover:translate-x-1">→</span>
                  </div>
                   <h4 className="font-bold text-[#0a2540] dark:text-white mb-1">{step.title}</h4>
@@ -544,7 +575,7 @@ function ProcessSection() {
             href="/apply"
             className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full btn-gradient text-sm font-semibold"
           >
-            Commencer ma demande <ArrowRight className="w-4 h-4" />
+            {t('process.cta')} <ArrowRight className="w-4 h-4" />
           </Link>
         </motion.div>
       </div>
@@ -553,58 +584,28 @@ function ProcessSection() {
 }
 
 // ── Testimonials ───────────────────────────────────────────────────────────────
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
+function buildStaticTestimonials(tList: (p: string) => string[], tValue: <T>(p: string) => T | undefined) {
+  return (tValue<{ id: string; role: string; text: string }[]>('testimonials.static') ?? []).map((item, i) => ({
+    id: String(i + 1),
+    name: ['Amara Diallo', 'Marie-Claire Nkosi', 'Jean-Baptiste Kabila', 'Fatou Sow', 'Christian Mbeki', 'Adaeze Okafor'][i],
+    country: ['Kinshasa, RD Congo', 'Cameroun', 'Kinshasa, RD Congo', 'Sénégal', 'Côte d\'Ivoire', 'Nigeria'][i],
+    destination: ['Berlin', 'Lisbonne', 'Hambourg', 'Porto', 'Munich', 'Lisbonne'][i],
+    role: item.role,
+    text: item.text,
+    rating: 5,
+    photoUrl: [
+      'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=80&q=70',
+      'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=80&q=70',
+      'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=80&q=70',
+      'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=80&q=70',
+      'https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?w=80&q=70',
+      'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&q=70',
+    ][i],
+    videoUrl: null,
+  }))
+}
 
-const STATIC_TESTIMONIALS = [
-  {
-    id: '1', name: 'Amara Diallo', country: 'Kinshasa, RD Congo', destination: 'Berlin',
-    role: 'Software Engineer',
-    text: 'Vision Europe Africa a changé ma vie. L\'équipe m\'a guidé étape par étape pour le visa travail allemand. Je gagne maintenant €55,000/an à Berlin !',
-    rating: 5,
-    photoUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=80&q=70',
-    videoUrl: null,
-  },
-  {
-    id: '2', name: 'Marie-Claire Nkosi', country: 'Cameroun', destination: 'Lisbonne',
-    role: 'Étudiante en Médecine',
-    text: 'J\'ai obtenu mon visa étudiant pour Lisbonne en 3 mois. L\'équipe est très professionnelle et disponible. Je recommande fortement !',
-    rating: 5,
-    photoUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=80&q=70',
-    videoUrl: null,
-  },
-  {
-    id: '3', name: 'Jean-Baptiste Kabila', country: 'Kinshasa, RD Congo', destination: 'Hambourg',
-    role: 'Logisticien',
-    text: 'Professionnel, transparent et efficace. Ils ont géré tous mes documents et j\'ai reçu mon permis de travail allemand plus vite que prévu.',
-    rating: 5,
-    photoUrl: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=80&q=70',
-    videoUrl: null,
-  },
-  {
-    id: '4', name: 'Fatou Sow', country: 'Sénégal', destination: 'Porto',
-    role: 'Étudiante en Commerce',
-    text: 'Le processus était clair et sans surprise. Vision Europe Africa m\'a accompagnée du premier contact jusqu\'à mon arrivée à Porto.',
-    rating: 5,
-    photoUrl: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=80&q=70',
-    videoUrl: null,
-  },
-  {
-    id: '5', name: 'Christian Mbeki', country: 'Côte d\'Ivoire', destination: 'Munich',
-    role: 'Spécialiste IT',
-    text: 'J\'étais sceptique, mais l\'équipe s\'est montrée extrêmement compétente. Mon dossier Opportunity Card a été accepté du premier coup !',
-    rating: 5,
-    photoUrl: 'https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?w=80&q=70',
-    videoUrl: null,
-  },
-  {
-    id: '6', name: 'Adaeze Okafor', country: 'Nigeria', destination: 'Lisbonne',
-    role: 'Infirmière',
-    text: 'Ils m\'ont trouvé un poste d\'infirmière à Lisbonne avec prise en charge du visa. En 4 mois j\'étais déjà en train de travailler au Portugal !',
-    rating: 5,
-    photoUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&q=70',
-    videoUrl: null,
-  },
-]
+const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
 
 function toEmbedUrl(url: string): string | null {
   const trimmed = url.trim()
@@ -620,8 +621,8 @@ function toEmbedUrl(url: string): string | null {
 }
 
 function TestimonialsSection() {
-  const { t } = useTranslation()
-  const [testimonials, setTestimonials] = useState(STATIC_TESTIMONIALS)
+  const { t, tList, tValue } = useTranslation()
+  const [testimonials, setTestimonials] = useState(() => buildStaticTestimonials(tList, tValue))
   const [video, setVideo] = useState<string | null>(null)
 
   useEffect(() => {
@@ -644,7 +645,7 @@ function TestimonialsSection() {
             {t('testimonials.title')}
           </div>
           <h2 className="section-title text-[#0a2540] dark:text-white mt-4 mb-3">
-            Ils ont réussi <span className="gradient-text">leur projet</span>
+            {t('testimonials.heading')} <span className="gradient-text">{t('testimonials.headingHighlight')}</span>
           </h2>
           <p className="text-[#425466] dark:text-[#ebebf5] max-w-2xl mx-auto">{t('testimonials.subtitle')}</p>
         </motion.div>
@@ -683,7 +684,7 @@ function TestimonialsSection() {
                       </div>
                     </div>
                     <div className="absolute inset-x-0 bottom-0 p-3 text-xs text-white/80 bg-gradient-to-t from-black/60 to-transparent">
-                      Voir le témoignage vidéo ▶
+                      {t('testimonials.watchVideo')}
                     </div>
                   </button>
                 )}
@@ -737,7 +738,7 @@ function TestimonialsSection() {
                 onClick={() => setVideo(null)}
                 className="absolute -top-10 right-0 text-white/80 hover:text-white text-sm flex items-center gap-1"
               >
-                Fermer <X className="w-4 h-4" />
+                {t('testimonials.close')} <X className="w-4 h-4" />
               </button>
               <div className="aspect-video rounded-2xl overflow-hidden bg-black shadow-2xl">
                 <iframe
@@ -745,7 +746,7 @@ function TestimonialsSection() {
                   className="w-full h-full"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
-                  title="Témoignage vidéo"
+                  title={t('testimonials.videoTitle')}
                 />
               </div>
             </motion.div>
@@ -758,17 +759,10 @@ function TestimonialsSection() {
 
 // ── FAQ ────────────────────────────────────────────────────────────────────────
 function FAQSection() {
-  const { t } = useTranslation()
+  const { t, tValue } = useTranslation()
   const [open, setOpen] = useState<number | null>(null)
 
-  const faqs = [
-    { q: 'Quels documents sont nécessaires pour un visa allemand ?', a: 'Passeport valide, casier judiciaire, justificatif de ressources, contrat de travail ou lettre d\'admission, assurance santé et preuve d\'hébergement. Notre équipe vous guide dans la préparation de chaque document.' },
-    { q: 'Combien de temps dure le processus d\'immigration ?', a: 'Visa étudiant : 2–4 mois. Visa travailleur : 3–6 mois. Visa visiteur : 4–8 semaines. Notre équipe vous donne une estimation précise lors de la consultation initiale.' },
-    { q: 'Quels sont vos frais de service ?', a: 'Nos frais varient selon la complexité du dossier. Nous offrons une consultation initiale gratuite. Contactez-nous pour un devis personnalisé.' },
-    { q: 'Puis-je travailler en Allemagne sans parler allemand ?', a: 'Oui, dans l\'IT, la santé et l\'ingénierie, l\'anglais est souvent suffisant. Nous recommandons cependant d\'atteindre le niveau B1 pour maximiser vos chances d\'intégration.' },
-    { q: 'Le Portugal est-il plus facile d\'accès que l\'Allemagne ?', a: 'Oui, le Portugal est généralement plus accessible grâce au visa D7 et au programme étudiant. Le coût de vie y est aussi plus abordable, avec une culture accueillante pour les Africains francophones.' },
-    { q: 'Quelle est votre garantie de succès ?', a: 'Nous avons un taux de 97%. Nous ne garantissons pas l\'approbation du visa (c\'est la décision de l\'ambassade), mais nous maximisons vos chances avec un dossier irréprochable.' },
-  ]
+  const faqs = tValue<{ q: string; a: string }[]>('faq.items') ?? []
 
   return (
     <section id="faq" className="section-padding bg-white dark:bg-black">
@@ -784,7 +778,7 @@ function FAQSection() {
             {t('faq.title')}
           </div>
           <h2 className="section-title text-[#0a2540] dark:text-white mt-4 mb-3">
-            Questions <span className="gradient-text">fréquentes</span>
+            {t('faq.heading')} <span className="gradient-text">{t('faq.headingHighlight')}</span>
           </h2>
           <p className="text-[#425466] dark:text-[#ebebf5]">{t('faq.subtitle')}</p>
         </motion.div>
@@ -844,6 +838,9 @@ function FAQSection() {
 
 // ── CTA Banner ────────────────────────────────────────────────────────────────
 function CTASection() {
+  const { t, tList } = useTranslation()
+  const chips = tList('cta.chips')
+
   return (
     <section className="section-padding bg-[#f6f9fc] dark:bg-[#1c1c1e]">
       <div className="container-custom">
@@ -863,17 +860,17 @@ function CTASection() {
               <Rocket className="w-8 h-8 text-white" />
             </div>
             <h2 className="text-2xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">
-              Prêt à commencer votre <span className="gradient-text-animated">voyage ?</span>
+              {t('cta.title')} <span className="gradient-text-animated">{t('cta.titleHighlight')}</span>
             </h2>
             <p className="text-white/70 max-w-xl mx-auto mb-8">
-              Des milliers d'Africains ont réalisé leur rêve européen grâce à nous. Soumettez votre candidature en moins de 10 minutes.
+              {t('cta.subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/apply"
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-white text-[#0a2540] text-sm font-bold hover:bg-[#f6f9fc] transition-all shadow-lg"
               >
-                Commencer maintenant <ArrowRight className="w-4 h-4" />
+                {t('cta.primary')} <ArrowRight className="w-4 h-4" />
               </Link>
               <a
                 href="https://t.me/visioneuropeafrica"
@@ -882,19 +879,18 @@ function CTASection() {
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full glass text-white text-sm font-bold hover:bg-white/15 transition-all"
               >
                 <Send className="w-4 h-4" />
-                Contacter sur Telegram
+                {t('cta.secondary')}
               </a>
             </div>
              <div className="flex items-center justify-center gap-4 sm:gap-6 mt-7 sm:mt-9 text-xs sm:text-sm text-white/70 flex-wrap">
-              <span className="flex items-center gap-2">
-                <Shield className="w-4 h-4 text-[#a5a3ff]" /> 100% Légal
-              </span>
-              <span className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-[#a5a3ff]" /> Réponse en 48h
-              </span>
-              <span className="flex items-center gap-2">
-                <Star className="w-4 h-4 text-[#f59e0b]" /> 97% de succès
-              </span>
+              {chips.map((chip, i) => (
+                <span key={i} className="flex items-center gap-2">
+                  {i === 0 ? <Shield className="w-4 h-4 text-[#a5a3ff]" /> : null}
+                  {i === 1 ? <Clock className="w-4 h-4 text-[#a5a3ff]" /> : null}
+                  {i === 2 ? <Star className="w-4 h-4 text-[#f59e0b]" /> : null}
+                  {chip}
+                </span>
+              ))}
             </div>
           </div>
         </motion.div>

@@ -1,8 +1,20 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { translations, Language } from '@/i18n/translations'
 import Cookies from 'js-cookie'
 
 const LANG_COOKIE = 'vea_language'
+
+function resolve(keys: string[], lang: Language): unknown | undefined {
+  let value: unknown = translations[lang]
+  for (const key of keys) {
+    if (value && typeof value === 'object' && key in (value as object)) {
+      value = (value as Record<string, unknown>)[key]
+    } else {
+      return undefined
+    }
+  }
+  return value
+}
 
 export function useTranslation() {
   const [language, setLanguage] = useState<Language>('fr') // Default French for African audience
@@ -20,27 +32,31 @@ export function useTranslation() {
   }, [])
 
   const t = useCallback(
-    (path: string): string => {
+    (path: string, fallback?: string): string => {
       const keys = path.split('.')
-      let value: unknown = translations[language]
-      for (const key of keys) {
-        if (value && typeof value === 'object' && key in (value as object)) {
-          value = (value as Record<string, unknown>)[key]
-        } else {
-          // Fallback to English
-          let fallback: unknown = translations.en
-          for (const k of keys) {
-            if (fallback && typeof fallback === 'object' && k in (fallback as object)) {
-              fallback = (fallback as Record<string, unknown>)[k]
-            } else return path
-          }
-          return typeof fallback === 'string' ? fallback : path
-        }
-      }
-      return typeof value === 'string' ? value : path
+      const value = resolve(keys, language) ?? resolve(keys, 'en')
+      return typeof value === 'string' ? value : (fallback ?? path)
     },
     [language]
   )
 
-  return { t, language, changeLanguage }
+  const tList = useCallback(
+    (path: string): string[] => {
+      const keys = path.split('.')
+      const value = resolve(keys, language) ?? resolve(keys, 'en')
+      return Array.isArray(value) ? (value as string[]) : []
+    },
+    [language]
+  )
+
+  const tValue = useCallback(
+    <T,>(path: string): T | undefined => {
+      const keys = path.split('.')
+      const value = resolve(keys, language) ?? resolve(keys, 'en')
+      return value as T | undefined
+    },
+    [language]
+  )
+
+  return { t, tList, tValue, language, changeLanguage }
 }

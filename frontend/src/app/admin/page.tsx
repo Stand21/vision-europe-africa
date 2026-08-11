@@ -81,6 +81,22 @@ interface Testimonial {
   sortOrder: number
 }
 
+interface Destination {
+  id: string
+  code: string
+  name: string
+  flag?: string
+  tagline?: string
+  description?: string
+  highlights: string[]
+  programs: string[]
+  statLabel?: string
+  statSub?: string
+  image?: string
+  isActive: boolean
+  sortOrder: number
+}
+
 // ── Login Form ─────────────────────────────────────────────────────────────────
 function AdminLogin({ onLogin }: { onLogin: (token: string) => void }) {
   const [email, setEmail] = useState('')
@@ -445,6 +461,191 @@ function TestimonialsManager({ token }: { token: string }) {
   )
 }
 
+// ── Destinations Manager ───────────────────────────────────────────────────────
+function DestinationsManager({ token }: { token: string }) {
+  const headers = { headers: { Authorization: `Bearer ${token}` } }
+  const [items, setItems] = useState<Destination[]>([])
+  const [loading, setLoading] = useState(true)
+  const emptyForm: Destination = { id: '', code: '', name: '', flag: '', tagline: '', description: '', highlights: [], programs: [], statLabel: '', statSub: '', image: '', isActive: true, sortOrder: 0 }
+  const [form, setForm] = useState<Destination>(emptyForm)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [highlightsText, setHighlightsText] = useState('')
+  const [programsText, setProgramsText] = useState('')
+
+  const load = async () => {
+    try {
+      const { data } = await axios.get(`${API}/admin/destinations`, headers)
+      setItems(data.destinations || [])
+    } catch {
+      toast.error('Erreur de chargement des destinations')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => { load() }, [])
+
+  const set = (k: keyof Destination) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    setForm({ ...form, [k]: e.target.type === 'checkbox' ? (e.target as HTMLInputElement).checked : e.target.value })
+
+  const splitList = (s: string) => s.split('\n').map(x => x.trim()).filter(Boolean)
+
+  const submit = async () => {
+    if (!form.code || !form.name) { toast.error('Code et nom sont requis'); return }
+    const payload: Destination = {
+      ...form,
+      code: form.code.trim().toUpperCase(),
+      highlights: splitList(highlightsText),
+      programs: splitList(programsText),
+    }
+    try {
+      if (editingId) {
+        await axios.patch(`${API}/admin/destinations/${editingId}`, payload, headers)
+        toast.success('Destination modifiée ✔')
+      } else {
+        await axios.post(`${API}/admin/destinations`, payload, headers)
+        toast.success('Destination ajoutée ✔')
+      }
+      setForm(emptyForm); setHighlightsText(''); setProgramsText(''); setEditingId(null); load()
+    } catch (e: any) {
+      toast.error(e?.response?.data?.error || 'Erreur lors de l\'enregistrement')
+    }
+  }
+
+  const startEdit = (d: Destination) => {
+    setForm({ ...d })
+    setHighlightsText((d.highlights || []).join('\n'))
+    setProgramsText((d.programs || []).join('\n'))
+    setEditingId(d.id)
+  }
+
+  const cancelEdit = () => {
+    setForm(emptyForm); setHighlightsText(''); setProgramsText(''); setEditingId(null)
+  }
+
+  const toggle = async (d: Destination) => {
+    try {
+      await axios.patch(`${API}/admin/destinations/${d.id}`, { is_active: !d.isActive }, headers)
+      load()
+    } catch {
+      toast.error('Erreur de mise à jour')
+    }
+  }
+
+  const remove = async (d: Destination) => {
+    if (!window.confirm(`Supprimer la destination ${d.name} ?`)) return
+    try {
+      await axios.delete(`${API}/admin/destinations/${d.id}`, headers)
+      toast.success('Destination supprimée')
+      if (editingId === d.id) cancelEdit()
+      load()
+    } catch {
+      toast.error('Erreur de suppression')
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Form */}
+      <div className="stat-card rounded-2xl p-6 space-y-4">
+        <h3 className="text-white font-semibold flex items-center gap-2">
+          <Globe2 className="w-4 h-4 text-gold-400" /> {editingId ? 'Modifier la destination' : 'Ajouter une destination'}
+        </h3>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <input value={form.code} onChange={set('code')} placeholder="Code (ex. DE) *" maxLength={4} className="input-premium text-sm" />
+          <input value={form.name} onChange={set('name')} placeholder="Nom (ex. Germany) *" className="input-premium text-sm" />
+          <input value={form.flag} onChange={set('flag')} placeholder="Drapeau (ex. 🇩🇪)" className="input-premium text-sm" />
+          <input value={form.tagline} onChange={set('tagline')} placeholder="Slogan (ex. Excellence & Opportunity)" className="input-premium text-sm lg:col-span-2" />
+          <input value={form.sortOrder} onChange={set('sortOrder')} placeholder="Ordre" type="number" className="input-premium text-sm" />
+        </div>
+        <textarea value={form.description} onChange={set('description')} rows={2} placeholder="Description..." className="input-premium text-sm w-full" />
+        <div className="grid sm:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">Points forts (un par ligne)</label>
+            <textarea value={highlightsText} onChange={e => setHighlightsText(e.target.value)} rows={3} placeholder={'Avg. salary €45,000/yr\nFree universities'} className="input-premium text-sm w-full" />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">Programmes / visas (un par ligne)</label>
+            <textarea value={programsText} onChange={e => setProgramsText(e.target.value)} rows={3} placeholder={'Work Visa\nStudent Visa'} className="input-premium text-sm w-full" />
+          </div>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <input value={form.statLabel} onChange={set('statLabel')} placeholder="Stat label (ex. €45,000)" className="input-premium text-sm" />
+          <input value={form.statSub} onChange={set('statSub')} placeholder="Stat subtitle" className="input-premium text-sm" />
+          <input value={form.image} onChange={set('image')} placeholder="URL image" className="input-premium text-sm" />
+        </div>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <label className="flex items-center gap-2 text-sm text-gray-300">
+            <input type="checkbox" checked={form.isActive} onChange={set('isActive')} className="accent-gold-400" />
+            Actif (visible sur le site)
+          </label>
+          <div className="flex gap-2">
+            {editingId && (
+              <button onClick={cancelEdit} className="px-4 py-2.5 rounded-xl border border-white/20 text-gray-400 hover:text-white text-sm transition-colors">
+                Annuler
+              </button>
+            )}
+            <button onClick={submit} className="btn-gold text-sm px-6 py-2.5 flex items-center gap-2">
+              <Plus className="w-4 h-4" /> {editingId ? 'Enregistrer' : 'Ajouter'}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* List */}
+      <div className="stat-card rounded-2xl overflow-hidden">
+        {loading ? (
+          <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 text-gold-400 animate-spin" /></div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="table-premium w-full">
+              <thead>
+                <tr><th>Code</th><th>Nom</th><th>Slogan</th><th>Points forts</th><th>Actif</th><th>Actions</th></tr>
+              </thead>
+              <tbody>
+                {items.map(d => (
+                  <tr key={d.id}>
+                    <td className="font-mono text-white font-semibold">{d.code}</td>
+                    <td>
+                      <div className="font-medium text-white text-sm flex items-center gap-2">
+                        <span className="text-base">{d.flag || ''}</span>
+                        {d.name}
+                      </div>
+                    </td>
+                    <td className="text-sm text-gray-400">{d.tagline || '—'}</td>
+                    <td className="text-sm text-gray-400 max-w-xs">
+                      {(d.highlights || []).slice(0, 2).join(' · ')}
+                      {(d.highlights || []).length > 2 ? ' …' : ''}
+                    </td>
+                    <td>
+                      <button onClick={() => toggle(d)} className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-colors ${d.isActive ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
+                        {d.isActive ? 'Activé' : 'Désactivé'}
+                      </button>
+                    </td>
+                    <td>
+                      <div className="flex items-center gap-1">
+                        <button onClick={() => startEdit(d)} className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors" title="Modifier">
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => remove(d)} className="p-1.5 rounded-lg hover:bg-red-900/30 text-gray-400 hover:text-red-400 transition-colors" title="Supprimer">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {items.length === 0 && (
+                  <tr><td colSpan={6} className="text-center text-gray-400 py-6">Aucune destination</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ── Dashboard Page ─────────────────────────────────────────────────────────────
 function Dashboard({ token }: { token: string }) {
   const [activeTab, setActiveTab] = useState('dashboard')
@@ -537,6 +738,7 @@ function Dashboard({ token }: { token: string }) {
     { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { id: 'applications', icon: FileText, label: 'Applications' },
     { id: 'testimonials', icon: Star, label: 'Témoignages' },
+    { id: 'destinations', icon: Globe2, label: 'Destinations' },
     { id: 'users', icon: Users, label: 'Users' },
     { id: 'settings', icon: Settings, label: 'Settings' },
   ]
@@ -809,6 +1011,13 @@ function Dashboard({ token }: { token: string }) {
           {!loading && activeTab === 'testimonials' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <TestimonialsManager token={token} />
+            </motion.div>
+          )}
+
+          {/* ── DESTINATIONS TAB ── */}
+          {!loading && activeTab === 'destinations' && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <DestinationsManager token={token} />
             </motion.div>
           )}
 

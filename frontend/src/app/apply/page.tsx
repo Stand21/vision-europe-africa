@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
+import { useTranslation } from '@/hooks/useTranslation'
 import axios from 'axios'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
@@ -82,6 +83,7 @@ const VISITOR_CATEGORIES = [
 
 // ── File Uploader ─────────────────────────────────────────────────────────────
 function FileUploader({ label, files, onChange }: { label: string; files: File[]; onChange: (f: File[]) => void }) {
+  const { t } = useTranslation()
   const onDrop = useCallback((accepted: File[]) => {
     onChange([...files, ...accepted])
   }, [files, onChange])
@@ -107,8 +109,8 @@ function FileUploader({ label, files, onChange }: { label: string; files: File[]
       >
         <input {...getInputProps()} />
         <Upload className="w-8 h-8 text-[#697386] dark:text-[#8e8e93] mx-auto mb-2" />
-        <p className="text-sm text-[#425466] dark:text-[#ebebf5]">Glissez-déposez vos fichiers ici, ou cliquez pour sélectionner</p>
-        <p className="text-xs text-[#697386] dark:text-[#8e8e93] mt-1">PDF, JPG, PNG — 10 Mo max</p>
+        <p className="text-sm text-[#425466] dark:text-[#ebebf5]">{t('apply.dropzone')}</p>
+        <p className="text-xs text-[#697386] dark:text-[#8e8e93] mt-1">{t('apply.fileTypes')}</p>
       </div>
       {files.length > 0 && (
         <div className="space-y-2">
@@ -132,6 +134,7 @@ function FileUploader({ label, files, onChange }: { label: string; files: File[]
 
 // ── Signature Pad ─────────────────────────────────────────────────────────────
 function SignaturePad({ onSave }: { onSave: (dataUrl: string) => void }) {
+  const { t } = useTranslation()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const drawing = useRef(false)
   const [hasSignature, setHasSignature] = useState(false)
@@ -177,7 +180,7 @@ function SignaturePad({ onSave }: { onSave: (dataUrl: string) => void }) {
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-[#425466] dark:text-[#ebebf5] mb-1.5">Signature électronique *</label>
+      <label className="block text-sm font-medium text-[#425466] dark:text-[#ebebf5] mb-1.5">{t('apply.signatureLabel')} *</label>
       <div className="relative">
         <canvas
           ref={canvasRef}
@@ -195,13 +198,13 @@ function SignaturePad({ onSave }: { onSave: (dataUrl: string) => void }) {
         {!hasSignature && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <span className="text-sm text-[#697386] dark:text-[#8e8e93] flex items-center gap-2">
-              <PenLine className="w-4 h-4" /> Signez ici
+              <PenLine className="w-4 h-4" /> {t('apply.signHere')}
             </span>
           </div>
         )}
       </div>
       <button type="button" onClick={clear} className="text-xs text-[#697386] dark:text-[#8e8e93] hover:text-[#ef4444] transition-colors">
-        Effacer la signature
+        {t('apply.clearSignature')}
       </button>
     </div>
   )
@@ -283,6 +286,7 @@ function SelectCards({ items, value, onChange }: {
 
 // ── Apply Page Content ────────────────────────────────────────────────────────
 function ApplyContent() {
+  const { t, tList, tValue } = useTranslation()
   const searchParams = useSearchParams()
   const urlProfile = (searchParams.get('profile') || '') as Profile
   const [profile, setProfile] = useState<Profile | null>(
@@ -360,12 +364,12 @@ function ApplyContent() {
   }
 
   const onSubmit = async (data: Record<string, any>) => {
-    if (!profile) { toast.error('Veuillez choisir un profil (Étudiant, Travailleur ou Visiteur)'); return }
-    if (profile === 'student' && !selectedField) { toast.error('Veuillez choisir votre filière d\'études'); return }
-    if (profile === 'worker' && !selectedJob) { toast.error('Veuillez choisir votre métier'); return }
-    if (profile === 'visitor' && !selectedCategory) { toast.error('Veuillez choisir une catégorie de visite'); return }
+    if (!profile) { toast.error(t('apply.errors.noProfile')); return }
+    if (profile === 'student' && !selectedField) { toast.error(t('apply.errors.noField')); return }
+    if (profile === 'worker' && !selectedJob) { toast.error(t('apply.errors.noJob')); return }
+    if (profile === 'visitor' && !selectedCategory) { toast.error(t('apply.errors.noCategory')); return }
     if ((profile === 'student' || profile === 'worker') && !signature) {
-      toast.error('Merci d\'ajouter votre signature électronique')
+      toast.error(t('apply.errors.noSignature'))
       return
     }
 
@@ -384,10 +388,10 @@ function ApplyContent() {
       files.forEach(f => formData.append('documents', f))
 
       await axios.post(`${API}/applications`, formData)
-      toast.success('Candidature envoyée ! Notre équipe vous contactera sous 48h.')
+      toast.success(t('apply.success'))
       clearDraft()
     } catch (err: any) {
-      const msg = err?.response?.data?.error || 'Échec de l\'envoi. Veuillez réessayer.'
+      const msg = err?.response?.data?.error || t('apply.fail')
       toast.error(msg)
     } finally {
       setSubmitting(false)
@@ -395,10 +399,15 @@ function ApplyContent() {
   }
 
   const profiles = [
-    { key: 'student' as Profile, icon: GraduationCap, label: 'Étudiant', desc: 'Étudier dans les meilleures universités européennes' },
-    { key: 'worker' as Profile, icon: Briefcase, label: 'Travailleur', desc: 'Accéder aux métiers en forte demande en Europe' },
-    { key: 'visitor' as Profile, icon: Plane, label: 'Visiteur', desc: 'Tourisme, affaires ou visite familiale' },
+    { key: 'student' as Profile, icon: GraduationCap, label: t('apply.profile.student.label'), desc: t('apply.profile.student.desc') },
+    { key: 'worker' as Profile, icon: Briefcase, label: t('apply.profile.worker.label'), desc: t('apply.profile.worker.desc') },
+    { key: 'visitor' as Profile, icon: Plane, label: t('apply.profile.visitor.label'), desc: t('apply.profile.visitor.desc') },
   ]
+
+  const educationLevels = tList('apply.educationLevels')
+  const targetDegrees = tList('apply.targetDegrees')
+  const workHours = tList('apply.workHours')
+  const durations = tList('apply.durations')
 
   const showSignature = profile === 'student' || profile === 'worker'
 
@@ -407,15 +416,15 @@ function ApplyContent() {
       <div className="container-custom max-w-4xl">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
           <h1 className="text-3xl md:text-4xl font-bold text-[#0a2540] dark:text-white mb-3">
-            Démarrez votre <span className="text-[#635bff]">candidature</span>
+            {t('apply.title')} <span className="text-[#635bff]">{t('apply.titleHighlight')}</span>
           </h1>
           <p className="text-[#425466] dark:text-[#ebebf5] max-w-xl mx-auto">
-            Formulaire unique : vos informations sont sauvegardées automatiquement en brouillon.
+            {t('apply.subtitle')}
           </p>
         </motion.div>
 
-        <div className="application-progress" aria-label="Progression de la candidature">
-          {['Profil', 'Projet', 'Informations', 'Documents'].map((label, index) => (
+        <div className="application-progress" aria-label={t('apply.progressAria')}>
+          {tList('apply.progress').map((label, index) => (
             <div key={label} className={`application-progress-step ${index === 0 ? 'is-current' : ''}`}>
               <span>{index + 1}</span>
               <strong>{label}</strong>
@@ -427,10 +436,10 @@ function ApplyContent() {
           {/* STEP 1 — Profile */}
           <div className="card p-6 md:p-8">
             <div className="flex items-center justify-between mb-5">
-              <h2 className="font-semibold text-lg text-[#0a2540] dark:text-white">1. Profil <span className="text-[#ef4444]">*</span></h2>
+              <h2 className="font-semibold text-lg text-[#0a2540] dark:text-white">1. {t('apply.step1Title')} <span className="text-[#ef4444]">*</span></h2>
               {hasDraft && (
                 <button type="button" onClick={clearDraft} className="text-xs flex items-center gap-1 text-[#697386] dark:text-[#8e8e93] hover:text-[#ef4444] transition-colors">
-                  <Trash2 className="w-3.5 h-3.5" /> Effacer le brouillon
+                  <Trash2 className="w-3.5 h-3.5" /> {t('apply.clearDraft')}
                 </button>
               )}
             </div>
@@ -461,28 +470,28 @@ function ApplyContent() {
           {profile && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="card p-6 md:p-8">
               <h2 className="font-semibold text-lg text-[#0a2540] dark:text-white mb-5">
-                2. {profile === 'student' ? 'Filière d\'études' : profile === 'worker' ? 'Métier' : 'Catégorie de visite'} <span className="text-[#ef4444]">*</span>
+                2. {profile === 'student' ? t('apply.studyFieldLabel') : profile === 'worker' ? t('apply.jobField') : t('apply.categoryField')} <span className="text-[#ef4444]">*</span>
               </h2>
               {profile === 'student' && (
-                <Field label="Filière d'études" required>
+                <Field label={t('apply.studyFieldLabel')} required>
                   <select value={selectedField} onChange={e => setSelectedField(e.target.value)} className={inputClass}>
-                    <option value="">Sélectionnez une filière</option>
+                    <option value="">{t('apply.selectField')}</option>
                     {STUDY_FIELDS.map(f => (
-                      <option key={f.id} value={f.id}>{f.name}</option>
+                      <option key={f.id} value={f.id}>{t(`apply.studyFields.${f.id}`)}</option>
                     ))}
                   </select>
                 </Field>
               )}
               {profile === 'worker' && (
                 <SelectCards
-                  items={PROFESSIONS.map(p => ({ ...p, sub: `${p.salary} · ${p.hours}` }))}
+                  items={PROFESSIONS.map(p => ({ ...p, name: t(`apply.professions.${p.id}`), sub: `${p.salary} · ${p.hours}` }))}
                   value={selectedJob}
                   onChange={setSelectedJob}
                 />
               )}
               {profile === 'visitor' && (
                 <SelectCards
-                  items={VISITOR_CATEGORIES}
+                  items={VISITOR_CATEGORIES.map(c => ({ ...c, name: t(`apply.visitorCats.${c.id}.label`), sub: t(`apply.visitorCats.${c.id}.desc`) }))}
                   value={selectedCategory}
                   onChange={setSelectedCategory}
                 />
@@ -493,61 +502,55 @@ function ApplyContent() {
           {/* STEP 3 — Details */}
           {profile && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="card p-6 md:p-8">
-              <h2 className="font-semibold text-lg text-[#0a2540] dark:text-white mb-5">3. Vos informations</h2>
+              <h2 className="font-semibold text-lg text-[#0a2540] dark:text-white mb-5">3. {t('apply.step3Title')}</h2>
               <div className="grid md:grid-cols-2 gap-5">
-                <Field label="Nom complet" required>
-                  <input {...register('fullName', { required: true })} className={inputClass} placeholder="Jean-Baptiste Kabila" />
+                <Field label={t('apply.fields.fullName')} required>
+                  <input {...register('fullName', { required: true })} className={inputClass} placeholder={t('apply.placeholders.fullName')} />
                 </Field>
-                <Field label="Email" required>
-                  <input {...register('email', { required: true, pattern: /^\S+@\S+\.\S+$/ })} type="email" className={inputClass} placeholder="jean@example.com" />
+                <Field label={t('apply.fields.email')} required>
+                  <input {...register('email', { required: true, pattern: /^\S+@\S+\.\S+$/ })} type="email" className={inputClass} placeholder={t('apply.placeholders.email')} />
                 </Field>
-                <Field label="Téléphone" required>
-                  <input {...register('phone', { required: true })} className={inputClass} placeholder="+243 000 000 000" />
+                <Field label={t('apply.fields.phone')} required>
+                  <input {...register('phone', { required: true })} className={inputClass} placeholder={t('apply.placeholders.phone')} />
                 </Field>
-                <Field label="WhatsApp" required>
-                  <input {...register('whatsapp', { required: true })} className={inputClass} placeholder="+243 000 000 000" />
+                <Field label={t('apply.fields.whatsapp')} required>
+                  <input {...register('whatsapp', { required: true })} className={inputClass} placeholder={t('apply.placeholders.whatsapp')} />
                 </Field>
 
                 {profile === 'student' && (
                   <>
-                    <Field label="Pays d'origine" required>
-                      <input {...register('country', { required: true })} className={inputClass} placeholder="République Démocratique du Congo" />
+                    <Field label={t('apply.fields.country')} required>
+                      <input {...register('country', { required: true })} className={inputClass} placeholder={t('apply.placeholders.country')} />
                     </Field>
-                    <Field label="Ville" required>
-                      <input {...register('city', { required: true })} className={inputClass} placeholder="Kinshasa" />
+                    <Field label={t('apply.fields.city')} required>
+                      <input {...register('city', { required: true })} className={inputClass} placeholder={t('apply.placeholders.city')} />
                     </Field>
-                    <Field label="Niveau d'études actuel" required>
+                    <Field label={t('apply.fields.educationLevel')} required>
                       <select {...register('educationLevel', { required: true })} className={inputClass}>
-                        <option value="">Sélectionnez</option>
-                        <option>Lycée</option>
-                        <option>Licence (en cours)</option>
-                        <option>Licence (obtenue)</option>
-                        <option>Master</option>
-                        <option>Doctorat (PhD)</option>
+                        <option value="">{t('apply.select')}</option>
+                        {educationLevels.map(l => <option key={l}>{l}</option>)}
                       </select>
                     </Field>
-                    <Field label="Diplôme visé" required>
+                    <Field label={t('apply.fields.targetDegree')} required>
                       <select {...register('targetDegree', { required: true })} className={inputClass}>
-                        <option value="">Sélectionnez</option>
-                        <option>Licence</option>
-                        <option>Master</option>
-                        <option>Doctorat (PhD)</option>
+                        <option value="">{t('apply.select')}</option>
+                        {targetDegrees.map(l => <option key={l}>{l}</option>)}
                       </select>
                     </Field>
-                    <Field label="Destination" required>
+                    <Field label={t('apply.fields.destination')} required>
                       <select {...register('destination', { required: true })} className={inputClass}>
-                        <option value="">Sélectionnez</option>
-                        <option value="germany">Germany</option>
-                        <option value="portugal">Portugal</option>
+                        <option value="">{t('apply.select')}</option>
+                        <option value="germany">{t('apply.destinations.germany')}</option>
+                        <option value="portugal">{t('apply.destinations.portugal')}</option>
                       </select>
                     </Field>
-                    <BudgetField label="Budget disponible" required register={register} name="budget" placeholder="ex. 5 000" currencies={currencies} currency={currency} setCurrency={setCurrency} />
-                    <Field label="N° passeport / CNI" required>
-                      <input {...register('idNumber', { required: true })} className={inputClass} placeholder="AB123456" />
+                    <BudgetField label={t('apply.fields.budget')} required register={register} name="budget" placeholder={t('apply.placeholders.budget')} currencies={currencies} currency={currency} setCurrency={setCurrency} />
+                    <Field label={t('apply.fields.idNumber')} required>
+                      <input {...register('idNumber', { required: true })} className={inputClass} placeholder={t('apply.placeholders.idNumber')} />
                     </Field>
                     <div className="md:col-span-2">
-                      <Field label="Lettre de motivation">
-                        <textarea {...register('motivationLetter')} rows={4} className={`${inputClass} resize-none`} placeholder="Expliquez pourquoi vous voulez étudier en Europe..." />
+                      <Field label={t('apply.fields.motivationLetter')}>
+                        <textarea {...register('motivationLetter')} rows={4} className={`${inputClass} resize-none`} placeholder={t('apply.placeholders.motivationLetter')} />
                       </Field>
                     </div>
                   </>
@@ -555,58 +558,52 @@ function ApplyContent() {
 
                 {profile === 'worker' && (
                   <>
-                    <Field label="Années d'expérience" required>
-                      <input {...register('experience', { required: true })} type="number" min="0" className={inputClass} placeholder="5" />
+                    <Field label={t('apply.fields.experience')} required>
+                      <input {...register('experience', { required: true })} type="number" min="0" className={inputClass} placeholder={t('apply.placeholders.experience')} />
                     </Field>
-                    <Field label="Destination" required>
+                    <Field label={t('apply.fields.destination')} required>
                       <select {...register('destination', { required: true })} className={inputClass}>
-                        <option value="">Sélectionnez</option>
-                        <option value="germany">Germany</option>
-                        <option value="portugal">Portugal</option>
+                        <option value="">{t('apply.select')}</option>
+                        <option value="germany">{t('apply.destinations.germany')}</option>
+                        <option value="portugal">{t('apply.destinations.portugal')}</option>
                       </select>
                     </Field>
-                    <Field label="Horaires préférés">
+                    <Field label={t('apply.fields.workHours')}>
                       <select {...register('workHours')} className={inputClass}>
-                        <option>Temps plein (40h/semaine)</option>
-                        <option>Temps partiel (20h/semaine)</option>
-                        <option>Flexible</option>
-                        <option>Postes décalés</option>
+                        {workHours.map(l => <option key={l}>{l}</option>)}
                       </select>
                     </Field>
-                    <BudgetField label="Salaire attendu (annuel)" register={register} name="expectedSalary" placeholder="ex. 35 000" currencies={currencies} currency={currency} setCurrency={setCurrency} />
-                    <BudgetField label="Budget d'immigration" required register={register} name="budget" placeholder="ex. 3 000" currencies={currencies} currency={currency} setCurrency={setCurrency} />
-                    <Field label="N° passeport / CNI" required>
-                      <input {...register('idNumber', { required: true })} className={inputClass} placeholder="AB123456" />
+                    <BudgetField label={t('apply.fields.expectedSalary')} register={register} name="expectedSalary" placeholder={t('apply.placeholders.expectedSalary')} currencies={currencies} currency={currency} setCurrency={setCurrency} />
+                    <BudgetField label={t('apply.fields.immigrationBudget')} required register={register} name="budget" placeholder={t('apply.placeholders.immigrationBudget')} currencies={currencies} currency={currency} setCurrency={setCurrency} />
+                    <Field label={t('apply.fields.idNumber')} required>
+                      <input {...register('idNumber', { required: true })} className={inputClass} placeholder={t('apply.placeholders.idNumber')} />
                     </Field>
                   </>
                 )}
 
                 {profile === 'visitor' && (
                   <>
-                    <Field label="Destination" required>
+                    <Field label={t('apply.fields.destination')} required>
                       <select {...register('destination', { required: true })} className={inputClass}>
-                        <option value="">Sélectionnez</option>
-                        <option value="germany">Germany</option>
-                        <option value="portugal">Portugal</option>
-                        <option value="multiple">Multiple Countries</option>
+                        <option value="">{t('apply.select')}</option>
+                        <option value="germany">{t('apply.destinations.germany')}</option>
+                        <option value="portugal">{t('apply.destinations.portugal')}</option>
+                        <option value="multiple">{t('apply.destinations.multiple')}</option>
                       </select>
                     </Field>
-                    <Field label="Durée prévue" required>
+                    <Field label={t('apply.fields.duration')} required>
                       <select {...register('duration', { required: true })} className={inputClass}>
-                        <option value="">Sélectionnez</option>
-                        <option>Moins de 2 semaines</option>
-                        <option>2–4 semaines</option>
-                        <option>1–3 mois</option>
-                        <option>Plus de 3 mois</option>
+                        <option value="">{t('apply.select')}</option>
+                        {durations.map(l => <option key={l}>{l}</option>)}
                       </select>
                     </Field>
-                    <BudgetField label="Budget estimé" register={register} name="budget" placeholder="ex. 2 000" currencies={currencies} currency={currency} setCurrency={setCurrency} />
-                    <Field label="N° passeport" required>
-                      <input {...register('passportNumber', { required: true })} className={inputClass} placeholder="AB123456" />
+                    <BudgetField label={t('apply.fields.budget')} register={register} name="budget" placeholder={t('apply.placeholders.budget')} currencies={currencies} currency={currency} setCurrency={setCurrency} />
+                    <Field label={t('apply.fields.passportNumber')} required>
+                      <input {...register('passportNumber', { required: true })} className={inputClass} placeholder={t('apply.placeholders.passportNumber')} />
                     </Field>
                     <div className="md:col-span-2">
-                      <Field label="Objet de la visite">
-                        <textarea {...register('purpose')} rows={3} className={`${inputClass} resize-none`} placeholder="Décrivez l'objet de votre visite..." />
+                      <Field label={t('apply.fields.purpose')}>
+                        <textarea {...register('purpose')} rows={3} className={`${inputClass} resize-none`} placeholder={t('apply.placeholders.purpose')} />
                       </Field>
                     </div>
                   </>
@@ -618,9 +615,9 @@ function ApplyContent() {
           {/* STEP 4 — Documents & signature */}
           {profile && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="card p-6 md:p-8 space-y-6">
-              <h2 className="font-semibold text-lg text-[#0a2540] dark:text-white">4. Documents & signature</h2>
+              <h2 className="font-semibold text-lg text-[#0a2540] dark:text-white">4. {t('apply.step4Title')}</h2>
               <FileUploader
-                label={profile === 'visitor' ? 'Téléverser le passeport' : 'Téléverser les documents (passeport, CNI, diplômes, CV...)'}
+                label={profile === 'visitor' ? t('apply.uploadPassport') : t('apply.uploadDocs')}
                 files={files}
                 onChange={setFiles}
               />
@@ -632,7 +629,7 @@ function ApplyContent() {
           {profile && (
             <div className="sticky bottom-0 z-10 -mx-1 rounded-2xl border border-[#e3e8ee] dark:border-[#38383a] bg-white/95 dark:bg-[#0b1020]/95 backdrop-blur px-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-lg md:static md:mx-0 md:rounded-none md:border-0 md:bg-transparent md:p-0 md:shadow-none">
               <button type="submit" disabled={submitting} className="application-submit btn-primary w-full justify-center">
-                {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> Envoi en cours...</> : <>Envoyer ma candidature <CheckCircle className="w-4 h-4" /></>}
+                {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> {t('apply.submitting')}</> : <>{t('apply.submit')} <CheckCircle className="w-4 h-4" /></>}
               </button>
             </div>
           )}
