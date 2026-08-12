@@ -41,8 +41,8 @@ router.patch('/currencies/:code', currenciesController.update)
 router.delete('/currencies/:code', currenciesController.remove)
 
 // ── Bourses : personnalisation ─────────────────────────────────────────────────
-// Les bourses viennent d'une API externe en lecture seule. On expose ici la
-// liste enrichie des personnalisations locales, et de quoi les modifier.
+// Les données principales viennent des sources officielles (sync-scholarships.js).
+// On expose ici la liste enrichie des personnalisations locales, et de quoi les modifier.
 router.get('/scholarships', async (req, res) => {
   const db = require('../config/database')
   try {

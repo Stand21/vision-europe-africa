@@ -130,6 +130,11 @@ async function start() {
       }
     })
 
+    if (process.env.ENABLE_SCHOLARSHIP_SYNC === 'true') {
+      const { scheduleScholarshipSync } = require('./services/scholarshipSyncScheduler')
+      scheduleScholarshipSync()
+    }
+
     app.listen(PORT, () => {
       logger.info(`🚀 Vision Europe Africa API running on port ${PORT}`)
       logger.info(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`)

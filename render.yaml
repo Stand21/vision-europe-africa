@@ -24,10 +24,12 @@ services:
         value: https://vea-frontend.onrender.com,http://localhost:3000
       - key: DASHBOARD_URL
         sync: false
-      # URL de l'API « Ma Bourse d'Études » qui alimente la section Bourses.
-      # Laisser vide masque simplement la section — le site reste fonctionnel.
-      - key: SCHOLARSHIP_API_URL
-        sync: false
+      # Synchronisation périodique des bourses depuis les sources officielles
+      # (voir backend/src/scripts/sync-scholarships.js) vers la table `scholarships`.
+      - key: ENABLE_SCHOLARSHIP_SYNC
+        value: 'true'
+      - key: SCHOLARSHIP_SYNC_INTERVAL_HOURS
+        value: '6'
 
   # ── Frontend ──────────────────────────────────────────────
   - type: web

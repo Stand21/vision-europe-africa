@@ -22,6 +22,13 @@ router.get('/scholarships/countries', async (req, res) => {
   res.json(await scholarships.countries())
 })
 
+router.get('/scholarships/:id', async (req, res) => {
+  const item = await scholarships.getById(req.params.id)
+  if (!item) return res.status(404).json({ error: 'Bourse introuvable' })
+  res.set('Cache-Control', 'public, max-age=300')
+  res.json(item)
+})
+
 // Réglages publics affichés sur le site (numéro WhatsApp…)
 router.get('/settings', async (req, res) => {
   const db = require('../config/database')

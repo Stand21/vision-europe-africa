@@ -18,6 +18,7 @@ import axios from 'axios'
 import toast from 'react-hot-toast'
 import Cookies from 'js-cookie'
 import { ImageField } from '@/components/admin/ImageField'
+import { scholarshipWhatsappLink } from '@/hooks/useScholarships'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
 
@@ -368,9 +369,22 @@ function WhatsAppSettings({ token }: { token: string }) {
     }
   }
 
-  const preview = number.replace(/[^\d]/g, '')
-    ? `https://wa.me/${number.replace(/[^\d]/g, '')}?text=${encodeURIComponent((message || '') + 'Bourse Chevening')}`
-    : null
+  const previewScholarship = {
+    id: '0',
+    title: 'Global Korea Scholarship — Graduate Degree Program',
+    provider: 'National Institute for International Education (NIIED)',
+    country: 'Corée du Sud',
+    levels: ['master', 'doctorat'],
+    fields: [],
+    fundingType: 'full',
+    covers: { tuition: true, accommodation: false, travel: true, stipend: true },
+    deadline: null,
+    applicationUrl: 'https://www.studyinkorea.go.kr/…',
+    sourceUrl: 'https://www.studyinkorea.go.kr/…',
+    sourceName: 'Study in Korea / GKS — Official',
+  } as unknown as Parameters<typeof scholarshipWhatsappLink>[1]
+
+  const preview = scholarshipWhatsappLink({ whatsapp_number: number, whatsapp_message: message }, previewScholarship)
 
   return (
     <div className="stat-card rounded-2xl p-4 md:p-6 space-y-4">
@@ -385,30 +399,33 @@ function WhatsAppSettings({ token }: { token: string }) {
         <div className="flex justify-center py-6"><Loader2 className="w-5 h-5 text-gold-400 animate-spin" /></div>
       ) : (
         <>
-          <div className="grid sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs text-gray-400 mb-1">Numéro (format international, sans + ni espaces)</label>
-              <input
-                value={number}
-                onChange={e => setNumber(e.target.value)}
-                placeholder="243999000000"
-                className="input-premium text-sm w-full"
-              />
-            </div>
-            <div>
-              <label className="block text-xs text-gray-400 mb-1">Début du message pré-rempli</label>
-              <input
-                value={message}
-                onChange={e => setMessage(e.target.value)}
-                placeholder="Laisser vide pour utiliser le texte traduit du site"
-                className="input-premium text-sm w-full"
-              />
-            </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">Numéro (format international, sans + ni espaces)</label>
+            <input
+              value={number}
+              onChange={e => setNumber(e.target.value)}
+              placeholder="243999000000"
+              className="input-premium text-sm w-full"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">Gabarit du message pré-rempli</label>
+            <textarea
+              value={message}
+              onChange={e => setMessage(e.target.value)}
+              placeholder="Laisser vide pour utiliser le gabarit par défaut du site"
+              rows={5}
+              className="input-premium text-sm w-full resize-y"
+            />
+            <p className="text-[11px] text-gray-500 mt-1">
+              Variables disponibles : <code className="text-gold-400">{'{{title}} {{country}} {{provider}} {{levels}} {{fundingType}} {{deadline}} {{sourceName}} {{applicationUrl}}'}</code>.
+              Laissez vide pour le gabarit complet par défaut du site.
+            </p>
           </div>
 
           {preview && (
             <div className="text-xs text-gray-400 break-all">
-              Aperçu :{' '}
+              Aperçu (avec une bourse d&apos;exemple) :{' '}
               <a href={preview} target="_blank" rel="noopener noreferrer" className="text-gold-400 hover:underline">
                 {preview.slice(0, 90)}…
               </a>
@@ -493,9 +510,10 @@ function ScholarshipsManager({ token }: { token: string }) {
           <GraduationCap className="w-4 h-4 text-gold-400" /> Bourses d&apos;études
         </h3>
         <p className="text-sm text-gray-400">
-          L&apos;API des bourses n&apos;est pas joignable. Vérifiez que le service tourne et que
-          la variable <code className="text-gold-400">SCHOLARSHIP_API_URL</code> est renseignée
-          côté serveur. La section Bourses reste masquée sur le site public.
+          Le service de bourses n&apos;est pas joignable. Vérifiez que le backend tourne et que
+          la base PostgreSQL contient des bourses synchronisées (voir
+          <code className="text-gold-400"> backend/src/scripts/sync-scholarships.js</code>).
+          La section Bourses reste masquée sur le site public.
         </p>
       </div>
     )
@@ -508,9 +526,9 @@ function ScholarshipsManager({ token }: { token: string }) {
           <GraduationCap className="w-4 h-4 text-gold-400" /> Bourses d&apos;études
         </h3>
         <p className="text-xs text-gray-400">
-          Les bourses proviennent de l&apos;API Ma Bourse d&apos;Études. Vous ne pouvez pas les
-          modifier ici, mais vous pouvez leur ajouter une affiche, les mettre en avant ou les
-          masquer du site — ces réglages sont conservés chez nous.
+          Les bourses sont synchronisées automatiquement depuis les sources officielles. Vous ne
+          pouvez pas modifier leurs données ici, mais vous pouvez leur ajouter une affiche, les
+          mettre en avant ou les masquer du site — ces réglages sont conservés chez nous.
         </p>
       </div>
 
