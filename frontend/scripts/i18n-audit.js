@@ -113,6 +113,8 @@ function looksHuman(value) {
 // Fragments de code que l'analyse ligne à ligne peut confondre avec du texte
 function looksLikeCode(v) {
   return /=>|\)\s*$|\(\s*['"`]|\.\w+\(|\$\{|`|\bconst\b|\breturn\b|\bfunction\b|\bappend\b|\bmap\b\(/.test(v)
+    || /\.\w+\s*&&|\.\w+\s*\?\?|\blength\b|\bnull\b|\bundefined\b/.test(v)  // expressions JS
+    || /^[a-z]+\.[a-z]/i.test(v)                                                   // accès à une propriété
 }
 
 // Clés d'objet dont la valeur est presque toujours affichée à l'écran

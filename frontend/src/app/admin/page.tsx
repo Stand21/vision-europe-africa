@@ -8,7 +8,7 @@ import {
   Search, Filter, Eye, Check, X, MessageSquare, Bell,
   ChevronLeft, ChevronRight, BarChart2, PieChart, Globe2,
   Loader2, Shield, Lock, Plus, Pencil, Trash2, RefreshCw,
-  Star, Video, ExternalLink, Menu
+  Star, Video, ExternalLink, Menu, GraduationCap
 } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -17,6 +17,7 @@ import {
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import Cookies from 'js-cookie'
+import { ImageField } from '@/components/admin/ImageField'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
 
@@ -327,6 +328,290 @@ function CurrencyManager({ token }: { token: string }) {
   )
 }
 
+// ── Réglages WhatsApp et bourses ──────────────────────────────────────────────
+function WhatsAppSettings({ token }: { token: string }) {
+  const headers = { headers: { Authorization: `Bearer ${token}` } }
+  const [number, setNumber] = useState('')
+  const [message, setMessage] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    axios.get(`${API}/admin/settings`, headers)
+      .then(({ data }) => {
+        const map = Object.fromEntries((data.settings || []).map((s: any) => [s.key, s.value]))
+        setNumber(map.whatsapp_number || '')
+        setMessage(map.whatsapp_message || '')
+      })
+      .catch(() => toast.error('Erreur de chargement des réglages'))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const save = async () => {
+    const digits = number.replace(/[^\d]/g, '')
+    if (digits && digits.length < 8) {
+      toast.error('Numéro trop court — utilisez le format international sans + ni espaces')
+      return
+    }
+    setSaving(true)
+    try {
+      await axios.patch(`${API}/admin/settings`, {
+        whatsapp_number: digits,
+        whatsapp_message: message,
+      }, headers)
+      setNumber(digits)
+      toast.success('Réglages enregistrés ✔')
+    } catch {
+      toast.error('Erreur lors de l\'enregistrement')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const preview = number.replace(/[^\d]/g, '')
+    ? `https://wa.me/${number.replace(/[^\d]/g, '')}?text=${encodeURIComponent((message || '') + 'Bourse Chevening')}`
+    : null
+
+  return (
+    <div className="stat-card rounded-2xl p-4 md:p-6 space-y-4">
+      <h3 className="text-white font-semibold flex items-center gap-2">
+        <MessageSquare className="w-4 h-4 text-gold-400" /> Contact WhatsApp
+      </h3>
+      <p className="text-xs text-gray-400">
+        Ce numéro apparaît à côté de chaque bourse. Laissez vide pour masquer le bouton.
+      </p>
+
+      {loading ? (
+        <div className="flex justify-center py-6"><Loader2 className="w-5 h-5 text-gold-400 animate-spin" /></div>
+      ) : (
+        <>
+          <div className="grid sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">Numéro (format international, sans + ni espaces)</label>
+              <input
+                value={number}
+                onChange={e => setNumber(e.target.value)}
+                placeholder="243999000000"
+                className="input-premium text-sm w-full"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">Début du message pré-rempli</label>
+              <input
+                value={message}
+                onChange={e => setMessage(e.target.value)}
+                placeholder="Laisser vide pour utiliser le texte traduit du site"
+                className="input-premium text-sm w-full"
+              />
+            </div>
+          </div>
+
+          {preview && (
+            <div className="text-xs text-gray-400 break-all">
+              Aperçu :{' '}
+              <a href={preview} target="_blank" rel="noopener noreferrer" className="text-gold-400 hover:underline">
+                {preview.slice(0, 90)}…
+              </a>
+            </div>
+          )}
+
+          <button onClick={save} disabled={saving} className="btn-gold text-sm px-6 py-2.5 flex items-center gap-2">
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+            Enregistrer
+          </button>
+        </>
+      )}
+    </div>
+  )
+}
+
+// ── Bourses d'études ──────────────────────────────────────────────────────────
+interface AdminScholarship {
+  id: string
+  title: string
+  provider?: string | null
+  country?: string | null
+  levels: string[]
+  fundingType?: string | null
+  daysRemaining?: number | null
+  imageUrl?: string | null
+  applicationUrl?: string | null
+  override?: { image_url?: string | null; is_featured?: boolean; is_hidden?: boolean } | null
+}
+
+function ScholarshipsManager({ token }: { token: string }) {
+  const headers = { headers: { Authorization: `Bearer ${token}` } }
+  const [items, setItems] = useState<AdminScholarship[]>([])
+  const [loading, setLoading] = useState(true)
+  const [available, setAvailable] = useState(true)
+  const [editing, setEditing] = useState<AdminScholarship | null>(null)
+  const [image, setImage] = useState('')
+  const [saving, setSaving] = useState(false)
+
+  const load = async () => {
+    try {
+      const { data } = await axios.get(`${API}/admin/scholarships`, headers)
+      setItems(data.data || [])
+      setAvailable(data.available !== false)
+    } catch {
+      toast.error('Erreur de chargement des bourses')
+      setAvailable(false)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => { load() }, [])
+
+  const patch = async (s: AdminScholarship, body: Record<string, unknown>) => {
+    try {
+      await axios.patch(`${API}/admin/scholarships/${encodeURIComponent(s.id)}`,
+        { title_snapshot: s.title, ...body }, headers)
+      await load()
+      return true
+    } catch {
+      toast.error('Erreur lors de l\'enregistrement')
+      return false
+    }
+  }
+
+  const saveImage = async () => {
+    if (!editing) return
+    setSaving(true)
+    const done = await patch(editing, { image_url: image })
+    setSaving(false)
+    if (done) {
+      toast.success(image ? 'Visuel enregistré ✔' : 'Visuel retiré')
+      setEditing(null)
+    }
+  }
+
+  if (!loading && !available) {
+    return (
+      <div className="stat-card rounded-2xl p-6 space-y-3">
+        <h3 className="text-white font-semibold flex items-center gap-2">
+          <GraduationCap className="w-4 h-4 text-gold-400" /> Bourses d&apos;études
+        </h3>
+        <p className="text-sm text-gray-400">
+          L&apos;API des bourses n&apos;est pas joignable. Vérifiez que le service tourne et que
+          la variable <code className="text-gold-400">SCHOLARSHIP_API_URL</code> est renseignée
+          côté serveur. La section Bourses reste masquée sur le site public.
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="stat-card rounded-2xl p-4 md:p-6 space-y-2">
+        <h3 className="text-white font-semibold flex items-center gap-2">
+          <GraduationCap className="w-4 h-4 text-gold-400" /> Bourses d&apos;études
+        </h3>
+        <p className="text-xs text-gray-400">
+          Les bourses proviennent de l&apos;API Ma Bourse d&apos;Études. Vous ne pouvez pas les
+          modifier ici, mais vous pouvez leur ajouter une affiche, les mettre en avant ou les
+          masquer du site — ces réglages sont conservés chez nous.
+        </p>
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center py-10"><Loader2 className="w-6 h-6 text-gold-400 animate-spin" /></div>
+      ) : (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {items.map(s => {
+            const custom = Boolean(s.override?.image_url)
+            return (
+              <div key={s.id} className={`stat-card rounded-2xl overflow-hidden flex flex-col ${s.override?.is_hidden ? 'opacity-50' : ''}`}>
+                <div className="relative h-32 bg-dark-200 flex items-center justify-center overflow-hidden">
+                  {s.imageUrl
+                    ? <img src={s.imageUrl} alt="" className="w-full h-full object-cover" />
+                    : <GraduationCap className="w-8 h-8 text-gold-400/30" />}
+                  {custom && (
+                    <span className="absolute top-2 left-2 px-2 py-0.5 rounded bg-gold-400 text-black text-[10px] font-bold">
+                      Visuel personnalisé
+                    </span>
+                  )}
+                  {s.override?.is_featured && (
+                    <span className="absolute top-2 right-2 px-2 py-0.5 rounded bg-primary-600 text-white text-[10px] font-bold">
+                      En avant
+                    </span>
+                  )}
+                </div>
+
+                <div className="p-4 flex flex-col flex-1 gap-2">
+                  <div className="text-sm font-medium text-white leading-snug line-clamp-2">{s.title}</div>
+                  <div className="text-xs text-gray-400 flex items-center gap-2 flex-wrap">
+                    {s.country && <span>{s.country}</span>}
+                    {s.daysRemaining != null && (
+                      <span className={s.daysRemaining < 0 ? 'text-red-400' : s.daysRemaining <= 7 ? 'text-amber-400' : ''}>
+                        · {s.daysRemaining < 0 ? 'clôturée' : `${s.daysRemaining} j`}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-1 mt-auto pt-2">
+                    <button
+                      onClick={() => { setEditing(s); setImage(s.override?.image_url || '') }}
+                      className="flex-1 px-3 py-2 rounded-xl bg-gold-400 text-black text-xs font-semibold hover:bg-gold-300 transition-colors"
+                    >
+                      {custom ? 'Changer le visuel' : 'Ajouter un visuel'}
+                    </button>
+                    <button
+                      onClick={() => patch(s, { is_featured: !s.override?.is_featured })}
+                      title={s.override?.is_featured ? 'Retirer de la mise en avant' : 'Mettre en avant'}
+                      className="p-2 rounded-xl hover:bg-white/10 text-gray-400 hover:text-gold-400 transition-colors"
+                    >
+                      <Star className={`w-4 h-4 ${s.override?.is_featured ? 'fill-gold-400 text-gold-400' : ''}`} />
+                    </button>
+                    <button
+                      onClick={() => patch(s, { is_hidden: !s.override?.is_hidden })}
+                      title={s.override?.is_hidden ? 'Réafficher sur le site' : 'Masquer du site'}
+                      className="p-2 rounded-xl hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                    >
+                      {s.override?.is_hidden ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+          {items.length === 0 && (
+            <p className="text-center text-gray-400 py-8 sm:col-span-2 lg:col-span-3">
+              Aucune bourse pour le moment.
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Panneau d'ajout de visuel */}
+      {editing && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setEditing(null)}>
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+          <div onClick={e => e.stopPropagation()} className="relative glass-dark rounded-3xl p-6 w-full max-w-lg space-y-4">
+            <h3 className="text-white font-semibold leading-snug">{editing.title}</h3>
+            <ImageField
+              value={image}
+              onChange={setImage}
+              token={token}
+              label="Affiche de la bourse"
+              hint="Format paysage conseillé (1200 × 630), comme les affiches de Ma Bourse d'Études."
+            />
+            <div className="flex gap-2 justify-end pt-2">
+              <button onClick={() => setEditing(null)} className="px-4 py-2.5 rounded-xl border border-white/20 text-gray-400 hover:text-white text-sm transition-colors">
+                Annuler
+              </button>
+              <button onClick={saveImage} disabled={saving} className="btn-gold text-sm px-6 py-2.5 flex items-center gap-2">
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                Enregistrer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── Destinations Manager ───────────────────────────────────────────────────────
 const CONTENT_LANGUAGES: { code: string; label: string; flag: string }[] = [
   { code: 'fr', label: 'Français',  flag: '🇫🇷' },
@@ -545,9 +830,16 @@ function DestinationsManager({ token }: { token: string }) {
           <input value={form.country_code} onChange={e => setForm({ ...form, country_code: e.target.value.toUpperCase() })} placeholder="Code ISO * (ex. FR)" maxLength={5} className="input-premium text-sm" />
           <input value={form.flag || ''} onChange={set('flag')} placeholder="Drapeau emoji (ex. 🇫🇷)" className="input-premium text-sm" />
           <input value={form.sort_order} onChange={set('sort_order')} type="number" placeholder="Ordre d'affichage" className="input-premium text-sm" />
-          <input value={form.image_url || ''} onChange={set('image_url')} placeholder="URL de l'image (optionnel)" className="input-premium text-sm" />
           <input value={form.accent_color || ''} onChange={set('accent_color')} placeholder="Couleur (#635bff)" className="input-premium text-sm" />
         </div>
+
+        <ImageField
+          value={form.image_url || ''}
+          onChange={url => setForm({ ...form, image_url: url })}
+          token={token}
+          label="Photo de la destination"
+          hint="Format paysage conseillé (1200 × 800). Sans photo, un dégradé avec le drapeau s'affiche."
+        />
 
         {/* ── Contenu traduisible ── */}
         <div className="rounded-xl border border-white/10 p-4 space-y-3">
@@ -1157,6 +1449,7 @@ function Dashboard({ token }: { token: string }) {
     { id: 'dashboard', icon: LayoutDashboard, label: 'Tableau de bord' },
     { id: 'applications', icon: FileText, label: 'Candidatures' },
     { id: 'destinations', icon: Globe2, label: 'Destinations' },
+    { id: 'scholarships', icon: GraduationCap, label: 'Bourses' },
     { id: 'testimonials', icon: Star, label: 'Témoignages' },
     { id: 'users', icon: Users, label: 'Utilisateurs' },
     { id: 'settings', icon: Settings, label: 'Réglages' },
@@ -1433,6 +1726,13 @@ function Dashboard({ token }: { token: string }) {
             </motion.div>
           )}
 
+          {/* ── BOURSES TAB ── */}
+          {!loading && activeTab === 'scholarships' && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <ScholarshipsManager token={token} />
+            </motion.div>
+          )}
+
           {/* ── TESTIMONIALS TAB ── */}
           {!loading && activeTab === 'testimonials' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
@@ -1443,6 +1743,7 @@ function Dashboard({ token }: { token: string }) {
           {/* ── SETTINGS TAB ── */}
           {!loading && activeTab === 'settings' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+              <WhatsAppSettings token={token} />
               <CurrencyManager token={token} />
               <div className="stat-card rounded-2xl p-4 md:p-6 space-y-4 max-w-2xl">
                 <h3 className="text-white font-semibold">Réglages administrateur</h3>

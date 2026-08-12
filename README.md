@@ -258,6 +258,42 @@ Follow the VPS guide above. Hostinger VPS supports Ubuntu 22.04 and all required
 
 ---
 
+## 🎓 Bourses d'études
+
+La section Bourses et la page `/bourses` sont alimentées par l'API externe
+**Ma Bourse d'Études**. Le backend sert de relais : le navigateur n'appelle
+jamais cette API directement.
+
+| Variable | Où | Rôle |
+|----------|-----|------|
+| `SCHOLARSHIP_API_URL` | backend | URL de base de l'API, sans `/` final. **Non renseignée, la section est simplement masquée** — le reste du site fonctionne normalement. |
+
+Le relais met les réponses en cache 5 minutes, ne transmet que les filtres
+autorisés (`q`, `country`, `level`, `field`, `status`, `page`, `limit`, `sort`)
+et renvoie une liste vide si l'API est injoignable, plutôt qu'une erreur.
+
+### Bouton WhatsApp
+
+Chaque bourse porte un bouton WhatsApp avec un message pré-rempli contenant son
+intitulé. Le numéro se règle dans **Admin → Réglages → Contact WhatsApp**, au
+format international sans `+` ni espaces (ex. `243999000000`). Laissé vide, le
+bouton n'apparaît pas.
+
+---
+
+## 💱 Devises et montants
+
+Tous les montants sont stockés en euros et convertis à l'affichage dans la
+devise du visiteur, déduite de son fuseau horaire — sans service tiers ni
+adresse IP. Le sélecteur de la barre de navigation permet d'en changer, et le
+choix est mémorisé.
+
+Les taux viennent de `open.er-api.com`, rafraîchis au plus une fois par jour et
+stockés en base (`exchange_rates`). Si l'API est indisponible, les derniers taux
+connus continuent d'être servis.
+
+---
+
 ## 🌍 Managing Destinations
 
 Destinations live in the `destinations` table and are edited from **Admin → Destinations**.

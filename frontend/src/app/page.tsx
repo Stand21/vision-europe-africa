@@ -10,7 +10,7 @@ import {
   ChevronDown, GraduationCap, Briefcase, Plane, MapPin, Users,
   Award, ChevronRight, Rocket, Globe, Send, PlaneTakeoff, Landmark,
   Ship, Play, X, Quote, Sparkles, BadgeCheck, BookOpen, Search,
-  SlidersHorizontal
+  SlidersHorizontal, MessageCircle
 } from 'lucide-react'
 import axios from 'axios'
 import Navbar from '@/components/layout/Navbar'
@@ -18,6 +18,7 @@ import Footer from '@/components/layout/Footer'
 import { useTranslation } from '@/hooks/useTranslation'
 import { useDestinations, type Destination } from '@/hooks/useDestinations'
 import { useCurrency } from '@/i18n/CurrencyProvider'
+import { useScholarships, usePublicSettings, whatsappLink } from '@/hooks/useScholarships'
 
 // ── Media (Unsplash) ───────────────────────────────────────────────────────────
 const MEDIA = {
@@ -781,6 +782,201 @@ function DestinationsSection() {
   )
 }
 
+// ── Bourses d'études ──────────────────────────────────────────────────────────
+/** Couleur du compte à rebours : rouge sous 7 jours, orange sous 30. */
+function deadlineTone(days?: number | null) {
+  if (days == null) return 'text-[#697386] dark:text-[#8e8e93]'
+  if (days <= 7) return 'text-[#ef4444] font-semibold'
+  if (days <= 30) return 'text-[#f59e0b] font-semibold'
+  return 'text-[#697386] dark:text-[#8e8e93]'
+}
+
+function ScholarshipsSection() {
+  const { t } = useTranslation()
+  const [country, setCountry] = useState('')
+  const [level, setLevel] = useState('')
+  const { scholarships, total, loading, available } = useScholarships({ country, level, limit: 6 })
+  const settings = usePublicSettings()
+
+  // L'API des bourses n'est pas configurée : la section n'a pas lieu d'être.
+  if (!available && !loading) return null
+
+  const countries = Array.from(new Set(scholarships.map(s => s.country).filter(Boolean))) as string[]
+
+  return (
+    <section id="scholarships" className="section-padding bg-white dark:bg-black relative overflow-hidden">
+      <div className="aurora-blob w-80 h-80 bg-[#22d3ee]/10 top-10 -left-24" />
+
+      <div className="container-custom relative">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-10"
+        >
+          <div className="section-kicker justify-center">
+            <GraduationCap className="w-3.5 h-3.5" />
+            {t('scholarships.kicker')}
+          </div>
+          <h2 className="section-title text-[#0a2540] dark:text-white mt-4 mb-3">
+            {t('scholarships.title')} <span className="gradient-text">{t('scholarships.titleHighlight')}</span>
+          </h2>
+          <p className="text-[#425466] dark:text-[#ebebf5] max-w-2xl mx-auto">{t('scholarships.subtitle')}</p>
+        </motion.div>
+
+        {/* Filtres */}
+        {!loading && scholarships.length > 0 && (
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
+            <select
+              value={country}
+              onChange={e => setCountry(e.target.value)}
+              className="rounded-xl border border-[#e3e8ee] dark:border-[#38383a] bg-white dark:bg-[#2c2c2e] text-sm text-[#0a2540] dark:text-white px-3 py-2.5 focus:outline-none focus:border-[#635bff]"
+            >
+              <option value="">{t('scholarships.all_countries')}</option>
+              {countries.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+            <select
+              value={level}
+              onChange={e => setLevel(e.target.value)}
+              className="rounded-xl border border-[#e3e8ee] dark:border-[#38383a] bg-white dark:bg-[#2c2c2e] text-sm text-[#0a2540] dark:text-white px-3 py-2.5 focus:outline-none focus:border-[#635bff]"
+            >
+              <option value="">{t('scholarships.all_levels')}</option>
+              <option value="licence">{t('scholarships.level_bachelor')}</option>
+              <option value="master">{t('scholarships.level_master')}</option>
+              <option value="doctorat">{t('scholarships.level_phd')}</option>
+            </select>
+          </div>
+        )}
+
+        {loading ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[0, 1, 2].map(i => (
+              <div key={i} className="rounded-3xl h-80 bg-black/5 dark:bg-white/5 animate-pulse" />
+            ))}
+          </div>
+        ) : scholarships.length === 0 ? (
+          <p className="text-center text-[#697386] dark:text-[#8e8e93] py-12">
+            {t('scholarships.empty')}
+          </p>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {scholarships.map((s, i) => {
+              const wa = whatsappLink(settings, s.title, t('scholarships.whatsapp_intro'))
+              return (
+                <motion.article
+                  key={s.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: Math.min(i, 5) * 0.06 }}
+                  className="rounded-3xl overflow-hidden bg-white dark:bg-[#1c1c1e] border border-[#e3e8ee] dark:border-[#38383a] shadow-sm hover:shadow-lg hover:border-[#635bff]/30 transition-all flex flex-col"
+                >
+                  {/* Visuel */}
+                  <div className="relative h-44 bg-[#f6f9fc] dark:bg-[#2c2c2e] flex items-center justify-center overflow-hidden">
+                    {s.imageUrl ? (
+                      <img
+                        src={s.imageUrl}
+                        alt=""
+                        loading="lazy"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <GraduationCap className="w-12 h-12 text-[#635bff]/30" />
+                    )}
+                    {s.fundingType === 'full' && (
+                      <span className="absolute top-3 left-3 badge bg-[#22c55e] text-white text-[11px]">
+                        {t('scholarships.fully_funded')}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="p-5 flex flex-col flex-1">
+                    <h3 className="font-bold text-[#0a2540] dark:text-white leading-snug mb-1 line-clamp-2">
+                      {s.title}
+                    </h3>
+                    {s.provider && (
+                      <p className="text-xs text-[#697386] dark:text-[#8e8e93] mb-3 line-clamp-1">{s.provider}</p>
+                    )}
+
+                    {/* Niveaux */}
+                    {s.levels.length > 0 && (
+                      <div className="flex gap-1.5 flex-wrap mb-4">
+                        {s.levels.slice(0, 3).map(l => (
+                          <span key={l} className="text-[11px] px-2 py-1 rounded-full bg-[#635bff]/10 text-[#635bff] font-medium capitalize">
+                            {l}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Échéance et pays */}
+                    <div className="flex items-center justify-between gap-2 text-xs pt-3 mt-auto border-t border-[#e3e8ee] dark:border-[#38383a]">
+                      <span className={`inline-flex items-center gap-1.5 ${deadlineTone(s.daysRemaining)}`}>
+                        <Clock className="w-3.5 h-3.5" />
+                        {s.daysRemaining == null
+                          ? t('scholarships.no_deadline')
+                          : s.daysRemaining < 0
+                            ? t('scholarships.closed')
+                            : s.daysRemaining === 0
+                              ? t('scholarships.last_day')
+                              : t('scholarships.days_left', { n: s.daysRemaining })}
+                      </span>
+                      {s.country && (
+                        <span className="inline-flex items-center gap-1.5 text-[#697386] dark:text-[#8e8e93]">
+                          <MapPin className="w-3.5 h-3.5" />
+                          {s.country}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-2 mt-4">
+                      {s.applicationUrl && (
+                        <a
+                          href={s.applicationUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-full btn-gradient px-4 py-2.5 text-xs font-semibold"
+                        >
+                          {t('scholarships.apply')} <ArrowUpRight className="w-3.5 h-3.5" />
+                        </a>
+                      )}
+                      {wa && (
+                        <a
+                          href={wa}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={t('scholarships.whatsapp')}
+                          title={t('scholarships.whatsapp')}
+                          className="inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2.5 text-xs font-semibold bg-[#25D366] text-white hover:bg-[#1da851] transition-colors whitespace-nowrap"
+                        >
+                          <MessageCircle className="w-4 h-4" />
+                          <span className="hidden sm:inline">{t('scholarships.whatsapp_short')}</span>
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </motion.article>
+              )
+            })}
+          </div>
+        )}
+
+        {total > scholarships.length && (
+          <div className="text-center mt-10">
+            <Link
+              href="/bourses"
+              className="inline-flex items-center gap-2 rounded-full glass px-6 py-3 text-sm font-semibold text-[#0a2540] dark:text-white border border-[#e3e8ee] dark:border-[#38383a] hover:border-[#635bff] transition-colors"
+            >
+              {t('scholarships.see_all', { n: total })} <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
+
 // ── Process ───────────────────────────────────────────────────────────────────
 function ProcessSection() {
   const { t, tList } = useTranslation()
@@ -1236,6 +1432,7 @@ export default function HomePage() {
         <TrustBar />
         <ProfileSection />
         <DestinationsSection />
+        <ScholarshipsSection />
         <ProcessSection />
         <TestimonialsSection />
         <FAQSection />

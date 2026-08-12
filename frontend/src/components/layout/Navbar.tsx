@@ -92,6 +92,7 @@ export default function Navbar() {
 
   const navLinks = [
     { href: '/#destinations', id: 'destinations', label: t('nav.destinations') },
+    { href: '/bourses',       id: 'scholarships', label: t('nav.scholarships')  },
     { href: '/#services',     id: 'services',     label: t('nav.services')      },
     { href: '/#testimonials', id: 'testimonials', label: t('nav.testimonials')  },
     { href: '/#faq',          id: 'faq',          label: t('nav.faq')           },

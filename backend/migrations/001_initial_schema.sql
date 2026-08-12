@@ -73,7 +73,7 @@ INSERT INTO admin_users (name, email, password_hash, role)
 VALUES (
   'Super Admin',
   'admin@visioneuropeafrica.com',
-  '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/Ley.b7J8XC5qzqXxG', -- bcrypt of 'Admin@2025'
+  '$2a$12$shDVlsJ1nKqnc1eLUiKPBOoj5hrKXUCmmyh/WbQFQmrXggyajEiem', -- bcrypt de 'Admin@2025' — À CHANGER EN PRODUCTION
   'superadmin'
 ) ON CONFLICT (email) DO NOTHING;
 

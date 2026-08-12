@@ -59,3 +59,16 @@ FROM (VALUES
    '{"en":"Lisbon","pt":"Lisboa","de":"Lissabon"}'::jsonb)
 ) AS d(id, text, role, city)
 WHERE testimonials.id = d.id;
+
+-- ── Correction des métiers hérités en anglais ─────────────────────────────────
+-- Le seed d'origine (migration 005) stockait « Software Engineer » dans la
+-- colonne `role`. Repris tel quel comme version française, il restait en
+-- anglais sur le site francophone. On ne remplace que cette valeur héritée
+-- précise : une saisie faite depuis l'admin n'est jamais écrasée.
+UPDATE testimonials SET
+  role_i18n = role_i18n || jsonb_build_object('fr', d.fr)
+FROM (VALUES
+  ('10000000-0000-4000-8000-000000000001'::uuid, 'Ingénieur logiciel', 'Software Engineer')
+) AS d(id, fr, legacy_en)
+WHERE testimonials.id = d.id
+  AND role_i18n->>'fr' = d.legacy_en;

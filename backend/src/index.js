@@ -56,6 +56,16 @@ app.use(morgan('combined', { stream: { write: msg => logger.info(msg.trim()) } }
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 
+// Visuels du site (bourses, destinations) : affichés dans la page, donc servis
+// en ligne — contrairement aux documents des candidats, forcés en téléchargement.
+app.use('/uploads/media', express.static(path.join(__dirname, '../uploads/media'), {
+  maxAge: '7d',
+  setHeaders: (res) => {
+    res.set('X-Content-Type-Options', 'nosniff')
+    res.set('Cache-Control', 'public, max-age=604800')
+  }
+}))
+
 // Static files (uploaded documents)
 app.use('/uploads', express.static(path.join(__dirname, '../uploads'), {
   setHeaders: (res) => {

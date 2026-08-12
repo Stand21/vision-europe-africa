@@ -84,6 +84,7 @@ dim "  Node $(node -v) · npm $(npm -v)"
 
 BACKEND_PORT="$(find_free_port 5000)"
 FRONTEND_PORT="$(find_free_port 3000)"
+BOURSES_PORT="$(find_free_port 8080)"
 
 if [ "$BACKEND_PORT" != "5000" ]; then
   dim "  Port 5000 occupé par « $(port_owner 5000) » → backend sur $BACKEND_PORT"
@@ -211,9 +212,78 @@ else
   exit 1
 fi
 
+ENV_MARKER_BOURSES="# généré par start-local.sh du site Vision Europe Africa"
+
+# ── 2b. API des bourses d'études ─────────────────────────────────────────────
+# Deuxième dépôt du projet : il alimente la section Bourses. On le démarre sur
+# la même instance PostgreSQL, dans sa propre base, plutôt que via son Docker.
+blue "▸ API des bourses d'études"
+
+BOURSES_DIR="${BOURSES_DIR:-$HOME/Downloads/ma-bourse-scholarship-api}"
+BOURSES_URL=""
+
+if [ ! -f "$BOURSES_DIR/package.json" ]; then
+  dim "  Dépôt introuvable dans $BOURSES_DIR — section Bourses masquée"
+  dim "  (indiquez son chemin avec : BOURSES_DIR=/chemin/vers/le/depot ./start-local.sh)"
+else
+  # Base dédiée, à côté de celle du site
+  if psql -h localhost -p "$DB_PORT" -U "$DB_USER" -d postgres -tAc \
+       "SELECT 1 FROM pg_database WHERE datname = 'ma_bourse'" 2>/dev/null | grep -q 1; then
+    dim "  Base « ma_bourse » déjà présente"
+  else
+    createdb -h localhost -p "$DB_PORT" -U "$DB_USER" ma_bourse 2>/dev/null \
+      && dim "  Base « ma_bourse » créée" || dim "  Base « ma_bourse » : création ignorée"
+  fi
+
+  BOURSES_DB="postgresql://${DB_USER}${DB_PASSWORD:+:$DB_PASSWORD}@localhost:${DB_PORT}/ma_bourse"
+
+  if [ ! -f "$BOURSES_DIR/.env" ] || grep -q "^$ENV_MARKER_BOURSES$" "$BOURSES_DIR/.env" 2>/dev/null; then
+    cat > "$BOURSES_DIR/.env" <<ENVB
+$ENV_MARKER_BOURSES
+PORT=$BOURSES_PORT
+DATABASE_URL=$BOURSES_DB
+CORS_ORIGIN=http://localhost:$FRONTEND_PORT
+CRON_SECRET=dev_local_secret
+SYNC_CRON=0 */6 * * *
+ENVB
+    dim "  .env écrit (port $BOURSES_PORT)"
+  else
+    dim "  .env personnalisé — conservé tel quel"
+  fi
+
+  if [ ! -d "$BOURSES_DIR/node_modules" ]; then
+    dim "  Installation des dépendances…"
+    (cd "$BOURSES_DIR" && npm install --no-audit --no-fund >/dev/null 2>&1)
+  fi
+
+  # Schéma puis, si la table est vide, quelques bourses de démonstration :
+  # les sources RSS du dépôt ne sont pas encore renseignées.
+  psql -h localhost -p "$DB_PORT" -U "$DB_USER" -d ma_bourse -q -f "$BOURSES_DIR/schema.sql" 2>/dev/null \
+    && dim "  Schéma appliqué"
+  DATABASE_URL="$BOURSES_DB" node "$ROOT/backend/scripts/seed-demo-scholarships.js" 2>&1 | sed 's/^/  /'
+
+  (cd "$BOURSES_DIR" && PORT=$BOURSES_PORT DATABASE_URL="$BOURSES_DB" node src/server.js > "$ROOT/.local-logs/bourses.log" 2>&1) &
+  BOURSES_PID=$!
+  mkdir -p "$ROOT/.local-logs"
+
+  for _ in $(seq 1 20); do
+    curl -sf "http://localhost:$BOURSES_PORT/health" >/dev/null 2>&1 && break
+    sleep 1
+  done
+  if curl -sf "http://localhost:$BOURSES_PORT/health" >/dev/null 2>&1; then
+    BOURSES_URL="http://localhost:$BOURSES_PORT"
+    NB=$(curl -s "http://localhost:$BOURSES_PORT/api/scholarships?status=open" | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{try{console.log(JSON.parse(d).pagination.total)}catch{console.log('?')}})" 2>/dev/null)
+    green "  ✔ API des bourses prête ($NB bourses)"
+  else
+    red "  ✖ L'API des bourses n'a pas démarré — voir .local-logs/bourses.log"
+    dim "  Le site fonctionnera, la section Bourses sera simplement masquée."
+  fi
+fi
+
 # ── 3. Fichiers .env ─────────────────────────────────────────────────────────
 blue "▸ Configuration"
 
+ENV_MARKER_BOURSES="# généré par start-local.sh du site Vision Europe Africa"
 ENV_MARKER="# généré par start-local.sh — supprimez cette ligne pour figer vos réglages"
 
 # On régénère tant que le fichier porte le marqueur : les identifiants de base
@@ -238,6 +308,9 @@ DASHBOARD_URL=http://localhost:$FRONTEND_PORT
 ALLOWED_ORIGINS=http://localhost:$FRONTEND_PORT
 
 LOG_LEVEL=info
+
+# API des bourses d'études — renseignée automatiquement si le dépôt est présent
+SCHOLARSHIP_API_URL=${SCHOLARSHIP_API_URL:-$BOURSES_URL}
 ENV
   dim "  backend/.env écrit (base : $DB_USER@localhost:$DB_PORT/$DB_NAME · API sur $BACKEND_PORT)"
 else
@@ -290,6 +363,7 @@ cleanup_quiet() {
   for pid in "${PIDS[@]:-}"; do
     kill "$pid" 2>/dev/null || true
   done
+  [ -n "${BOURSES_PID:-}" ] && kill "$BOURSES_PID" 2>/dev/null || true
 }
 
 cleanup() {
@@ -347,6 +421,8 @@ echo ""
 echo "   Site      →  http://localhost:$FRONTEND_PORT"
 echo "   Admin     →  http://localhost:$FRONTEND_PORT/admin"
 echo "   API       →  http://localhost:$BACKEND_PORT/api/destinations"
+[ -n "$BOURSES_URL" ] && echo "   Bourses   →  http://localhost:$FRONTEND_PORT/bourses"
+[ -n "$BOURSES_URL" ] && echo "   API bourses  →  $BOURSES_URL/api/scholarships"
 echo ""
 echo "   Login admin : admin@visioneuropeafrica.com / Admin@2025"
 printf "\033[1;32m%s\033[0m\n" "╰──────────────────────────────────────────────────────────╯"

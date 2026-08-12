@@ -10,7 +10,8 @@ const PUBLIC_COLS = `
   code, country_code, flag, image_url, accent_color, is_featured,
   available_from, available_until,
   name_i18n, tagline_i18n, description_i18n, programs_i18n, highlights_i18n,
-  languages, profiles, avg_salary, cost_level, visa_weeks_min, visa_weeks_max
+  languages, profiles, avg_salary, salary_min, salary_max,
+  cost_level, visa_weeks_min, visa_weeks_max
 `
 
 const ADMIN_COLS = `
@@ -18,7 +19,8 @@ const ADMIN_COLS = `
   highlights, programs, image_url, accent_color, is_featured,
   available_from, available_until, is_active, sort_order,
   name_i18n, tagline_i18n, description_i18n, highlights_i18n, programs_i18n,
-  languages, profiles, avg_salary, cost_level, visa_weeks_min, visa_weeks_max,
+  languages, profiles, avg_salary, salary_min, salary_max,
+  cost_level, visa_weeks_min, visa_weeks_max,
   created_at, updated_at
 `
 
