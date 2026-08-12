@@ -3,10 +3,19 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Mail, Phone, MapPin, Send, GraduationCap, Briefcase, Plane, Globe, Landmark, ArrowRight, ShieldCheck, Clock, Heart } from 'lucide-react'
 import { useTranslation } from '@/hooks/useTranslation'
+import { useDestinations } from '@/hooks/useDestinations'
 
 export default function Footer() {
   const { t } = useTranslation()
+  const { destinations } = useDestinations()
   const year = new Date().getFullYear()
+
+  // Show the first few live destinations in the quick-links column.
+  const featuredLinks = destinations.slice(0, 3).map(d => ({
+    href: '/#destinations',
+    label: `${d.flag ? d.flag + ' ' : ''}${d.name}`,
+    icon: Globe,
+  }))
 
   return (
     <footer id="contact" className="relative bg-[#0a2540] dark:bg-black text-white pt-20 overflow-hidden">
@@ -26,7 +35,7 @@ export default function Footer() {
               />
             </div>
             <p className="text-sm text-[#c7c7cc] leading-relaxed max-w-md mb-6">
-              Nous aidons les étudiants et travailleurs africains à réaliser leur rêve européen grâce à des voies d'immigration légales et transparentes vers l'Allemagne et le Portugal.
+              {t('footer.tagline')}
             </p>
             <div className="flex gap-3">
               {[
@@ -50,14 +59,13 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-semibold text-white mb-5 text-sm uppercase tracking-wider">Services</h4>
+            <h4 className="font-semibold text-white mb-5 text-sm uppercase tracking-wider">{t('footer.services_title')}</h4>
             <ul className="space-y-3">
               {[
-                { href: '/apply?profile=student', label: 'Immigration Étudiante', icon: GraduationCap },
-                { href: '/apply?profile=worker', label: 'Immigration Travailleur', icon: Briefcase },
-                { href: '/apply?profile=visitor', label: 'Visa Visiteur', icon: Plane },
-                { href: '/#destinations', label: 'Allemagne', icon: Landmark },
-                { href: '/#destinations', label: 'Portugal', icon: Globe },
+                { href: '/apply?profile=student', label: t('footer.services.student'), icon: GraduationCap },
+                { href: '/apply?profile=worker', label: t('footer.services.worker'), icon: Briefcase },
+                { href: '/apply?profile=visitor', label: t('footer.services.visitor'), icon: Plane },
+                ...featuredLinks,
               ].map(({ href, label, icon: Icon }) => (
                 <li key={label}>
                   <Link href={href} className="flex items-center gap-2.5 text-sm text-[#c7c7cc] hover:text-white transition-colors group">
@@ -73,7 +81,7 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="font-semibold text-white mb-5 text-sm uppercase tracking-wider">Contact</h4>
+            <h4 className="font-semibold text-white mb-5 text-sm uppercase tracking-wider">{t('footer.contact_title')}</h4>
             <ul className="space-y-4">
               <li className="flex items-start gap-3 text-sm text-[#c7c7cc]">
                 <span className="w-8 h-8 rounded-lg bg-[#635bff]/10 flex items-center justify-center flex-shrink-0">
@@ -104,9 +112,9 @@ export default function Footer() {
         {/* Trust strip */}
         <div className="mt-14 grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
-            { icon: ShieldCheck, label: '100% Légal & transparent' },
-            { icon: Clock, label: 'Réponse garantie sous 48h' },
-            { icon: Heart, label: 'Accompagnement humain' },
+            { icon: ShieldCheck, label: t('footer.trust.legal') },
+            { icon: Clock, label: t('footer.trust.response') },
+            { icon: Heart, label: t('footer.trust.human') },
           ].map(({ icon: Icon, label }) => (
             <div key={label} className="flex items-center gap-3 px-5 py-4 rounded-2xl bg-white/[0.04] border border-white/[0.06]">
               <Icon className="w-5 h-5 text-[#7b79ff]" />
@@ -120,17 +128,17 @@ export default function Footer() {
           <div className="absolute inset-0 grid-pattern opacity-40" />
           <div className="relative flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
-              <h3 className="text-xl font-bold text-white mb-1">Restez informé</h3>
-              <p className="text-sm text-white/80">Recevez nos conseils et opportunités directement par email.</p>
+              <h3 className="text-xl font-bold text-white mb-1">{t('footer.newsletter.title')}</h3>
+              <p className="text-sm text-white/80">{t('footer.newsletter.subtitle')}</p>
             </div>
             <div className="flex flex-col sm:flex-row w-full md:w-auto gap-3">
               <input
                 type="email"
-                placeholder="votre@email.com"
+                placeholder={t('footer.newsletter.placeholder')}
                 className="w-full sm:w-auto sm:flex-1 md:w-72 px-5 py-3 rounded-full bg-white/15 backdrop-blur border border-white/25 text-white text-sm placeholder-white/70 focus:outline-none focus:border-white/60 transition-colors"
               />
               <button className="w-full sm:w-auto px-6 py-3 rounded-full bg-white text-[#0a2540] text-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#f6f9fc] transition-colors shadow-lg">
-                S'inscrire <ArrowRight className="w-4 h-4" />
+                {t('footer.newsletter.button')} <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -142,9 +150,9 @@ export default function Footer() {
             © {year} Vision Europe Africa. {t('footer.rights')} — {t('footer.legal')}
           </p>
           <div className="flex gap-6">
-            <Link href="/privacy" className="text-sm text-[#8e8e93] hover:text-white transition-colors">Privacy</Link>
-            <Link href="/terms" className="text-sm text-[#8e8e93] hover:text-white transition-colors">Terms</Link>
-            <Link href="/admin" className="text-sm text-[#8e8e93] hover:text-[#7b79ff] transition-colors">Admin</Link>
+            <Link href="/privacy" className="text-sm text-[#8e8e93] hover:text-white transition-colors">{t('footer.privacy')}</Link>
+            <Link href="/terms" className="text-sm text-[#8e8e93] hover:text-white transition-colors">{t('footer.legal')}</Link>
+            <Link href="/admin" className="text-sm text-[#8e8e93] hover:text-[#7b79ff] transition-colors">{t('nav.admin')}</Link>
           </div>
         </div>
       </div>

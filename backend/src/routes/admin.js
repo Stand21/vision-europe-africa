@@ -4,6 +4,7 @@ const { authenticate, requireRole } = require('../middleware/auth')
 const adminController = require('../controllers/adminController')
 const currenciesController = require('../controllers/currenciesController')
 const testimonialsController = require('../controllers/testimonialsController')
+const destinationsController = require('../controllers/destinationsController')
 
 // POST /api/admin/login
 router.post('/login', adminController.login)
@@ -36,6 +37,14 @@ router.get('/currencies', currenciesController.list)
 router.post('/currencies', currenciesController.create)
 router.patch('/currencies/:code', currenciesController.update)
 router.delete('/currencies/:code', currenciesController.remove)
+
+// ── Destinations management ────────────────────────────────────────────────────
+router.get('/destinations', destinationsController.list)
+router.post('/destinations', destinationsController.create)
+router.patch('/destinations/:id', destinationsController.update)
+router.delete('/destinations/:id', destinationsController.remove)
+// Bulk-delete every destination whose availability period has ended
+router.post('/destinations/purge-expired', requireRole('superadmin'), destinationsController.purgeExpired)
 
 // ── Testimonials management ────────────────────────────────────────────────────
 router.get('/testimonials', testimonialsController.list)

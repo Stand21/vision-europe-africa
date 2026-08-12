@@ -9,12 +9,15 @@ import {
   ArrowRight, ArrowUpRight, Star, CheckCircle, Clock, Shield,
   ChevronDown, GraduationCap, Briefcase, Plane, MapPin, Users,
   Award, ChevronRight, Rocket, Globe, Send, PlaneTakeoff, Landmark,
-  Ship, Play, X, Quote, Sparkles, BadgeCheck, BookOpen, Search
+  Ship, Play, X, Quote, Sparkles, BadgeCheck, BookOpen, Search,
+  SlidersHorizontal
 } from 'lucide-react'
 import axios from 'axios'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import { useTranslation } from '@/hooks/useTranslation'
+import { useDestinations, type Destination } from '@/hooks/useDestinations'
+import { useCurrency } from '@/i18n/CurrencyProvider'
 
 // ── Media (Unsplash) ───────────────────────────────────────────────────────────
 const MEDIA = {
@@ -36,6 +39,13 @@ const AVATARS = [
 function HeroSection() {
   const { t } = useTranslation()
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.2 })
+  const { destinations } = useDestinations()
+
+  // Show the featured ones first, cap at 2 cards so the hero stays compact.
+  const heroDestinations = [...destinations]
+    .sort((a, b) => Number(b.is_featured) - Number(a.is_featured))
+    .slice(0, 2)
+  const otherCount = Math.max(destinations.length - heroDestinations.length, 0)
 
   const stats = [
     { value: 5000, suffix: '+', label: t('hero.stats.applicants'), icon: Users },
@@ -138,7 +148,7 @@ function HeroSection() {
                 </div>
               </div>
               <p className="text-sm text-[#c7c7cc]">
-                <span className="font-semibold text-white">5,000+</span> candidats de 30+ pays africains
+                <span className="font-semibold text-white">5 000+</span> {t('hero.trust')}
               </p>
             </motion.div>
           </div>
@@ -153,63 +163,52 @@ function HeroSection() {
             <div className="absolute -inset-6 bg-brand-gradient opacity-20 blur-3xl rounded-full" />
 
             <div className="grid grid-cols-1 gap-5 relative">
-              {/* Germany card */}
-              <div className="glass-card rounded-3xl p-6">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#635bff] to-[#8b5cf6] flex items-center justify-center flex-shrink-0 shadow-glow">
-                    <Landmark className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <div className="font-semibold text-white">Germany</div>
-                      <div className="text-right">
-                        <div className="font-semibold text-[#a5a3ff] text-sm">€45k+</div>
-                        <div className="text-xs text-white/50">avg salary/yr</div>
-                      </div>
+              {/* Featured destinations — loaded from the admin-managed list */}
+              {heroDestinations.map(dest => (
+                <div key={dest.code} className="glass-card rounded-3xl p-5 sm:p-6">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div
+                      className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-glow text-2xl"
+                      style={{ background: `linear-gradient(135deg, ${dest.accent_color || '#635bff'}, #0a2540)` }}
+                    >
+                      {dest.flag || <Globe className="w-6 h-6 text-white" />}
                     </div>
-                    <div className="text-xs text-white/60 mt-0.5">Excellence & Opportunity</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="font-semibold text-white truncate">{dest.name}</div>
+                        <div className="text-xs text-white/50 flex-shrink-0">{dest.country_code}</div>
+                      </div>
+                      <div className="text-xs text-white/60 mt-0.5 truncate">{dest.tagline}</div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 flex-wrap">
+                    {dest.programs.slice(0, 3).map(tag => (
+                      <span key={tag} className="text-xs px-3 py-1.5 rounded-full bg-white/10 text-white/80 border border-white/15">{tag}</span>
+                    ))}
                   </div>
                 </div>
-                <div className="flex gap-2 flex-wrap">
-                  {['Work Visa', 'Student', 'Opportunity Card'].map(tag => (
-                    <span key={tag} className="text-xs px-3 py-1.5 rounded-full bg-white/10 text-white/80 border border-white/15">{tag}</span>
-                  ))}
-                </div>
-              </div>
+              ))}
 
-              {/* Portugal card */}
-              <div className="glass-card rounded-3xl p-6">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#22d3ee] to-[#0d9488] flex items-center justify-center flex-shrink-0 shadow-glow">
-                    <Ship className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <div className="font-semibold text-white">Portugal</div>
-                      <div className="text-right">
-                        <div className="font-semibold text-[#22d3ee] text-sm">D7 Visa</div>
-                        <div className="text-xs text-white/50">affordable entry</div>
-                      </div>
-                    </div>
-                    <div className="text-xs text-white/60 mt-0.5">Your First Step in EU</div>
-                  </div>
-                </div>
-                <div className="flex gap-2 flex-wrap">
-                  {['Student Visa', 'D7', 'NHR Tax', 'EU Path'].map(tag => (
-                    <span key={tag} className="text-xs px-3 py-1.5 rounded-full bg-white/10 text-white/80 border border-white/15">{tag}</span>
-                  ))}
-                </div>
-              </div>
+              {otherCount > 0 && (
+                <button
+                  onClick={() => document.getElementById('destinations')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="glass rounded-2xl p-4 text-sm text-white/80 hover:text-white transition-colors inline-flex items-center justify-center gap-2"
+                >
+                  <Globe className="w-4 h-4" />
+                  +{otherCount} {t('hero.more_destinations')}
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              )}
 
               {/* Mini stats */}
               <div className="grid grid-cols-2 gap-3 sm:gap-5 mt-5 sm:mt-5">
                 <div className="glass rounded-2xl p-4 sm:p-5 text-center">
                   <div className="text-xl sm:text-2xl font-extrabold text-white">97%</div>
-                  <div className="text-xs text-white/50 mt-0.5 sm:mt-1">Success Rate</div>
+                  <div className="text-xs text-white/50 mt-0.5 sm:mt-1">{t('hero.mini.success')}</div>
                 </div>
                 <div className="glass rounded-2xl p-4 sm:p-5 text-center">
                   <div className="text-xl sm:text-2xl font-extrabold text-white">48h</div>
-                  <div className="text-xs text-white/50 mt-0.5 sm:mt-1">Response Time</div>
+                  <div className="text-xs text-white/50 mt-0.5 sm:mt-1">{t('hero.mini.response')}</div>
                 </div>
               </div>
             </div>
@@ -241,13 +240,9 @@ function HeroSection() {
 
 // ── Trust Bar ──────────────────────────────────────────────────────────────────
 function TrustBar() {
-  const items = [
-    { icon: Shield, label: 'Accompagnement certifié' },
-    { icon: BadgeCheck, label: 'Dossiers complets' },
-    { icon: Clock, label: 'Réponse sous 48h' },
-    { icon: Send, label: 'Suivi Telegram' },
-    { icon: Globe, label: '100% en ligne' },
-  ]
+  const { tList } = useTranslation()
+  const icons = [Shield, BadgeCheck, Clock, Send, Globe]
+  const items = tList<string>('hero.trust_bar').map((label, i) => ({ icon: icons[i], label }))
 
   const doubled = [...items, ...items]
 
@@ -269,7 +264,7 @@ function TrustBar() {
 
 // ── Profiles / Services ────────────────────────────────────────────────────────
 function ProfileSection() {
-  const { t } = useTranslation()
+  const { t, tList } = useTranslation()
 
   const profiles = [
     {
@@ -278,7 +273,7 @@ function ProfileSection() {
       description: t('profiles.student.description'),
       badge: t('profiles.student.badge'),
       href: '/apply?profile=student',
-      features: ['Universités gratuites (Allemagne)', 'Visa étudiant D', 'Compte bloqué', 'Bourse DAAD'],
+      features: tList<string>('profiles.student.features'),
     },
     {
       key: 'worker', image: MEDIA.worker, chip: Briefcase,
@@ -286,7 +281,7 @@ function ProfileSection() {
       description: t('profiles.worker.description'),
       badge: t('profiles.worker.badge'),
       href: '/apply?profile=worker',
-      features: ['Offres d\'emploi vérifiées', 'Validation de diplômes', 'Visa travailleur', 'Formation linguistique'],
+      features: tList<string>('profiles.worker.features'),
     },
     {
       key: 'visitor', image: MEDIA.visitor, chip: Plane,
@@ -294,7 +289,7 @@ function ProfileSection() {
       description: t('profiles.visitor.description'),
       badge: t('profiles.visitor.badge'),
       href: '/apply?profile=visitor',
-      features: ['Visa Schengen type C', 'Dossier optimisé', 'Simulation consulaire', 'Assurance voyage'],
+      features: tList<string>('profiles.visitor.features'),
     },
   ]
 
@@ -307,7 +302,7 @@ function ProfileSection() {
           viewport={{ once: true }}
           className="text-center mb-14"
         >
-          <div className="section-kicker justify-center">Nos services</div>
+          <div className="section-kicker justify-center">{t('profiles.title')}</div>
           <h2 className="section-title text-[#0a2540] dark:text-white mt-4 mb-3">
             {t('profiles.title')}
           </h2>
@@ -370,49 +365,80 @@ function ProfileSection() {
 }
 
 // ── Destinations ───────────────────────────────────────────────────────────────
+// Number of days before a destination closes where we start warning visitors.
+const CLOSING_SOON_DAYS = 45
+
+function daysUntil(date?: string | null): number | null {
+  if (!date) return null
+  const diff = new Date(date + 'T23:59:59').getTime() - Date.now()
+  return Math.ceil(diff / 86_400_000)
+}
+
 function DestinationsSection() {
   const { t } = useTranslation()
+  const { formatMoney, formatRange } = useCurrency()
+  const { destinations, loading } = useDestinations()
 
-  const destinations = [
-    {
-      image: MEDIA.germany, icon: <Landmark className="w-6 h-6 text-white" />,
-      code: 'DE',
-      name: t('destinations.germany.name'),
-      tagline: t('destinations.germany.tagline'),
-      description: t('destinations.germany.description'),
-      highlights: t('destinations.germany.highlights') as unknown as string[],
-      cta: '/apply?profile=student&destination=germany',
-      statLabel: '€45,000', statSub: 'Salaire moyen/an',
-    },
-    {
-      image: MEDIA.portugal, icon: <Ship className="w-6 h-6 text-white" />,
-      code: 'PT',
-      name: t('destinations.portugal.name'),
-      tagline: t('destinations.portugal.tagline'),
-      description: t('destinations.portugal.description'),
-      highlights: t('destinations.portugal.highlights') as unknown as string[],
-      cta: '/apply?profile=student&destination=portugal',
-      statLabel: 'D7 Visa', statSub: 'Entrée accessible',
-    },
-  ]
+  const [profile, setProfile] = useState('')
+  const [cost, setCost] = useState('')
+  const [language, setLanguage] = useState('')
+  const [visa, setVisa] = useState('')
+  const [sort, setSort] = useState('default')
+  const [openCode, setOpenCode] = useState<string | null>(null)
+
+  // Les options de langue viennent des destinations réellement publiées.
+  const languageOptions = Array.from(
+    new Set(destinations.flatMap(d => d.languages || []))
+  ).sort((a, b) => a.localeCompare(b))
+
+  const matchesVisa = (d: Destination) => {
+    if (!visa) return true
+    const weeks = d.visa_weeks_max ?? d.visa_weeks_min
+    if (weeks == null) return false
+    if (visa === 'fast') return weeks < 8
+    if (visa === 'medium') return weeks >= 8 && weeks <= 12
+    return weeks > 12
+  }
+
+  const filtered = destinations
+    .filter(d => !profile || (d.profiles || []).includes(profile))
+    .filter(d => !cost || d.cost_level === cost)
+    .filter(d => !language || (d.languages || []).includes(language))
+    .filter(matchesVisa)
+
+  const sorted = [...filtered].sort((a, b) => {
+    if (sort === 'salary') return (b.avg_salary ?? 0) - (a.avg_salary ?? 0)
+    if (sort === 'visa') return (a.visa_weeks_min ?? 99) - (b.visa_weeks_min ?? 99)
+    if (sort === 'name') return a.name.localeCompare(b.name)
+    return Number(b.is_featured) - Number(a.is_featured)
+  })
+
+  const activeFilters = [profile, cost, language, visa].filter(Boolean).length
+  const reset = () => { setProfile(''); setCost(''); setLanguage(''); setVisa(''); setSort('default') }
+
+  const opened = sorted.find(d => d.code === openCode) || null
+
+  const selectClass =
+    'w-full rounded-xl border border-[#e3e8ee] dark:border-[#38383a] bg-white dark:bg-[#2c2c2e] ' +
+    'text-sm text-[#0a2540] dark:text-white px-3 py-2.5 focus:outline-none focus:border-[#635bff] transition-colors'
 
   return (
     <section id="destinations" className="section-padding relative bg-[#f6f9fc] dark:bg-[#1c1c1e] overflow-hidden">
-      {/* Background image */}
       <div className="absolute inset-0 bg-[url('/images/destinations-bg.jpg')] bg-center bg-cover opacity-20" />
       <div className="absolute inset-0 bg-gradient-to-b from-[#f6f9fc]/70 via-transparent to-[#f6f9fc]/70 dark:from-[#1c1c1e]/70 dark:via-transparent dark:to-[#1c1c1e]/70" />
       <div className="aurora-blob w-96 h-96 bg-[#635bff]/10 top-10 -right-24" />
+
       <div className="relative z-10 container-custom">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-14"
+          className="text-center mb-10"
         >
           <div className="section-kicker justify-center">
             <MapPin className="w-3.5 h-3.5" />
-            {t('destinations.title')}
+            {t('destinations.kicker')}
           </div>
           <h2 className="section-title text-[#0a2540] dark:text-white mt-4 mb-3">
             {t('destinations.title')}
@@ -420,70 +446,345 @@ function DestinationsSection() {
           <p className="text-[#425466] dark:text-[#ebebf5] max-w-2xl mx-auto">{t('destinations.subtitle')}</p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-7">
-          {destinations.map((dest, i) => (
-            <motion.div
-              key={dest.code}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
-               className="group relative rounded-3xl overflow-hidden min-h-[340px] sm:min-h-[400px] md:min-h-[460px] shadow-lg"
-            >
-              <Image
-                src={dest.image}
-                alt={dest.name}
-                fill
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0a2540] via-[#0a2540]/55 to-[#0a2540]/10" />
+        {/* ── Barre de filtres ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="rounded-2xl bg-white/80 dark:bg-[#2c2c2e]/80 backdrop-blur border border-[#e3e8ee] dark:border-[#38383a] p-4 sm:p-5 mb-8 shadow-sm"
+        >
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <div className="flex items-center gap-2 text-sm font-semibold text-[#0a2540] dark:text-white">
+              <SlidersHorizontal className="w-4 h-4 text-[#635bff]" />
+              {t('destinations.filters.title')}
+            </div>
+            {activeFilters > 0 && (
+              <button
+                onClick={reset}
+                className="text-xs font-medium text-[#635bff] hover:underline inline-flex items-center gap-1"
+              >
+                <X className="w-3 h-3" /> {t('destinations.filters.reset')}
+              </button>
+            )}
+          </div>
 
-               <div className="relative z-10 flex flex-col justify-end h-full p-5 sm:p-7">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-11 h-11 rounded-2xl bg-brand-gradient shadow-glow flex items-center justify-center">
-                    {dest.icon}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            <div>
+              <label className="block text-xs text-[#697386] dark:text-[#8e8e93] mb-1.5">{t('destinations.filters.profile')}</label>
+              <select value={profile} onChange={e => setProfile(e.target.value)} className={selectClass}>
+                <option value="">{t('destinations.filters.all_profiles')}</option>
+                <option value="student">{t('profiles.student.title')}</option>
+                <option value="worker">{t('profiles.worker.title')}</option>
+                <option value="visitor">{t('profiles.visitor.title')}</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs text-[#697386] dark:text-[#8e8e93] mb-1.5">{t('destinations.filters.budget')}</label>
+              <select value={cost} onChange={e => setCost(e.target.value)} className={selectClass}>
+                <option value="">{t('destinations.filters.all_budgets')}</option>
+                <option value="low">{t('destinations.cost.low')}</option>
+                <option value="medium">{t('destinations.cost.medium')}</option>
+                <option value="high">{t('destinations.cost.high')}</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs text-[#697386] dark:text-[#8e8e93] mb-1.5">{t('destinations.filters.language')}</label>
+              <select value={language} onChange={e => setLanguage(e.target.value)} className={selectClass}>
+                <option value="">{t('destinations.filters.all_languages')}</option>
+                {languageOptions.map(l => <option key={l} value={l}>{l}</option>)}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs text-[#697386] dark:text-[#8e8e93] mb-1.5">{t('destinations.filters.visa')}</label>
+              <select value={visa} onChange={e => setVisa(e.target.value)} className={selectClass}>
+                <option value="">{t('destinations.filters.all_visas')}</option>
+                <option value="fast">{t('destinations.filters.visa_fast')}</option>
+                <option value="medium">{t('destinations.filters.visa_medium')}</option>
+                <option value="slow">{t('destinations.filters.visa_slow')}</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs text-[#697386] dark:text-[#8e8e93] mb-1.5">{t('destinations.filters.sort')}</label>
+              <select value={sort} onChange={e => setSort(e.target.value)} className={selectClass}>
+                <option value="default">{t('destinations.filters.sort_default')}</option>
+                <option value="salary">{t('destinations.filters.sort_salary')}</option>
+                <option value="visa">{t('destinations.filters.sort_visa')}</option>
+                <option value="name">{t('destinations.filters.sort_name')}</option>
+              </select>
+            </div>
+          </div>
+
+          {!loading && (
+            <div className="mt-4 text-xs text-[#697386] dark:text-[#8e8e93]">
+              <span className="font-semibold text-[#0a2540] dark:text-white">{sorted.length}</span>{' '}
+              {sorted.length > 1
+                ? t('destinations.filters.results_many')
+                : t('destinations.filters.results_one')}
+            </div>
+          )}
+        </motion.div>
+
+        {/* ── Résultats ── */}
+        {loading ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[0, 1, 2].map(i => (
+              <div key={i} className="rounded-3xl min-h-[380px] bg-black/5 dark:bg-white/5 animate-pulse" />
+            ))}
+          </div>
+        ) : sorted.length === 0 ? (
+          <div className="text-center py-16 rounded-3xl border border-dashed border-[#e3e8ee] dark:border-[#38383a]">
+            <Globe className="w-10 h-10 text-[#635bff]/40 mx-auto mb-4" />
+            <p className="font-semibold text-[#0a2540] dark:text-white mb-1">{t('destinations.filters.empty_title')}</p>
+            <p className="text-sm text-[#697386] dark:text-[#8e8e93] mb-5">{t('destinations.filters.empty_hint')}</p>
+            <button onClick={reset} className="btn-gradient rounded-full px-5 py-2.5 text-sm font-semibold">
+              {t('destinations.filters.reset')}
+            </button>
+          </div>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {sorted.map((dest, i) => {
+              const remaining = daysUntil(dest.available_until)
+              const closingSoon = remaining !== null && remaining <= CLOSING_SOON_DAYS
+              const accent = dest.accent_color || '#635bff'
+
+              return (
+                <motion.div
+                  key={dest.code}
+                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: Math.min(i, 5) * 0.06 }}
+                  className="group relative rounded-3xl overflow-hidden min-h-[380px] shadow-lg flex flex-col"
+                >
+                  {dest.image_url ? (
+                    <Image
+                      src={dest.image_url}
+                      alt={dest.name}
+                      fill
+                      unoptimized={/^https?:\/\//.test(dest.image_url)}
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
+                  ) : (
+                    <div
+                      className="absolute inset-0 flex items-center justify-center"
+                      style={{ background: `linear-gradient(140deg, ${accent} 0%, #0a2540 85%)` }}
+                    >
+                      <span className="text-[7rem] opacity-25 select-none">{dest.flag || '🌍'}</span>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a2540] via-[#0a2540]/70 to-[#0a2540]/20" />
+
+                  <div className="relative z-10 flex flex-col justify-end h-full p-5">
+                    <div className="flex items-center gap-2 mb-3 flex-wrap">
+                      <div
+                        className="w-10 h-10 rounded-2xl shadow-glow flex items-center justify-center text-xl"
+                        style={{ background: `linear-gradient(135deg, ${accent}, #0a2540)` }}
+                      >
+                        {dest.flag || <Globe className="w-5 h-5 text-white" />}
+                      </div>
+                      {dest.is_featured && (
+                        <span className="badge glass text-white backdrop-blur text-[11px]">{t('destinations.card.featured')}</span>
+                      )}
+                      {closingSoon && (
+                        <span className="badge bg-amber-500/90 text-white backdrop-blur inline-flex items-center gap-1 text-[11px]">
+                          <Clock className="w-3 h-3" />
+                          {remaining! > 0
+                            ? t('destinations.card.closing_in', { n: remaining! })
+                            : t('destinations.card.last_day')}
+                        </span>
+                      )}
+                    </div>
+
+                    <h3 className="text-xl font-extrabold text-white">{dest.name}</h3>
+                    <p className="text-sm text-[#a5a3ff] font-medium mb-3">{dest.tagline}</p>
+
+                    {/* Chiffres clés */}
+                    <div className="grid grid-cols-3 gap-2 mb-4">
+                      <div className="rounded-xl bg-white/10 backdrop-blur px-2 py-2 text-center">
+                        <div className="text-[11px] text-white/50">{t('destinations.card.salary')}</div>
+                        <div className="text-sm font-bold text-white">
+                          {dest.avg_salary ? formatMoney(dest.avg_salary, { compact: true }) : '—'}
+                        </div>
+                      </div>
+                      <div className="rounded-xl bg-white/10 backdrop-blur px-2 py-2 text-center">
+                        <div className="text-[11px] text-white/50">{t('destinations.cost.label')}</div>
+                        <div className="text-sm font-bold text-white">
+                          {dest.cost_level ? t(`destinations.cost.${dest.cost_level}`) : '—'}
+                        </div>
+                      </div>
+                      <div className="rounded-xl bg-white/10 backdrop-blur px-2 py-2 text-center">
+                        <div className="text-[11px] text-white/50">{t('destinations.card.visa_delay')}</div>
+                        <div className="text-sm font-bold text-white">
+                          {dest.visa_weeks_min ? `${dest.visa_weeks_min}-${dest.visa_weeks_max ?? dest.visa_weeks_min}s` : '—'}
+                        </div>
+                      </div>
+                    </div>
+
+                    {(dest.languages || []).length > 0 && (
+                      <div className="flex gap-1.5 flex-wrap mb-4">
+                        {dest.languages.slice(0, 3).map(l => (
+                          <span key={l} className="text-[11px] px-2 py-1 rounded-full bg-white/10 text-white/75 border border-white/15">
+                            {l}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-2 pt-3 border-t border-white/15">
+                      <Link
+                        href={`/apply?destination=${dest.code}`}
+                        className="flex-1 inline-flex items-center justify-center gap-2 rounded-full btn-gradient px-4 py-2 text-xs sm:text-sm font-semibold"
+                      >
+                        {t('destinations.card.apply')} <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                      <button
+                        onClick={() => setOpenCode(dest.code)}
+                        className="rounded-full px-4 py-2 text-xs sm:text-sm font-semibold text-white border border-white/25 hover:bg-white/10 transition-colors whitespace-nowrap"
+                      >
+                        {t('destinations.card.details')}
+                      </button>
+                    </div>
                   </div>
-                  <span className="badge glass text-white backdrop-blur">Premium Destination</span>
+                </motion.div>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* ── Panneau détail ── */}
+      <AnimatePresence>
+        {opened && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            onClick={() => setOpenCode(null)}
+          >
+            <div className="absolute inset-0 bg-[#0a2540]/70 backdrop-blur-sm" />
+            <motion.div
+              initial={{ opacity: 0, y: 24, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 24, scale: 0.97 }}
+              onClick={e => e.stopPropagation()}
+              className="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-3xl bg-white dark:bg-[#1c1c1e] shadow-2xl"
+            >
+              <div
+                className="h-32 flex items-end p-6 relative"
+                style={{ background: `linear-gradient(135deg, ${opened.accent_color || '#635bff'}, #0a2540)` }}
+              >
+                <span className="text-5xl mr-4">{opened.flag || '🌍'}</span>
+                <div>
+                  <h3 className="text-2xl font-extrabold text-white">{opened.name}</h3>
+                  <p className="text-sm text-white/70">{opened.tagline}</p>
                 </div>
-                <h3 className="text-2xl font-extrabold text-white mb-1">{dest.name}</h3>
-                <p className="text-sm text-[#a5a3ff] font-medium mb-4">{dest.tagline}</p>
-                <p className="text-sm text-white/70 leading-relaxed mb-6 max-w-md">{dest.description}</p>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-7">
-                  {(Array.isArray(dest.highlights) ? dest.highlights : []).slice(0, 4).map((h: string) => (
-                    <li key={h} className="flex items-center gap-2 text-sm text-white/80">
-                      <span className="w-5 h-5 rounded-full bg-white/15 flex items-center justify-center flex-shrink-0">
-                        <CheckCircle className="w-3 h-3 text-[#22d3ee]" />
-                      </span>
-                      {h}
-                    </li>
-                  ))}
-                </ul>
-                <div className="flex items-center justify-between pt-4 sm:pt-5 border-t border-white/15">
-                  <Link
-                    href={dest.cta}
-                    className="inline-flex items-center gap-2 rounded-full btn-gradient px-4 py-2 text-xs sm:text-sm font-semibold"
-                  >
-                    Postuler maintenant <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  </Link>
-                  <div className="text-right">
-                    <div className="font-bold text-white">{dest.statLabel}</div>
-                    <div className="text-xs text-white/50">{dest.statSub}</div>
+                <button
+                  onClick={() => setOpenCode(null)}
+                  aria-label={t('destinations.detail.close')}
+                  className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/25 hover:bg-black/40 text-white flex items-center justify-center transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="p-6 space-y-6">
+                {opened.description && (
+                  <p className="text-sm leading-relaxed text-[#425466] dark:text-[#ebebf5]">{opened.description}</p>
+                )}
+
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="rounded-xl bg-[#f6f9fc] dark:bg-[#2c2c2e] p-3 text-center">
+                    <div className="text-xs text-[#697386] dark:text-[#8e8e93]">{t('destinations.card.salary')}</div>
+                    <div className="font-bold text-[#0a2540] dark:text-white">
+                      {opened.avg_salary
+                        ? (opened.salary_min && opened.salary_max
+                            ? formatRange(opened.salary_min, opened.salary_max)
+                            : formatMoney(opened.avg_salary))
+                        : '—'}
+                    </div>
+                  </div>
+                  <div className="rounded-xl bg-[#f6f9fc] dark:bg-[#2c2c2e] p-3 text-center">
+                    <div className="text-xs text-[#697386] dark:text-[#8e8e93]">{t('destinations.cost.label')}</div>
+                    <div className="font-bold text-[#0a2540] dark:text-white">
+                      {opened.cost_level ? t(`destinations.cost.${opened.cost_level}`) : '—'}
+                    </div>
+                  </div>
+                  <div className="rounded-xl bg-[#f6f9fc] dark:bg-[#2c2c2e] p-3 text-center">
+                    <div className="text-xs text-[#697386] dark:text-[#8e8e93]">{t('destinations.card.visa_delay')}</div>
+                    <div className="font-bold text-[#0a2540] dark:text-white">
+                      {opened.visa_weeks_min
+                        ? `${opened.visa_weeks_min}–${opened.visa_weeks_max ?? opened.visa_weeks_min} ${t('destinations.card.visa_unit')}`
+                        : '—'}
+                    </div>
                   </div>
                 </div>
+
+                {(opened.highlights || []).length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-[#0a2540] dark:text-white mb-3">{t('destinations.detail.highlights')}</h4>
+                    <ul className="grid sm:grid-cols-2 gap-2">
+                      {opened.highlights.map(h => (
+                        <li key={h} className="flex items-start gap-2 text-sm text-[#425466] dark:text-[#ebebf5]">
+                          <CheckCircle className="w-4 h-4 text-[#635bff] flex-shrink-0 mt-0.5" />
+                          {h}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {(opened.programs || []).length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-[#0a2540] dark:text-white mb-3">{t('destinations.detail.programs')}</h4>
+                    <div className="flex gap-2 flex-wrap">
+                      {opened.programs.map(p => (
+                        <span key={p} className="text-xs px-3 py-1.5 rounded-full bg-[#635bff]/10 text-[#635bff] font-medium">
+                          {p}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {(opened.languages || []).length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-[#0a2540] dark:text-white mb-3">{t('destinations.card.languages')}</h4>
+                    <div className="flex gap-2 flex-wrap">
+                      {opened.languages.map(l => (
+                        <span key={l} className="text-xs px-3 py-1.5 rounded-full bg-[#f6f9fc] dark:bg-[#2c2c2e] text-[#425466] dark:text-[#ebebf5]">
+                          {l}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <Link
+                  href={`/apply?destination=${opened.code}`}
+                  className="btn-gradient w-full rounded-full py-3 text-sm font-semibold inline-flex items-center justify-center gap-2"
+                >
+                  {t('destinations.detail.apply_now')} <ArrowRight className="w-4 h-4" />
+                </Link>
               </div>
             </motion.div>
-          ))}
-        </div>
-      </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   )
 }
 
 // ── Process ───────────────────────────────────────────────────────────────────
 function ProcessSection() {
-  const { t } = useTranslation()
-  const steps = t('process.steps') as unknown as { title: string; desc: string }[]
+  const { t, tList } = useTranslation()
+  const steps = tList<{ title: string; desc: string }>('process.steps')
 
   const stepIcons = [
     Users, BookOpen, Search, CheckCircle, PlaneTakeoff,
@@ -499,7 +800,7 @@ function ProcessSection() {
           viewport={{ once: true }}
           className="text-center mb-14"
         >
-          <div className="section-kicker justify-center">Comment ça marche</div>
+          <div className="section-kicker justify-center">{t('process.title')}</div>
           <h2 className="section-title text-[#0a2540] dark:text-white mt-4 mb-3">
             {t('process.title')}
           </h2>
@@ -523,7 +824,7 @@ function ProcessSection() {
                 </div>
                  <div className="flex-1 bg-white dark:bg-[#1c1c1e] rounded-2xl border border-[#e3e8ee] dark:border-[#38383a] p-4 sm:p-6 shadow-sm hover:shadow-md hover:border-[#635bff]/30 transition-all group">
                  <div className="flex items-center gap-2 sm:gap-3 mb-1">
-                   <span className="text-xs font-bold text-[#635bff] uppercase tracking-widest">Étape {i + 1}</span>
+                   <span className="text-xs font-bold text-[#635bff] uppercase tracking-widest">{t('process.step_label')} {i + 1}</span>
                    <span className="text-[#635bff]/30 font-bold text-sm transition-all group-hover:translate-x-1">→</span>
                  </div>
                   <h4 className="font-bold text-[#0a2540] dark:text-white mb-1">{step.title}</h4>
@@ -620,15 +921,22 @@ function toEmbedUrl(url: string): string | null {
 }
 
 function TestimonialsSection() {
-  const { t } = useTranslation()
+  const { t, language } = useTranslation()
   const [testimonials, setTestimonials] = useState(STATIC_TESTIMONIALS)
   const [video, setVideo] = useState<string | null>(null)
 
+  // Le contenu des témoignages vit en base : on le redemande à chaque
+  // changement de langue, l'API renvoie la traduction (repli français).
   useEffect(() => {
-    axios.get(`${API}/testimonials`)
-      .then(r => { if (Array.isArray(r.data) && r.data.length) setTestimonials(r.data) })
+    let cancelled = false
+    axios.get(`${API}/testimonials`, { params: { lang: language } })
+      .then(r => {
+        if (cancelled) return
+        if (Array.isArray(r.data) && r.data.length) setTestimonials(r.data)
+      })
       .catch(() => {})
-  }, [])
+    return () => { cancelled = true }
+  }, [language])
 
   return (
     <section id="testimonials" className="section-padding bg-[#f6f9fc] dark:bg-[#1c1c1e]">
@@ -641,10 +949,10 @@ function TestimonialsSection() {
         >
           <div className="section-kicker justify-center">
             <Users className="w-3.5 h-3.5" />
-            {t('testimonials.title')}
+            {t('testimonials.kicker')}
           </div>
           <h2 className="section-title text-[#0a2540] dark:text-white mt-4 mb-3">
-            Ils ont réussi <span className="gradient-text">leur projet</span>
+            {t('testimonials.title')} <span className="gradient-text">{t('testimonials.titleHighlight')}</span>
           </h2>
           <p className="text-[#425466] dark:text-[#ebebf5] max-w-2xl mx-auto">{t('testimonials.subtitle')}</p>
         </motion.div>
@@ -683,7 +991,7 @@ function TestimonialsSection() {
                       </div>
                     </div>
                     <div className="absolute inset-x-0 bottom-0 p-3 text-xs text-white/80 bg-gradient-to-t from-black/60 to-transparent">
-                      Voir le témoignage vidéo ▶
+                      {t('testimonials.video_cta')} ▶
                     </div>
                   </button>
                 )}
@@ -745,7 +1053,7 @@ function TestimonialsSection() {
                   className="w-full h-full"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
-                  title="Témoignage vidéo"
+                  title={t('testimonials.video_cta')}
                 />
               </div>
             </motion.div>
@@ -758,17 +1066,11 @@ function TestimonialsSection() {
 
 // ── FAQ ────────────────────────────────────────────────────────────────────────
 function FAQSection() {
-  const { t } = useTranslation()
+  const { t, tList } = useTranslation()
   const [open, setOpen] = useState<number | null>(null)
 
-  const faqs = [
-    { q: 'Quels documents sont nécessaires pour un visa allemand ?', a: 'Passeport valide, casier judiciaire, justificatif de ressources, contrat de travail ou lettre d\'admission, assurance santé et preuve d\'hébergement. Notre équipe vous guide dans la préparation de chaque document.' },
-    { q: 'Combien de temps dure le processus d\'immigration ?', a: 'Visa étudiant : 2–4 mois. Visa travailleur : 3–6 mois. Visa visiteur : 4–8 semaines. Notre équipe vous donne une estimation précise lors de la consultation initiale.' },
-    { q: 'Quels sont vos frais de service ?', a: 'Nos frais varient selon la complexité du dossier. Nous offrons une consultation initiale gratuite. Contactez-nous pour un devis personnalisé.' },
-    { q: 'Puis-je travailler en Allemagne sans parler allemand ?', a: 'Oui, dans l\'IT, la santé et l\'ingénierie, l\'anglais est souvent suffisant. Nous recommandons cependant d\'atteindre le niveau B1 pour maximiser vos chances d\'intégration.' },
-    { q: 'Le Portugal est-il plus facile d\'accès que l\'Allemagne ?', a: 'Oui, le Portugal est généralement plus accessible grâce au visa D7 et au programme étudiant. Le coût de vie y est aussi plus abordable, avec une culture accueillante pour les Africains francophones.' },
-    { q: 'Quelle est votre garantie de succès ?', a: 'Nous avons un taux de 97%. Nous ne garantissons pas l\'approbation du visa (c\'est la décision de l\'ambassade), mais nous maximisons vos chances avec un dossier irréprochable.' },
-  ]
+  const faqs = tList<{ q: string; a: string }>('faq.items')
+
 
   return (
     <section id="faq" className="section-padding bg-white dark:bg-black">
@@ -781,10 +1083,10 @@ function FAQSection() {
         >
           <div className="section-kicker justify-center">
             <Shield className="w-3.5 h-3.5" />
-            {t('faq.title')}
+            {t('faq.kicker')}
           </div>
           <h2 className="section-title text-[#0a2540] dark:text-white mt-4 mb-3">
-            Questions <span className="gradient-text">fréquentes</span>
+            {t('faq.title')} <span className="gradient-text">{t('faq.titleHighlight')}</span>
           </h2>
           <p className="text-[#425466] dark:text-[#ebebf5]">{t('faq.subtitle')}</p>
         </motion.div>
@@ -844,6 +1146,8 @@ function FAQSection() {
 
 // ── CTA Banner ────────────────────────────────────────────────────────────────
 function CTASection() {
+  const { t } = useTranslation()
+
   return (
     <section className="section-padding bg-[#f6f9fc] dark:bg-[#1c1c1e]">
       <div className="container-custom">
@@ -863,17 +1167,17 @@ function CTASection() {
               <Rocket className="w-8 h-8 text-white" />
             </div>
             <h2 className="text-2xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">
-              Prêt à commencer votre <span className="gradient-text-animated">voyage ?</span>
+              {t('cta.title')} <span className="gradient-text-animated">{t('cta.titleHighlight')}</span>
             </h2>
             <p className="text-white/70 max-w-xl mx-auto mb-8">
-              Des milliers d'Africains ont réalisé leur rêve européen grâce à nous. Soumettez votre candidature en moins de 10 minutes.
+              {t('cta.subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/apply"
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-white text-[#0a2540] text-sm font-bold hover:bg-[#f6f9fc] transition-all shadow-lg"
               >
-                Commencer maintenant <ArrowRight className="w-4 h-4" />
+                {t('cta.primary')} <ArrowRight className="w-4 h-4" />
               </Link>
               <a
                 href="https://t.me/visioneuropeafrica"
@@ -882,18 +1186,18 @@ function CTASection() {
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full glass text-white text-sm font-bold hover:bg-white/15 transition-all"
               >
                 <Send className="w-4 h-4" />
-                Contacter sur Telegram
+                {t('cta.secondary')}
               </a>
             </div>
              <div className="flex items-center justify-center gap-4 sm:gap-6 mt-7 sm:mt-9 text-xs sm:text-sm text-white/70 flex-wrap">
               <span className="flex items-center gap-2">
-                <Shield className="w-4 h-4 text-[#a5a3ff]" /> 100% Légal
+                <Shield className="w-4 h-4 text-[#a5a3ff]" /> {t('footer.trust.legal')}
               </span>
               <span className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-[#a5a3ff]" /> Réponse en 48h
+                <Clock className="w-4 h-4 text-[#a5a3ff]" /> {t('footer.trust.response')}
               </span>
               <span className="flex items-center gap-2">
-                <Star className="w-4 h-4 text-[#f59e0b]" /> 97% de succès
+                <Star className="w-4 h-4 text-[#f59e0b]" /> 97 % {t('hero.mini.success')}
               </span>
             </div>
           </div>
@@ -910,7 +1214,7 @@ function WhatsAppFloat() {
       href="https://wa.me/237000000000"
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Chat WhatsApp"
+      aria-label="WhatsApp"
       className="whatsapp-float fixed z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-glow-lg bg-[#25D366] hover:bg-[#20bd5a] transition-colors"
       initial={{ scale: 0 }}
       animate={{ scale: 1 }}

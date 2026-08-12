@@ -2,8 +2,10 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, ChevronDown, Moon, Sun, Sparkles } from 'lucide-react'
+import { Menu, X, ChevronDown, Moon, Sun, Sparkles, Coins } from 'lucide-react'
 import { useTranslation } from '@/hooks/useTranslation'
+import { useTheme } from '@/hooks/useTheme'
+import { useCurrency } from '@/i18n/CurrencyProvider'
 import type { Language } from '@/i18n/translations'
 
 const LANGUAGES: { code: Language; label: string; flag: string }[] = [
@@ -13,14 +15,15 @@ const LANGUAGES: { code: Language; label: string; flag: string }[] = [
   { code: 'de', label: 'Deutsch',   flag: '🇩🇪' },
 ]
 
-const DARK_COOKIE = 'vea_dark'
 
 export default function Navbar() {
   const { t, language, changeLanguage } = useTranslation()
+  const { darkMode, toggleTheme } = useTheme()
+  const { currency, setCurrency, availableCurrencies, autoDetected } = useCurrency()
+  const [currencyOpen, setCurrencyOpen] = useState(false)
   const [scrolled,    setScrolled]    = useState(false)
   const [mobileOpen,  setMobileOpen]  = useState(false)
   const [langOpen,    setLangOpen]    = useState(false)
-  const [darkMode,    setDarkMode]    = useState(false)
   const [active,      setActive]      = useState('')
   const navRef = useRef<HTMLElement>(null)
 
@@ -47,23 +50,6 @@ export default function Navbar() {
     return () => observer.disconnect()
   }, [])
 
-  // Initial dark mode: cookie > system preference
-  useEffect(() => {
-    const saved = document.cookie.match(new RegExp(`${DARK_COOKIE}=([^;]*)`))
-    if (saved) {
-      setDarkMode(saved[1] === '1')
-    } else {
-      setDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches)
-    }
-  }, [])
-
-  // Keep <html class="dark"> in sync and persist the preference
-  useEffect(() => {
-    const root = window.document.documentElement
-    root.classList.toggle('dark', darkMode)
-    document.cookie = `${DARK_COOKIE}=${darkMode ? '1' : '0'}; path=/; max-age=31536000`
-  }, [darkMode])
-
   // Lock body scroll while the mobile menu is open
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? 'hidden' : ''
@@ -76,6 +62,7 @@ export default function Navbar() {
       if (navRef.current && !navRef.current.contains(e.target as Node)) {
         setMobileOpen(false)
         setLangOpen(false)
+        setCurrencyOpen(false)
       }
     }
     document.addEventListener('pointerdown', onPointerDown)
@@ -88,6 +75,7 @@ export default function Navbar() {
       if (e.key === 'Escape') {
         setMobileOpen(false)
         setLangOpen(false)
+        setCurrencyOpen(false)
       }
     }
     window.addEventListener('keydown', onKey)
@@ -163,12 +151,55 @@ export default function Navbar() {
 
           {/* Dark mode toggle */}
           <button
-            onClick={() => setDarkMode(!darkMode)}
+            onClick={toggleTheme}
             className="p-2.5 rounded-xl border border-[#e3e8ee] dark:border-[#38383a] text-[#425466] dark:text-[#ebebf5] hover:border-[#cbd5e1] dark:hover:border-[#48484a] hover:text-[#0a2540] dark:hover:text-white transition-all"
-            aria-label="Toggle dark mode"
+            aria-label={darkMode ? t('common.theme_light') : t('common.theme_dark')}
           >
             {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
+
+          {/* Currency switcher */}
+          <div className="relative">
+            <button
+              onClick={() => { setCurrencyOpen(!currencyOpen); setLangOpen(false) }}
+              aria-expanded={currencyOpen}
+              aria-label={t('common.currency')}
+              className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl border border-[#e3e8ee] dark:border-[#38383a] text-sm text-[#425466] dark:text-[#ebebf5] hover:border-[#cbd5e1] dark:hover:border-[#48484a] hover:text-[#0a2540] dark:hover:text-white transition-all"
+            >
+              <Coins className="w-4 h-4" />
+              <span className="text-xs font-medium">{currency}</span>
+              <ChevronDown className={`w-3 h-3 transition-transform ${currencyOpen ? 'rotate-180' : ''}`} />
+            </button>
+            <AnimatePresence>
+              {currencyOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 6, scale: 0.96 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute right-0 top-full mt-2 w-44 max-h-72 overflow-y-auto glass-strong rounded-2xl"
+                >
+                  {autoDetected && (
+                    <div className="px-4 py-2 text-[10px] uppercase tracking-wider text-[#697386] dark:text-[#8e8e93] border-b border-[#e3e8ee] dark:border-[#38383a]">
+                      {t('common.auto_detected')}
+                    </div>
+                  )}
+                  {availableCurrencies.map(code => (
+                    <button
+                      key={code}
+                      onClick={() => { setCurrency(code); setCurrencyOpen(false) }}
+                      className={`w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors hover:bg-[#f6f9fc] dark:hover:bg-[#2c2c2e] ${
+                        currency === code ? 'text-[#635bff] font-medium' : 'text-[#425466] dark:text-[#ebebf5]'
+                      }`}
+                    >
+                      <span>{code}</span>
+                      {currency === code && <span className="w-1.5 h-1.5 rounded-full bg-[#635bff]" />}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           {/* Language switcher */}
           <div className="relative">
@@ -257,6 +288,15 @@ export default function Navbar() {
                   {active === id && <span className="w-1.5 h-1.5 rounded-full bg-[#635bff]" />}
                 </Link>
               ))}
+              {/* Thème — le bouton du haut est masqué sur mobile */}
+              <button
+                onClick={toggleTheme}
+                className="px-4 py-3 text-sm rounded-xl flex items-center justify-between text-[#425466] dark:text-[#ebebf5] hover:bg-[#f6f9fc] dark:hover:bg-[#2c2c2e] transition-all"
+              >
+                {darkMode ? t('common.theme_light') : t('common.theme_dark')}
+                {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              </button>
+
               <Link
                 href="/apply"
                 onClick={() => setMobileOpen(false)}

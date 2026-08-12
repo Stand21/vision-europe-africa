@@ -4,6 +4,7 @@ const db = require('../config/database')
 const telegramService = require('../services/telegramService')
 const emailService = require('../services/emailService')
 const logger = require('../config/logger')
+const destinationsController = require('./destinationsController')
 
 // ── Validation Rules ───────────────────────────────────────────────────────────
 exports.validateApplication = [
@@ -12,7 +13,15 @@ exports.validateApplication = [
   body('phone').trim().notEmpty().withMessage('Phone is required'),
   body('whatsapp').trim().notEmpty().withMessage('WhatsApp is required'),
   body('profile').isIn(['student', 'worker', 'visitor']).withMessage('Invalid profile'),
-  body('destination').isIn(['germany', 'portugal', 'multiple']).withMessage('Invalid destination'),
+  // Destinations are managed in DB and can open/close over time — validate live.
+  body('destination').trim().notEmpty().withMessage('Destination is required')
+    .bail()
+    .custom(async (value) => {
+      if (value === 'multiple') return true
+      const open = await destinationsController.isDestinationOpen(value)
+      if (!open) throw new Error('This destination is not available')
+      return true
+    }),
   body('budget').optional().trim(),
   body('currency').optional().trim().isLength({ max: 10 }).withMessage('Invalid currency'),
 ]
