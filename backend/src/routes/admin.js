@@ -14,24 +14,6 @@ router.post('/login', adminController.login)
 // All below require authentication
 router.use(authenticate)
 
-// TEMPORAIRE — diagnostic de dérive de schéma (Neon). À retirer une fois le
-// correctif de migration validé en production.
-router.get('/debug/schema/:table', async (req, res) => {
-  const db = require('../config/database')
-  try {
-    const { rows } = await db.query(
-      `SELECT column_name, data_type, is_nullable
-         FROM information_schema.columns
-        WHERE table_name = $1
-        ORDER BY ordinal_position`,
-      [req.params.table]
-    )
-    res.json({ table: req.params.table, columns: rows })
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-})
-
 // GET /api/admin/stats
 router.get('/stats', adminController.getStats)
 
