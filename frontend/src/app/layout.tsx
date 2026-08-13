@@ -1,15 +1,18 @@
 import type { Metadata, Viewport } from 'next'
 import { Toaster } from 'react-hot-toast'
 import Script from 'next/script'
+import { LocaleProviders } from '@/i18n/LocaleProviders'
 import './globals.css'
 
+// Métadonnées SEO : Next.js les rend côté serveur, avant que la langue de
+// l'utilisateur soit connue. On garde donc une version neutre en anglais.
 export const metadata: Metadata = {
   title: 'Vision Europe Africa — Your Gateway to Europe',
-  description: 'Legal immigration pathways to Germany and Portugal for African students and workers. Professional, trusted, and secure.',
-  keywords: 'immigration Europe, Germany visa, Portugal visa, student visa Africa, work permit Europe',
+  description: 'Legal immigration pathways to Europe for African students and workers. Professional, trusted, and secure.', // i18n-ignore
+  keywords: 'immigration Europe, Europe visa, student visa Africa, work permit Europe, immigration Afrique Europe', // i18n-ignore
   openGraph: {
     title: 'Vision Europe Africa',
-    description: 'Your Gateway to Europe — Legal immigration for African students and workers.',
+    description: 'Your Gateway to Europe — Legal immigration for African students and workers.', // i18n-ignore
     type: 'website',
     locale: 'fr_FR',
     siteName: 'Vision Europe Africa',
@@ -29,7 +32,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{var d=document.documentElement,c=('; '+document.cookie).match(/; vea_dark=([^;]*)/);d.classList.toggle('dark',c?c[1]==='1':window.matchMedia('(prefers-color-scheme: dark)').matches)}catch(e){}`,
+            // Applique le thème avant le premier rendu : évite tout flash au chargement.
+            // `color-scheme` aligne aussi les contrôles natifs (listes, ascenseurs).
+            __html: `try{var d=document.documentElement,c=('; '+document.cookie).match(/; vea_dark=([^;]*)/),k=c?c[1]==='1':window.matchMedia('(prefers-color-scheme: dark)').matches;d.classList.toggle('dark',k);d.style.colorScheme=k?'dark':'light'}catch(e){}`,
           }}
         />
       </head>
@@ -39,7 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           src="https://cdn.jsdelivr.net/npm/@iconify/iconify@3.1.1/dist/iconify.min.js"
           strategy="beforeInteractive"
         />
-        {children}
+        <LocaleProviders>{children}</LocaleProviders>
         <Toaster
           position="top-right"
           toastOptions={{

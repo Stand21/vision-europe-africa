@@ -24,6 +24,7 @@ vision-europe-africa/
 - 🏠 Premium landing page with hero, stats, destinations, testimonials, FAQ
 - 👤 Profile selection: Student | Worker | Visitor
 - 📋 Smart multi-step forms with file upload & e-signature
+- 🌍 Unlimited destinations, managed from the admin panel
 - 🔐 Secure admin dashboard with charts, filters, pagination, CSV export
 - 📱 Fully responsive — mobile, tablet, desktop
 
@@ -34,6 +35,8 @@ vision-europe-africa/
 - 📁 Secure file upload with type & size validation
 - 🗄️ PostgreSQL with migrations & activity logging
 - 📊 Dashboard statistics API with charts data
+- 🗓️ Destinations with an availability window — a destination auto-hides from the
+  public site and the application form once its end date has passed
 
 ---
 
@@ -255,6 +258,68 @@ Follow the VPS guide above. Hostinger VPS supports Ubuntu 22.04 and all required
 
 ---
 
+## 🎓 Bourses d'études
+
+La section Bourses et la page `/bourses` sont alimentées par l'API externe
+**Ma Bourse d'Études**. Le backend sert de relais : le navigateur n'appelle
+jamais cette API directement.
+
+| Variable | Où | Rôle |
+|----------|-----|------|
+| `SCHOLARSHIP_API_URL` | backend | URL de base de l'API, sans `/` final. **Non renseignée, la section est simplement masquée** — le reste du site fonctionne normalement. |
+
+Le relais met les réponses en cache 5 minutes, ne transmet que les filtres
+autorisés (`q`, `country`, `level`, `field`, `status`, `page`, `limit`, `sort`)
+et renvoie une liste vide si l'API est injoignable, plutôt qu'une erreur.
+
+### Bouton WhatsApp
+
+Chaque bourse porte un bouton WhatsApp avec un message pré-rempli contenant son
+intitulé. Le numéro se règle dans **Admin → Réglages → Contact WhatsApp**, au
+format international sans `+` ni espaces (ex. `243999000000`). Laissé vide, le
+bouton n'apparaît pas.
+
+---
+
+## 💱 Devises et montants
+
+Tous les montants sont stockés en euros et convertis à l'affichage dans la
+devise du visiteur, déduite de son fuseau horaire — sans service tiers ni
+adresse IP. Le sélecteur de la barre de navigation permet d'en changer, et le
+choix est mémorisé.
+
+Les taux viennent de `open.er-api.com`, rafraîchis au plus une fois par jour et
+stockés en base (`exchange_rates`). Si l'API est indisponible, les derniers taux
+connus continuent d'être servis.
+
+---
+
+## 🌍 Managing Destinations
+
+Destinations live in the `destinations` table and are edited from **Admin → Destinations**.
+
+| Field | Purpose |
+|-------|---------|
+| `name`, `country_code`, `flag` | Country identity (e.g. *France*, `FR`, 🇫🇷) |
+| `code` | Slug used in the form and in `/apply?destination=…` — auto-generated from the name |
+| `tagline`, `description` | Copy shown on the landing-page card |
+| `highlights`, `programs` | Bullet points and visa types (one per line in the admin form) |
+| `image_url`, `accent_color` | Card background; without an image a branded gradient with the flag is used |
+| `is_featured` | Pins the destination to the hero section |
+| `available_from` / `available_until` | Availability window — leave empty for a permanent destination |
+| `is_active` | Manual on/off switch |
+
+**How the period works**
+
+- Public endpoints read the `destinations_public` view, which keeps only rows that are
+  active *and* within `[available_from, available_until]`.
+- Once `available_until` has passed, the destination disappears from the landing page and
+  the application form, and applications targeting it are rejected by the API validator.
+- The row stays in the database with an **Expired** badge in the admin, so it can be
+  reopened by pushing the date back. Use **Delete expired** to purge them for good.
+
+---
+
 ## 📡 API Documentation
 
 ### Public Endpoints
@@ -263,7 +328,7 @@ Follow the VPS guide above. Hostinger VPS supports Ubuntu 22.04 and all required
 |--------|----------|-------------|
 | POST | `/api/applications` | Submit application (multipart/form-data) |
 | GET | `/api/applications/:id` | Check application status |
-| GET | `/api/destinations` | Get available destinations |
+| GET | `/api/destinations` | Destinations currently open (active + inside their availability period) |
 | GET | `/api/testimonials` | Get testimonials |
 | GET | `/health` | Health check |
 
@@ -276,6 +341,11 @@ Follow the VPS guide above. Hostinger VPS supports Ubuntu 22.04 and all required
 | PATCH | `/api/admin/applications/:id/status` | Update application status |
 | DELETE | `/api/admin/applications/:id` | Delete application (superadmin) |
 | GET | `/api/admin/stats` | Dashboard statistics |
+| GET | `/api/admin/destinations` | List every destination (incl. expired & disabled) |
+| POST | `/api/admin/destinations` | Create a destination |
+| PATCH | `/api/admin/destinations/:id` | Update a destination |
+| DELETE | `/api/admin/destinations/:id` | Delete a destination |
+| POST | `/api/admin/destinations/purge-expired` | Delete all destinations past their end date (superadmin) |
 
 ### Application Submission (POST /api/applications)
 

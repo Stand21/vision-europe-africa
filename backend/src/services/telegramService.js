@@ -7,6 +7,11 @@ function getBot() {
   if (!bot && process.env.TELEGRAM_BOT_TOKEN) {
     // Polling mode lets the bot receive the inline Approve/Reject button callbacks.
     bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: true })
+    // Without a listener, an unhandled 'polling_error' (e.g. two instances
+    // polling the same token — a 409 conflict) crashes the whole process.
+    bot.on('polling_error', err => {
+      logger.error('Telegram polling error (bot notifications disabled until it clears):', err.message)
+    })
   }
   return bot
 }

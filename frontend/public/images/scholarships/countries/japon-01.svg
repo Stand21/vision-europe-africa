@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg-countriesjapon01svg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a2540"/>
+      <stop offset="55%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#0a2540"/>
+    </linearGradient>
+    <pattern id="dots-countriesjapon01svg" width="34" height="34" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="2" fill="#ffffff" opacity="0.06"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg-countriesjapon01svg)"/>
+  <rect width="1200" height="630" fill="url(#dots-countriesjapon01svg)"/>
+  <g transform="translate(940,90) scale(1.7)" fill="#ffffff" opacity="0.10">
+    <path d="M100 0 L200 45 L100 90 L0 45 Z M40 62 V95 Q100 118 160 95 V62 L100 85 Z"/>
+  </g>
+  <g transform="translate(80,110) scale(0.62)" fill="#ffffff" opacity="0.85">
+    <path d="M100 0 L200 45 L100 90 L0 45 Z M40 62 V95 Q100 118 160 95 V62 L100 85 Z"/>
+  </g>
+  <text x="80" y="330" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="700" fill="#ffffff">Japon</text>
+  <text x="80" y="378" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="500" fill="#ffffff" opacity="0.75">Bourse d’études</text>
+</svg>

@@ -1,12 +1,11 @@
-import { useCallback, useEffect, useState } from 'react'
-import { translations, Language } from '@/i18n/translations'
-import Cookies from 'js-cookie'
+'use client'
+import { useCallback } from 'react'
+import { translations, type Language } from '@/i18n/translations'
+import { useLanguage, FALLBACK_LANGUAGE } from '@/i18n/LanguageProvider'
 
-const LANG_COOKIE = 'vea_language'
-
-function resolve(keys: string[], lang: Language): unknown | undefined {
+function resolve(lang: Language, path: string): unknown {
   let value: unknown = translations[lang]
-  for (const key of keys) {
+  for (const key of path.split('.')) {
     if (value && typeof value === 'object' && key in (value as object)) {
       value = (value as Record<string, unknown>)[key]
     } else {
@@ -16,47 +15,39 @@ function resolve(keys: string[], lang: Language): unknown | undefined {
   return value
 }
 
+/**
+ * Traductions. La langue vient du contexte partagé : tous les composants de la
+ * page changent ensemble, y compris ceux qui ne sont pas dans la barre de nav.
+ */
 export function useTranslation() {
-  const [language, setLanguage] = useState<Language>('fr') // Default French for African audience
+  const { language, changeLanguage } = useLanguage()
 
-  useEffect(() => {
-    const saved = Cookies.get(LANG_COOKIE) as Language
-    if (saved && translations[saved]) {
-      setLanguage(saved)
-    }
-  }, [])
-
-  const changeLanguage = useCallback((lang: Language) => {
-    setLanguage(lang)
-    Cookies.set(LANG_COOKIE, lang, { expires: 365 })
-  }, [])
-
+  /**
+   * Chaîne traduite. Retombe sur le français si la clé manque, puis sur le
+   * chemin lui-même — jamais sur du vide.
+   *
+   * `vars` remplit les gabarits : t('destinations.card.closing_in', { n: 12 })
+   */
   const t = useCallback(
-    (path: string, fallback?: string): string => {
-      const keys = path.split('.')
-      const value = resolve(keys, language) ?? resolve(keys, 'en')
-      return typeof value === 'string' ? value : (fallback ?? path)
+    (path: string, vars?: Record<string, string | number>): string => {
+      const value = resolve(language, path) ?? resolve(FALLBACK_LANGUAGE, path)
+      if (typeof value !== 'string') return path
+      if (!vars) return value
+      return value.replace(/\{(\w+)\}/g, (match, key) =>
+        key in vars ? String(vars[key]) : match
+      )
     },
     [language]
   )
 
+  /** Pour les tableaux du fichier de traductions (étapes, FAQ, listes…). */
   const tList = useCallback(
-    (path: string): string[] => {
-      const keys = path.split('.')
-      const value = resolve(keys, language) ?? resolve(keys, 'en')
-      return Array.isArray(value) ? (value as string[]) : []
+    <T,>(path: string): T[] => {
+      const value = resolve(language, path) ?? resolve(FALLBACK_LANGUAGE, path)
+      return Array.isArray(value) ? (value as T[]) : []
     },
     [language]
   )
 
-  const tValue = useCallback(
-    <T,>(path: string): T | undefined => {
-      const keys = path.split('.')
-      const value = resolve(keys, language) ?? resolve(keys, 'en')
-      return value as T | undefined
-    },
-    [language]
-  )
-
-  return { t, tList, tValue, language, changeLanguage }
+  return { t, tList, language, changeLanguage }
 }

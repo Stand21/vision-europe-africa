@@ -1,9 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: 'standalone',
   images: {
-    domains: ['images.unsplash.com', 'flagcdn.com', 'upload.wikimedia.org'],
+    remotePatterns: [
+      { protocol: 'https', hostname: 'images.unsplash.com' },
+      { protocol: 'https', hostname: 'flagcdn.com' },
+      { protocol: 'https', hostname: 'upload.wikimedia.org' },
+    ],
     formats: ['image/avif', 'image/webp'],
   },
   env: {

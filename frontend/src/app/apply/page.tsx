@@ -16,6 +16,9 @@ import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import { useTranslation } from '@/hooks/useTranslation'
 import axios from 'axios'
+import { useDestinations, type Destination } from '@/hooks/useDestinations'
+import { useTranslation } from '@/hooks/useTranslation'
+import { useCurrency } from '@/i18n/CurrencyProvider'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
 const DRAFT_KEY = 'vea_application_draft'
@@ -43,42 +46,46 @@ const FALLBACK_CURRENCIES = [
   { code: 'EGP', symbol: 'E£', label: 'Egyptian Pound' },
 ]
 
-// ── Study Fields ─────────────────────────────────────────────────────────────
+// ── Filières d'études ────────────────────────────────────────────────────────
+// Les montants sont en euros : ils sont convertis à l'affichage dans la devise
+// du visiteur. Les libellés viennent des traductions (form.study_fields.*).
 const STUDY_FIELDS = [
-  { id: 'cs', name: 'Computer Science', icon: Code, tuition: '€0–500/yr', duration: '3–5 yrs', salary: '€45,000/yr', countries: ['DE', 'PT'] },
-  { id: 'cyber', name: 'Cybersecurity', icon: Lock, tuition: '€500–1500/yr', duration: '3–4 yrs', salary: '€55,000/yr', countries: ['DE', 'PT'] },
-  { id: 'med', name: 'Medicine', icon: Stethoscope, tuition: '€1,000–5,000/yr', duration: '6 yrs', salary: '€70,000/yr', countries: ['DE', 'PT'] },
-  { id: 'biz', name: 'Business Administration', icon: BarChart3, tuition: '€0–2,000/yr', duration: '3 yrs', salary: '€40,000/yr', countries: ['DE', 'PT'] },
-  { id: 'log', name: 'Logistics', icon: Truck, tuition: '€0–800/yr', duration: '3 yrs', salary: '€42,000/yr', countries: ['DE'] },
-  { id: 'civil', name: 'Civil Engineering', icon: Building2, tuition: '€0–600/yr', duration: '4–5 yrs', salary: '€52,000/yr', countries: ['DE', 'PT'] },
-  { id: 'mkt', name: 'Marketing', icon: Megaphone, tuition: '€0–1,500/yr', duration: '3 yrs', salary: '€38,000/yr', countries: ['DE', 'PT'] },
-  { id: 'ai', name: 'Artificial Intelligence', icon: Brain, tuition: '€0–1,000/yr', duration: '4 yrs', salary: '€65,000/yr', countries: ['DE'] },
-  { id: 'fin', name: 'Finance', icon: Wallet, tuition: '€500–2,000/yr', duration: '3–4 yrs', salary: '€48,000/yr', countries: ['DE', 'PT'] },
-  { id: 'trade', name: 'International Trade', icon: Globe, tuition: '€0–1,500/yr', duration: '3 yrs', salary: '€44,000/yr', countries: ['DE', 'PT'] },
+  { id: 'cs',     icon: Code,       tuitionMin: 0,    tuitionMax: 500,  yearsMin: 3, yearsMax: 5, salary: 45000 },
+  { id: 'cyber',  icon: Lock,       tuitionMin: 500,  tuitionMax: 1500, yearsMin: 3, yearsMax: 4, salary: 55000 },
+  { id: 'med',    icon: Stethoscope,tuitionMin: 1000, tuitionMax: 5000, yearsMin: 6, yearsMax: 6, salary: 70000 },
+  { id: 'biz',    icon: BarChart3,  tuitionMin: 0,    tuitionMax: 2000, yearsMin: 3, yearsMax: 3, salary: 40000 },
+  { id: 'log',    icon: Truck,      tuitionMin: 0,    tuitionMax: 800,  yearsMin: 3, yearsMax: 3, salary: 42000 },
+  { id: 'civil',  icon: Building2,  tuitionMin: 0,    tuitionMax: 600,  yearsMin: 4, yearsMax: 5, salary: 52000 },
+  { id: 'mkt',    icon: Megaphone,  tuitionMin: 0,    tuitionMax: 1500, yearsMin: 3, yearsMax: 3, salary: 38000 },
+  { id: 'ai',     icon: Brain,      tuitionMin: 0,    tuitionMax: 1000, yearsMin: 4, yearsMax: 4, salary: 65000 },
+  { id: 'fin',    icon: Wallet,     tuitionMin: 500,  tuitionMax: 2000, yearsMin: 3, yearsMax: 4, salary: 48000 },
+  { id: 'trade',  icon: Globe,      tuitionMin: 0,    tuitionMax: 1500, yearsMin: 3, yearsMax: 3, salary: 44000 },
 ]
 
-// ── Professions ───────────────────────────────────────────────────────────────
+// ── Métiers ──────────────────────────────────────────────────────────────────
+// salaryMin / salaryMax en euros bruts annuels ; demand est une clé de traduction.
 const PROFESSIONS = [
-  { id: 'dev', name: 'Software Developer', icon: Code, salary: '€45,000–80,000', demand: 'Very High', hours: '40h/week', countries: ['DE', 'PT'] },
-  { id: 'driver', name: 'Driver', icon: Car, salary: '€28,000–38,000', demand: 'High', hours: '40–50h/week', countries: ['DE', 'PT'] },
-  { id: 'welder', name: 'Welder', icon: Wrench, salary: '€30,000–45,000', demand: 'High', hours: '40h/week', countries: ['DE'] },
-  { id: 'nurse', name: 'Nurse', icon: Stethoscope, salary: '€35,000–55,000', demand: 'Very High', hours: '38–40h/week', countries: ['DE', 'PT'] },
-  { id: 'warehouse', name: 'Warehouse Worker', icon: Warehouse, salary: '€25,000–35,000', demand: 'High', hours: '40h/week', countries: ['DE', 'PT'] },
-  { id: 'factory', name: 'Factory Worker', icon: Factory, salary: '€24,000–36,000', demand: 'High', hours: '40h/week', countries: ['DE'] },
-  { id: 'security', name: 'Security Agent', icon: Lock, salary: '€22,000–32,000', demand: 'Medium', hours: '40–48h/week', countries: ['DE', 'PT'] },
-  { id: 'mechanic', name: 'Mechanic', icon: Settings, salary: '€28,000–45,000', demand: 'High', hours: '40h/week', countries: ['DE', 'PT'] },
-  { id: 'construction', name: 'Construction Worker', icon: HardHat, salary: '€26,000–40,000', demand: 'Very High', hours: '40–50h/week', countries: ['DE', 'PT'] },
-  { id: 'delivery', name: 'Delivery Driver', icon: Luggage, salary: '€24,000–35,000', demand: 'Very High', hours: '40–50h/week', countries: ['DE', 'PT'] },
-  { id: 'hospitality', name: 'Hospitality Worker', icon: Utensils, salary: '€20,000–32,000', demand: 'High', hours: '40h/week', countries: ['PT', 'DE'] },
+  { id: 'dev',          icon: Code,       salaryMin: 45000, salaryMax: 80000, demand: 'very_high', hoursMin: 40, hoursMax: 40 },
+  { id: 'driver',       icon: Car,        salaryMin: 28000, salaryMax: 38000, demand: 'high',      hoursMin: 40, hoursMax: 50 },
+  { id: 'welder',       icon: Wrench,     salaryMin: 30000, salaryMax: 45000, demand: 'high',      hoursMin: 40, hoursMax: 40 },
+  { id: 'nurse',        icon: Stethoscope,salaryMin: 35000, salaryMax: 55000, demand: 'very_high', hoursMin: 38, hoursMax: 40 },
+  { id: 'warehouse',    icon: Warehouse,  salaryMin: 25000, salaryMax: 35000, demand: 'high',      hoursMin: 40, hoursMax: 40 },
+  { id: 'factory',      icon: Factory,    salaryMin: 24000, salaryMax: 36000, demand: 'high',      hoursMin: 40, hoursMax: 40 },
+  { id: 'security',     icon: Lock,       salaryMin: 22000, salaryMax: 32000, demand: 'medium',    hoursMin: 40, hoursMax: 48 },
+  { id: 'mechanic',     icon: Settings,   salaryMin: 28000, salaryMax: 45000, demand: 'high',      hoursMin: 40, hoursMax: 40 },
+  { id: 'construction', icon: HardHat,    salaryMin: 26000, salaryMax: 40000, demand: 'very_high', hoursMin: 40, hoursMax: 50 },
+  { id: 'delivery',     icon: Luggage,    salaryMin: 24000, salaryMax: 35000, demand: 'very_high', hoursMin: 40, hoursMax: 50 },
+  { id: 'hospitality',  icon: Utensils,   salaryMin: 20000, salaryMax: 32000, demand: 'high',      hoursMin: 40, hoursMax: 40 },
 ]
 
-// ── Visitor Categories ────────────────────────────────────────────────────────
+// ── Catégories de visite ─────────────────────────────────────────────────────
+// Nom et description viennent des traductions (form.categories.*).
 const VISITOR_CATEGORIES = [
-  { id: 'tourism', name: 'Tourism', icon: Camera, desc: 'Explore Europe\'s most beautiful cities and landmarks.' },
-  { id: 'family', name: 'Family Visit', icon: Heart, desc: 'Visit family members residing in Europe.' },
-  { id: 'business', name: 'Business Visit', icon: Briefcase, desc: 'Attend meetings, conferences or sign contracts.' },
-  { id: 'conference', name: 'Conferences', icon: Mic, desc: 'Participate in academic or professional conferences.' },
-  { id: 'discovery', name: 'European Discovery', icon: Globe, desc: 'Multi-country exploration tour of Europe.' },
+  { id: 'tourism',    icon: Camera },
+  { id: 'family',     icon: Heart },
+  { id: 'business',   icon: Briefcase },
+  { id: 'conference', icon: Mic },
+  { id: 'discovery',  icon: Globe },
 ]
 
 // ── File Uploader ─────────────────────────────────────────────────────────────
@@ -109,8 +116,8 @@ function FileUploader({ label, files, onChange }: { label: string; files: File[]
       >
         <input {...getInputProps()} />
         <Upload className="w-8 h-8 text-[#697386] dark:text-[#8e8e93] mx-auto mb-2" />
-        <p className="text-sm text-[#425466] dark:text-[#ebebf5]">{t('apply.dropzone')}</p>
-        <p className="text-xs text-[#697386] dark:text-[#8e8e93] mt-1">{t('apply.fileTypes')}</p>
+        <p className="text-sm text-[#425466] dark:text-[#ebebf5]">{t('form.upload.drag')}</p>
+        <p className="text-xs text-[#697386] dark:text-[#8e8e93] mt-1">{t('form.upload.hint')}</p>
       </div>
       {files.length > 0 && (
         <div className="space-y-2">
@@ -180,7 +187,7 @@ function SignaturePad({ onSave }: { onSave: (dataUrl: string) => void }) {
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-[#425466] dark:text-[#ebebf5] mb-1.5">{t('apply.signatureLabel')} *</label>
+      <label className="block text-sm font-medium text-[#425466] dark:text-[#ebebf5] mb-1.5">{t('form.signature.label')} *</label>
       <div className="relative">
         <canvas
           ref={canvasRef}
@@ -212,6 +219,35 @@ function SignaturePad({ onSave }: { onSave: (dataUrl: string) => void }) {
 
 // ── Reusable form helpers ──────────────────────────────────────────────────────
 const inputClass = "input"
+
+// ── Destination dropdown ──────────────────────────────────────────────────────
+// Options come from the admin-managed list; only destinations inside their
+// availability period are returned by the API, so the list closes itself.
+function DestinationSelect({
+  register,
+  destinations,
+  loading,
+  allowMultiple = false,
+}: {
+  register: any
+  destinations: Destination[]
+  loading: boolean
+  allowMultiple?: boolean
+}) {
+  const { t } = useTranslation()
+
+  return (
+    <select {...register('destination', { required: true })} className={inputClass} disabled={loading}>
+      <option value="">{loading ? t('form.placeholders.loading') : t('form.placeholders.select')}</option>
+      {destinations.map(d => (
+        <option key={d.code} value={d.code}>
+          {d.flag ? `${d.flag} ` : ''}{d.name}
+        </option>
+      ))}
+      {allowMultiple && <option value="multiple">🌍 {t('form.options.multiple_countries')}</option>}
+    </select>
+  )
+}
 const labelClass = "block text-sm font-medium text-[#425466] dark:text-[#ebebf5] mb-1.5"
 
 function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
@@ -233,6 +269,8 @@ function BudgetField({ label, register, name, placeholder, required, currencies,
   currency: string
   setCurrency: (c: string) => void
 }) {
+  const { t } = useTranslation()
+
   return (
     <Field label={label} required={required}>
       <div className="flex gap-2">
@@ -240,7 +278,7 @@ function BudgetField({ label, register, name, placeholder, required, currencies,
           value={currency}
           onChange={e => setCurrency(e.target.value)}
           className="input w-24 sm:w-32 flex-shrink-0"
-          aria-label="Currency"
+          aria-label={t('form.labels.currency')}
         >
           {currencies.map(c => (
             <option key={c.code} value={c.code}>{c.symbol} {c.code}</option>
@@ -286,7 +324,14 @@ function SelectCards({ items, value, onChange }: {
 
 // ── Apply Page Content ────────────────────────────────────────────────────────
 function ApplyContent() {
-  const { t, tList, tValue } = useTranslation()
+  const { t, tList } = useTranslation()
+  const { formatRange } = useCurrency()
+
+  // Salaire et horaires d'un métier, dans la devise et la langue du visiteur
+  const professionSummary = (p: { salaryMin: number; salaryMax: number; hoursMin: number; hoursMax: number }) => {
+    const hours = p.hoursMin === p.hoursMax ? `${p.hoursMin}` : `${p.hoursMin}–${p.hoursMax}`
+    return `${formatRange(p.salaryMin, p.salaryMax, { compact: true })} · ${hours} ${t('form.field_info.per_week')}`
+  }
   const searchParams = useSearchParams()
   const urlProfile = (searchParams.get('profile') || '') as Profile
   const [profile, setProfile] = useState<Profile | null>(
@@ -299,6 +344,7 @@ function ApplyContent() {
   const [signature, setSignature] = useState('')
   const [currency, setCurrency] = useState('EUR')
   const [currencies, setCurrencies] = useState(FALLBACK_CURRENCIES)
+  const { destinations, loading: destinationsLoading } = useDestinations()
   const [hasDraft, setHasDraft] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const initialized = useRef(false)
@@ -364,12 +410,12 @@ function ApplyContent() {
   }
 
   const onSubmit = async (data: Record<string, any>) => {
-    if (!profile) { toast.error(t('apply.errors.noProfile')); return }
-    if (profile === 'student' && !selectedField) { toast.error(t('apply.errors.noField')); return }
-    if (profile === 'worker' && !selectedJob) { toast.error(t('apply.errors.noJob')); return }
-    if (profile === 'visitor' && !selectedCategory) { toast.error(t('apply.errors.noCategory')); return }
+    if (!profile) { toast.error(t('form.errors.no_profile')); return }
+    if (profile === 'student' && !selectedField) { toast.error(t('form.errors.no_field')); return }
+    if (profile === 'worker' && !selectedJob) { toast.error(t('form.errors.no_job')); return }
+    if (profile === 'visitor' && !selectedCategory) { toast.error(t('form.errors.no_category')); return }
     if ((profile === 'student' || profile === 'worker') && !signature) {
-      toast.error(t('apply.errors.noSignature'))
+      toast.error(t('form.errors.no_signature'))
       return
     }
 
@@ -388,10 +434,10 @@ function ApplyContent() {
       files.forEach(f => formData.append('documents', f))
 
       await axios.post(`${API}/applications`, formData)
-      toast.success(t('apply.success'))
+      toast.success(t('form.success'))
       clearDraft()
     } catch (err: any) {
-      const msg = err?.response?.data?.error || t('apply.fail')
+      const msg = err?.response?.data?.error || t('form.error')
       toast.error(msg)
     } finally {
       setSubmitting(false)
@@ -399,9 +445,9 @@ function ApplyContent() {
   }
 
   const profiles = [
-    { key: 'student' as Profile, icon: GraduationCap, label: t('apply.profile.student.label'), desc: t('apply.profile.student.desc') },
-    { key: 'worker' as Profile, icon: Briefcase, label: t('apply.profile.worker.label'), desc: t('apply.profile.worker.desc') },
-    { key: 'visitor' as Profile, icon: Plane, label: t('apply.profile.visitor.label'), desc: t('apply.profile.visitor.desc') },
+    { key: 'student' as Profile, icon: GraduationCap, label: t('profiles.student.title'), desc: t('profiles.student.description') },
+    { key: 'worker' as Profile, icon: Briefcase, label: t('profiles.worker.title'), desc: t('profiles.worker.description') },
+    { key: 'visitor' as Profile, icon: Plane, label: t('profiles.visitor.title'), desc: t('profiles.visitor.description') },
   ]
 
   const educationLevels = tList('apply.educationLevels')
@@ -416,15 +462,15 @@ function ApplyContent() {
       <div className="container-custom max-w-4xl">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
           <h1 className="text-3xl md:text-4xl font-bold text-[#0a2540] dark:text-white mb-3">
-            {t('apply.title')} <span className="text-[#635bff]">{t('apply.titleHighlight')}</span>
+            {t('form.title')}
           </h1>
           <p className="text-[#425466] dark:text-[#ebebf5] max-w-xl mx-auto">
-            {t('apply.subtitle')}
+            {t('form.autosave')}
           </p>
         </motion.div>
 
-        <div className="application-progress" aria-label={t('apply.progressAria')}>
-          {tList('apply.progress').map((label, index) => (
+        <div className="application-progress" aria-label={t('form.progress')}>
+          {[t('form.steps.profile'), t('form.steps.project'), t('form.steps.details'), t('form.steps.documents')].map((label, index) => (
             <div key={label} className={`application-progress-step ${index === 0 ? 'is-current' : ''}`}>
               <span>{index + 1}</span>
               <strong>{label}</strong>
@@ -436,10 +482,10 @@ function ApplyContent() {
           {/* STEP 1 — Profile */}
           <div className="card p-6 md:p-8">
             <div className="flex items-center justify-between mb-5">
-              <h2 className="font-semibold text-lg text-[#0a2540] dark:text-white">1. {t('apply.step1Title')} <span className="text-[#ef4444]">*</span></h2>
+              <h2 className="font-semibold text-lg text-[#0a2540] dark:text-white">1. {t('form.steps.profile')} <span className="text-[#ef4444]">*</span></h2>
               {hasDraft && (
                 <button type="button" onClick={clearDraft} className="text-xs flex items-center gap-1 text-[#697386] dark:text-[#8e8e93] hover:text-[#ef4444] transition-colors">
-                  <Trash2 className="w-3.5 h-3.5" /> {t('apply.clearDraft')}
+                  <Trash2 className="w-3.5 h-3.5" /> {t('form.clear_draft')}
                 </button>
               )}
             </div>
@@ -470,28 +516,28 @@ function ApplyContent() {
           {profile && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="card p-6 md:p-8">
               <h2 className="font-semibold text-lg text-[#0a2540] dark:text-white mb-5">
-                2. {profile === 'student' ? t('apply.studyFieldLabel') : profile === 'worker' ? t('apply.jobField') : t('apply.categoryField')} <span className="text-[#ef4444]">*</span>
+                2. {profile === 'student' ? t('form.steps.field_step') : profile === 'worker' ? t('form.steps.job_step') : t('form.steps.category_step')} <span className="text-[#ef4444]">*</span>
               </h2>
               {profile === 'student' && (
-                <Field label={t('apply.studyFieldLabel')} required>
+                <Field label={t('form.labels.field')} required>
                   <select value={selectedField} onChange={e => setSelectedField(e.target.value)} className={inputClass}>
-                    <option value="">{t('apply.selectField')}</option>
+                    <option value="">{t('form.placeholders.select_field')}</option>
                     {STUDY_FIELDS.map(f => (
-                      <option key={f.id} value={f.id}>{t(`apply.studyFields.${f.id}`)}</option>
+                      <option key={f.id} value={f.id}>{t(`form.study_fields.${f.id}`)}</option>
                     ))}
                   </select>
                 </Field>
               )}
               {profile === 'worker' && (
                 <SelectCards
-                  items={PROFESSIONS.map(p => ({ ...p, name: t(`apply.professions.${p.id}`), sub: `${p.salary} · ${p.hours}` }))}
+                  items={PROFESSIONS.map(p => ({ ...p, name: t(`form.professions.${p.id}`), sub: professionSummary(p) }))}
                   value={selectedJob}
                   onChange={setSelectedJob}
                 />
               )}
               {profile === 'visitor' && (
                 <SelectCards
-                  items={VISITOR_CATEGORIES.map(c => ({ ...c, name: t(`apply.visitorCats.${c.id}.label`), sub: t(`apply.visitorCats.${c.id}.desc`) }))}
+                  items={VISITOR_CATEGORIES.map(c => ({ ...c, name: t(`form.categories.${c.id}.name`), sub: t(`form.categories.${c.id}.desc`) }))}
                   value={selectedCategory}
                   onChange={setSelectedCategory}
                 />
@@ -502,55 +548,51 @@ function ApplyContent() {
           {/* STEP 3 — Details */}
           {profile && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="card p-6 md:p-8">
-              <h2 className="font-semibold text-lg text-[#0a2540] dark:text-white mb-5">3. {t('apply.step3Title')}</h2>
+              <h2 className="font-semibold text-lg text-[#0a2540] dark:text-white mb-5">3. {t('form.steps.details')}</h2>
               <div className="grid md:grid-cols-2 gap-5">
-                <Field label={t('apply.fields.fullName')} required>
-                  <input {...register('fullName', { required: true })} className={inputClass} placeholder={t('apply.placeholders.fullName')} />
+                <Field label={t('form.labels.full_name')} required>
+                  <input {...register('fullName', { required: true })} className={inputClass} placeholder={t('form.placeholders.full_name')} />
                 </Field>
-                <Field label={t('apply.fields.email')} required>
-                  <input {...register('email', { required: true, pattern: /^\S+@\S+\.\S+$/ })} type="email" className={inputClass} placeholder={t('apply.placeholders.email')} />
+                <Field label={t('form.labels.email')} required>
+                  <input {...register('email', { required: true, pattern: /^\S+@\S+\.\S+$/ })} type="email" className={inputClass} placeholder={t('form.placeholders.email')} />
                 </Field>
-                <Field label={t('apply.fields.phone')} required>
-                  <input {...register('phone', { required: true })} className={inputClass} placeholder={t('apply.placeholders.phone')} />
+                <Field label={t('form.labels.phone')} required>
+                  <input {...register('phone', { required: true })} className={inputClass} placeholder={t('form.placeholders.phone')} />
                 </Field>
-                <Field label={t('apply.fields.whatsapp')} required>
-                  <input {...register('whatsapp', { required: true })} className={inputClass} placeholder={t('apply.placeholders.whatsapp')} />
+                <Field label={t('form.labels.whatsapp')} required>
+                  <input {...register('whatsapp', { required: true })} className={inputClass} placeholder={t('form.placeholders.phone')} />
                 </Field>
 
                 {profile === 'student' && (
                   <>
-                    <Field label={t('apply.fields.country')} required>
-                      <input {...register('country', { required: true })} className={inputClass} placeholder={t('apply.placeholders.country')} />
+                    <Field label={t('form.labels.country')} required>
+                      <input {...register('country', { required: true })} className={inputClass} placeholder={t('form.placeholders.country')} />
                     </Field>
-                    <Field label={t('apply.fields.city')} required>
-                      <input {...register('city', { required: true })} className={inputClass} placeholder={t('apply.placeholders.city')} />
+                    <Field label={t('form.labels.city')} required>
+                      <input {...register('city', { required: true })} className={inputClass} placeholder={t('form.placeholders.city')} />
                     </Field>
-                    <Field label={t('apply.fields.educationLevel')} required>
+                    <Field label={t('form.labels.education_level')} required>
                       <select {...register('educationLevel', { required: true })} className={inputClass}>
-                        <option value="">{t('apply.select')}</option>
-                        {educationLevels.map(l => <option key={l}>{l}</option>)}
+                        <option value="">{t('form.placeholders.select')}</option>
+                        {tList<string>('form.options.education_levels').map(o => <option key={o}>{o}</option>)}
                       </select>
                     </Field>
-                    <Field label={t('apply.fields.targetDegree')} required>
+                    <Field label={t('form.labels.target_degree')} required>
                       <select {...register('targetDegree', { required: true })} className={inputClass}>
-                        <option value="">{t('apply.select')}</option>
-                        {targetDegrees.map(l => <option key={l}>{l}</option>)}
+                        <option value="">{t('form.placeholders.select')}</option>
+                        {tList<string>('form.options.degrees').map(o => <option key={o}>{o}</option>)}
                       </select>
                     </Field>
-                    <Field label={t('apply.fields.destination')} required>
-                      <select {...register('destination', { required: true })} className={inputClass}>
-                        <option value="">{t('apply.select')}</option>
-                        <option value="germany">{t('apply.destinations.germany')}</option>
-                        <option value="portugal">{t('apply.destinations.portugal')}</option>
-                      </select>
+                    <Field label={t('form.labels.destination')} required>
+                      <DestinationSelect register={register} destinations={destinations} loading={destinationsLoading} />
                     </Field>
-                    <BudgetField label={t('apply.fields.budget')} required register={register} name="budget" placeholder={t('apply.placeholders.budget')} currencies={currencies} currency={currency} setCurrency={setCurrency} />
-                    <Field label={t('apply.fields.idNumber')} required>
-                      <input {...register('idNumber', { required: true })} className={inputClass} placeholder={t('apply.placeholders.idNumber')} />
+                    <BudgetField label={t('form.labels.budget')} required register={register} name="budget" placeholder={t('form.placeholders.budget')} currencies={currencies} currency={currency} setCurrency={setCurrency} />
+                    <Field label={t('form.labels.id_number')} required>
+                      <input {...register('idNumber', { required: true })} className={inputClass} placeholder={t('form.placeholders.id_number')} />
                     </Field>
                     <div className="md:col-span-2">
-                      <Field label={t('apply.fields.motivationLetter')}>
-                        <textarea {...register('motivationLetter')} rows={4} className={`${inputClass} resize-none`} placeholder={t('apply.placeholders.motivationLetter')} />
+                      <Field label={t('form.labels.motivation')}>
+                        <textarea {...register('motivationLetter')} rows={4} className={`${inputClass} resize-none`} placeholder={t('form.placeholders.motivation')} />
                       </Field>
                     </div>
                   </>
@@ -558,52 +600,43 @@ function ApplyContent() {
 
                 {profile === 'worker' && (
                   <>
-                    <Field label={t('apply.fields.experience')} required>
-                      <input {...register('experience', { required: true })} type="number" min="0" className={inputClass} placeholder={t('apply.placeholders.experience')} />
+                    <Field label={t('form.labels.experience')} required>
+                      <input {...register('experience', { required: true })} type="number" min="0" className={inputClass} placeholder={t('form.placeholders.experience')} />
                     </Field>
-                    <Field label={t('apply.fields.destination')} required>
-                      <select {...register('destination', { required: true })} className={inputClass}>
-                        <option value="">{t('apply.select')}</option>
-                        <option value="germany">{t('apply.destinations.germany')}</option>
-                        <option value="portugal">{t('apply.destinations.portugal')}</option>
-                      </select>
+                    <Field label={t('form.labels.destination')} required>
+                      <DestinationSelect register={register} destinations={destinations} loading={destinationsLoading} />
                     </Field>
-                    <Field label={t('apply.fields.workHours')}>
+                    <Field label={t('form.labels.work_hours')}>
                       <select {...register('workHours')} className={inputClass}>
-                        {workHours.map(l => <option key={l}>{l}</option>)}
+                        {tList<string>('form.options.work_hours').map(o => <option key={o}>{o}</option>)}
                       </select>
                     </Field>
-                    <BudgetField label={t('apply.fields.expectedSalary')} register={register} name="expectedSalary" placeholder={t('apply.placeholders.expectedSalary')} currencies={currencies} currency={currency} setCurrency={setCurrency} />
-                    <BudgetField label={t('apply.fields.immigrationBudget')} required register={register} name="budget" placeholder={t('apply.placeholders.immigrationBudget')} currencies={currencies} currency={currency} setCurrency={setCurrency} />
-                    <Field label={t('apply.fields.idNumber')} required>
-                      <input {...register('idNumber', { required: true })} className={inputClass} placeholder={t('apply.placeholders.idNumber')} />
+                    <BudgetField label={t('form.labels.expected_salary')} register={register} name="expectedSalary" placeholder={t('form.placeholders.salary')} currencies={currencies} currency={currency} setCurrency={setCurrency} />
+                    <BudgetField label={t('form.labels.immigration_budget')} required register={register} name="budget" placeholder={t('form.placeholders.budget')} currencies={currencies} currency={currency} setCurrency={setCurrency} />
+                    <Field label={t('form.labels.id_number')} required>
+                      <input {...register('idNumber', { required: true })} className={inputClass} placeholder={t('form.placeholders.id_number')} />
                     </Field>
                   </>
                 )}
 
                 {profile === 'visitor' && (
                   <>
-                    <Field label={t('apply.fields.destination')} required>
-                      <select {...register('destination', { required: true })} className={inputClass}>
-                        <option value="">{t('apply.select')}</option>
-                        <option value="germany">{t('apply.destinations.germany')}</option>
-                        <option value="portugal">{t('apply.destinations.portugal')}</option>
-                        <option value="multiple">{t('apply.destinations.multiple')}</option>
-                      </select>
+                    <Field label={t('form.labels.destination')} required>
+                      <DestinationSelect register={register} destinations={destinations} loading={destinationsLoading} allowMultiple />
                     </Field>
-                    <Field label={t('apply.fields.duration')} required>
+                    <Field label={t('form.labels.duration')} required>
                       <select {...register('duration', { required: true })} className={inputClass}>
-                        <option value="">{t('apply.select')}</option>
-                        {durations.map(l => <option key={l}>{l}</option>)}
+                        <option value="">{t('form.placeholders.select')}</option>
+                        {tList<string>('form.options.durations').map(o => <option key={o}>{o}</option>)}
                       </select>
                     </Field>
-                    <BudgetField label={t('apply.fields.budget')} register={register} name="budget" placeholder={t('apply.placeholders.budget')} currencies={currencies} currency={currency} setCurrency={setCurrency} />
-                    <Field label={t('apply.fields.passportNumber')} required>
-                      <input {...register('passportNumber', { required: true })} className={inputClass} placeholder={t('apply.placeholders.passportNumber')} />
+                    <BudgetField label={t('form.labels.budget')} register={register} name="budget" placeholder={t('form.placeholders.budget')} currencies={currencies} currency={currency} setCurrency={setCurrency} />
+                    <Field label={t('form.labels.id_number')} required>
+                      <input {...register('passportNumber', { required: true })} className={inputClass} placeholder={t('form.placeholders.id_number')} />
                     </Field>
                     <div className="md:col-span-2">
-                      <Field label={t('apply.fields.purpose')}>
-                        <textarea {...register('purpose')} rows={3} className={`${inputClass} resize-none`} placeholder={t('apply.placeholders.purpose')} />
+                      <Field label={t('form.labels.purpose')}>
+                        <textarea {...register('purpose')} rows={3} className={`${inputClass} resize-none`} placeholder={t('form.placeholders.purpose')} />
                       </Field>
                     </div>
                   </>
@@ -615,9 +648,9 @@ function ApplyContent() {
           {/* STEP 4 — Documents & signature */}
           {profile && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="card p-6 md:p-8 space-y-6">
-              <h2 className="font-semibold text-lg text-[#0a2540] dark:text-white">4. {t('apply.step4Title')}</h2>
+              <h2 className="font-semibold text-lg text-[#0a2540] dark:text-white">4. {t('form.steps.documents')}</h2>
               <FileUploader
-                label={profile === 'visitor' ? t('apply.uploadPassport') : t('apply.uploadDocs')}
+                label={t('form.upload.label')}
                 files={files}
                 onChange={setFiles}
               />
@@ -629,7 +662,7 @@ function ApplyContent() {
           {profile && (
             <div className="sticky bottom-0 z-10 -mx-1 rounded-2xl border border-[#e3e8ee] dark:border-[#38383a] bg-white/95 dark:bg-[#0b1020]/95 backdrop-blur px-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-lg md:static md:mx-0 md:rounded-none md:border-0 md:bg-transparent md:p-0 md:shadow-none">
               <button type="submit" disabled={submitting} className="application-submit btn-primary w-full justify-center">
-                {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> {t('apply.submitting')}</> : <>{t('apply.submit')} <CheckCircle className="w-4 h-4" /></>}
+                {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> {t('form.submitting')}</> : <>{t('form.submit')} <CheckCircle className="w-4 h-4" /></>}
               </button>
             </div>
           )}
