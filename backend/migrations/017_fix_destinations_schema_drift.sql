@@ -16,10 +16,40 @@
 -- n'importe quel environnement, qu'il ait déjà ces colonnes ou non.
 -- ============================================================
 
+-- ── 0. Réalité du terrain sur Neon ─────────────────────────────────────────────
+-- La table `destinations` n'y a pas été créée par la version actuelle de 008 :
+-- son schéma réel (constaté via introspection) est bien plus ancien —
+-- colonnes `image` (pas `image_url`), pas de `country_code`, etc. On répare
+-- ce point précis avant le reste, qui suppose déjà `image_url`/`country_code`.
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+     WHERE table_name = 'destinations' AND column_name = 'image'
+  ) AND NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+     WHERE table_name = 'destinations' AND column_name = 'image_url'
+  ) THEN
+    ALTER TABLE destinations RENAME COLUMN image TO image_url;
+  END IF;
+END $$;
+
 -- ── 1. Colonnes potentiellement manquantes sur `destinations` ────────────────
 -- (008) fenêtre de disponibilité
+ALTER TABLE destinations ADD COLUMN IF NOT EXISTS country_code  VARCHAR(5);
+ALTER TABLE destinations ADD COLUMN IF NOT EXISTS accent_color  VARCHAR(20) DEFAULT '#635bff';
+ALTER TABLE destinations ADD COLUMN IF NOT EXISTS is_featured   BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE destinations ADD COLUMN IF NOT EXISTS image_url     TEXT;
 ALTER TABLE destinations ADD COLUMN IF NOT EXISTS available_from  DATE;
 ALTER TABLE destinations ADD COLUMN IF NOT EXISTS available_until DATE;
+
+-- Rattrapage : lignes créées avant l'ajout de country_code (donc encore NULL)
+UPDATE destinations SET country_code = d.cc
+FROM (VALUES
+  ('germany','DE'), ('portugal','PT'), ('france','FR'), ('belgium','BE'),
+  ('spain','ES'), ('italy','IT'), ('netherlands','NL'), ('poland','PL')
+) AS d(code, cc)
+WHERE destinations.code = d.code AND destinations.country_code IS NULL;
 
 -- (009) filtres
 ALTER TABLE destinations ADD COLUMN IF NOT EXISTS languages       JSONB   NOT NULL DEFAULT '[]';
