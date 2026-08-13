@@ -18,7 +18,7 @@ const LANGUAGES: { code: Language; label: string; flag: string }[] = [
 
 export default function Navbar() {
   const { t, language, changeLanguage } = useTranslation()
-  const { darkMode, toggleTheme } = useTheme()
+  const { darkMode, mounted, toggleTheme } = useTheme()
   const { currency, setCurrency, availableCurrencies, autoDetected } = useCurrency()
   const [currencyOpen, setCurrencyOpen] = useState(false)
   const [scrolled,    setScrolled]    = useState(false)
@@ -154,9 +154,9 @@ export default function Navbar() {
           <button
             onClick={toggleTheme}
             className="p-2.5 rounded-xl border border-[#e3e8ee] dark:border-[#38383a] text-[#425466] dark:text-[#ebebf5] hover:border-[#cbd5e1] dark:hover:border-[#48484a] hover:text-[#0a2540] dark:hover:text-white transition-all"
-            aria-label={darkMode ? t('common.theme_light') : t('common.theme_dark')}
+            aria-label={mounted && darkMode ? t('common.theme_light') : t('common.theme_dark')}
           >
-            {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            {mounted && darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
 
           {/* Currency switcher */}
@@ -294,8 +294,8 @@ export default function Navbar() {
                 onClick={toggleTheme}
                 className="px-4 py-3 text-sm rounded-xl flex items-center justify-between text-[#425466] dark:text-[#ebebf5] hover:bg-[#f6f9fc] dark:hover:bg-[#2c2c2e] transition-all"
               >
-                {darkMode ? t('common.theme_light') : t('common.theme_dark')}
-                {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                {mounted && darkMode ? t('common.theme_light') : t('common.theme_dark')}
+                {mounted && darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </button>
 
               <Link

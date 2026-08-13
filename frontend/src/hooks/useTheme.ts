@@ -19,9 +19,18 @@ function initialDark(): boolean {
 export function useTheme() {
   const [darkMode, setDarkMode] = useState<boolean>(initialDark)
 
+  // `initialDark()` lit le DOM (déjà correct côté client grâce au script
+  // inline), donc diffère volontairement du rendu serveur (toujours `false`) —
+  // ça évite le flash de fond blanc/noir. Mais un composant qui affiche une
+  // icône différente selon `darkMode` (Sun ≠ Moon) provoquerait une erreur
+  // d'hydratation s'il se basait dessus avant le montage : `mounted` permet à
+  // ce genre de composant d'attendre un rendu client pour bifurquer.
+  const [mounted, setMounted] = useState(false)
+
   // Deux onglets ouverts : garder l'état aligné sur le DOM au montage.
   useEffect(() => {
     setDarkMode(document.documentElement.classList.contains('dark'))
+    setMounted(true)
   }, [])
 
   const applyTheme = useCallback((dark: boolean) => {
@@ -36,5 +45,5 @@ export function useTheme() {
     applyTheme(!document.documentElement.classList.contains('dark'))
   }, [applyTheme])
 
-  return { darkMode, toggleTheme, applyTheme }
+  return { darkMode, mounted, toggleTheme, applyTheme }
 }
