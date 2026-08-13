@@ -21,7 +21,7 @@ services:
       - key: TELEGRAM_CHAT_ID
         sync: false
       - key: ALLOWED_ORIGINS
-        value: https://vea-frontend.onrender.com,http://localhost:3000
+        value: https://vea-frontend-xgyv.onrender.com,http://localhost:3000
       - key: DASHBOARD_URL
         sync: false
       # Synchronisation périodique des bourses depuis les sources officielles
@@ -45,7 +45,7 @@ services:
       - key: PORT
         value: 10000
       - key: NEXT_PUBLIC_API_URL
-        value: https://vea-backend.onrender.com/api
+        value: https://vea-backend-kgih.onrender.com/api
 
 # Neon provides the production PostgreSQL database.
   # ── PostgreSQL ────────────────────────────────────────────
