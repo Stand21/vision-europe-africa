@@ -110,7 +110,7 @@ export default function Navbar() {
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
           ? 'glass-strong py-3'
-          : 'bg-white/60 dark:bg-black/40 backdrop-blur-md py-4'
+          : 'bg-white/90 dark:bg-black/85 backdrop-blur-md py-4'
       }`}
     >
       <div className="container-custom flex items-center justify-between">
