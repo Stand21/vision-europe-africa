@@ -107,13 +107,13 @@ export default function Navbar() {
           : 'bg-white/80 dark:bg-black/60 backdrop-blur-xl'
       }`}
     >
-      <div className="container-custom flex items-center justify-between">
+      <div className="container-custom flex items-center justify-between py-3 sm:py-1">
         {/* Logo */}
         <Link href="/" className="flex items-center shrink-0">
           <img
             src="/images/logo-transparent.png"
             alt="Vision Europe Africa"
-            className="h-9 sm:h-12 w-auto object-contain invert dark:invert-0"
+            className="h-10 sm:h-12 w-auto object-contain invert dark:invert-0"
           />
         </Link>
 
@@ -268,7 +268,7 @@ export default function Navbar() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="lg:hidden bg-white dark:bg-[#1c1c1e] max-h-[calc(100dvh-4.5rem)] overflow-y-auto"
+            className="lg:hidden bg-white dark:bg-[#1c1c1e] max-h-[calc(100dvh-5rem)] overflow-y-auto"
           >
             <div className="container-custom py-5 flex flex-col gap-1">
               {navLinks.map(({ href, id, label }) => (
