@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from 'next'
 import { Toaster } from 'react-hot-toast'
-import Script from 'next/script'
 import { LocaleProviders } from '@/i18n/LocaleProviders'
 import './globals.css'
 
@@ -30,6 +29,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        />
         <script
           dangerouslySetInnerHTML={{
             // Applique le thème avant le premier rendu : évite tout flash au chargement.
@@ -39,11 +42,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="antialiased">
-        {/* Iconify — loaded once for the whole app */}
-        <Script
-          src="https://cdn.jsdelivr.net/npm/@iconify/iconify@3.1.1/dist/iconify.min.js"
-          strategy="beforeInteractive"
-        />
         <LocaleProviders>{children}</LocaleProviders>
         <Toaster
           position="top-right"

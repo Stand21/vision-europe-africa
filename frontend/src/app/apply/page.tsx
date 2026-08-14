@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import React, { useState, useRef, useCallback, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
@@ -14,7 +14,6 @@ import {
 } from 'lucide-react'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
-import { useTranslation } from '@/hooks/useTranslation'
 import axios from 'axios'
 import { useDestinations, type Destination } from '@/hooks/useDestinations'
 import { useTranslation } from '@/hooks/useTranslation'
@@ -25,17 +24,17 @@ const DRAFT_KEY = 'vea_application_draft'
 
 type Profile = 'student' | 'worker' | 'visitor'
 
-// ── Currencies (fallback; live list comes from /api/currencies) ───────────────
+// â”€â”€ Currencies (fallback; live list comes from /api/currencies) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const FALLBACK_CURRENCIES = [
-  { code: 'EUR', symbol: '€', label: 'Euro' },
+  { code: 'EUR', symbol: 'â‚¬', label: 'Euro' },
   { code: 'USD', symbol: '$', label: 'US Dollar' },
-  { code: 'GBP', symbol: '£', label: 'British Pound' },
+  { code: 'GBP', symbol: 'Â£', label: 'British Pound' },
   { code: 'CHF', symbol: 'Fr', label: 'Swiss Franc' },
   { code: 'XOF', symbol: 'CFA', label: 'West African CFA (BCEAO)' },
   { code: 'XAF', symbol: 'CFA', label: 'Central African CFA (BEAC)' },
   { code: 'GNF', symbol: 'GFr', label: 'Guinean Franc' },
-  { code: 'NGN', symbol: '₦', label: 'Nigerian Naira' },
-  { code: 'GHS', symbol: '₵', label: 'Ghanaian Cedi' },
+  { code: 'NGN', symbol: 'â‚¦', label: 'Nigerian Naira' },
+  { code: 'GHS', symbol: 'â‚µ', label: 'Ghanaian Cedi' },
   { code: 'KES', symbol: 'KSh', label: 'Kenyan Shilling' },
   { code: 'TZS', symbol: 'TSh', label: 'Tanzanian Shilling' },
   { code: 'UGX', symbol: 'USh', label: 'Ugandan Shilling' },
@@ -43,12 +42,12 @@ const FALLBACK_CURRENCIES = [
   { code: 'CDF', symbol: 'FC', label: 'Congolese Franc' },
   { code: 'MAD', symbol: 'DH', label: 'Moroccan Dirham' },
   { code: 'DZD', symbol: 'DA', label: 'Algerian Dinar' },
-  { code: 'EGP', symbol: 'E£', label: 'Egyptian Pound' },
+  { code: 'EGP', symbol: 'EÂ£', label: 'Egyptian Pound' },
 ]
 
-// ── Filières d'études ────────────────────────────────────────────────────────
-// Les montants sont en euros : ils sont convertis à l'affichage dans la devise
-// du visiteur. Les libellés viennent des traductions (form.study_fields.*).
+// â”€â”€ FiliÃ¨res d'Ã©tudes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Les montants sont en euros : ils sont convertis Ã  l'affichage dans la devise
+// du visiteur. Les libellÃ©s viennent des traductions (form.study_fields.*).
 const STUDY_FIELDS = [
   { id: 'cs',     icon: Code,       tuitionMin: 0,    tuitionMax: 500,  yearsMin: 3, yearsMax: 5, salary: 45000 },
   { id: 'cyber',  icon: Lock,       tuitionMin: 500,  tuitionMax: 1500, yearsMin: 3, yearsMax: 4, salary: 55000 },
@@ -62,8 +61,8 @@ const STUDY_FIELDS = [
   { id: 'trade',  icon: Globe,      tuitionMin: 0,    tuitionMax: 1500, yearsMin: 3, yearsMax: 3, salary: 44000 },
 ]
 
-// ── Métiers ──────────────────────────────────────────────────────────────────
-// salaryMin / salaryMax en euros bruts annuels ; demand est une clé de traduction.
+// â”€â”€ MÃ©tiers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// salaryMin / salaryMax en euros bruts annuels ; demand est une clÃ© de traduction.
 const PROFESSIONS = [
   { id: 'dev',          icon: Code,       salaryMin: 45000, salaryMax: 80000, demand: 'very_high', hoursMin: 40, hoursMax: 40 },
   { id: 'driver',       icon: Car,        salaryMin: 28000, salaryMax: 38000, demand: 'high',      hoursMin: 40, hoursMax: 50 },
@@ -78,7 +77,7 @@ const PROFESSIONS = [
   { id: 'hospitality',  icon: Utensils,   salaryMin: 20000, salaryMax: 32000, demand: 'high',      hoursMin: 40, hoursMax: 40 },
 ]
 
-// ── Catégories de visite ─────────────────────────────────────────────────────
+// â”€â”€ CatÃ©gories de visite â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Nom et description viennent des traductions (form.categories.*).
 const VISITOR_CATEGORIES = [
   { id: 'tourism',    icon: Camera },
@@ -88,7 +87,7 @@ const VISITOR_CATEGORIES = [
   { id: 'discovery',  icon: Globe },
 ]
 
-// ── File Uploader ─────────────────────────────────────────────────────────────
+// â”€â”€ File Uploader â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function FileUploader({ label, files, onChange }: { label: string; files: File[]; onChange: (f: File[]) => void }) {
   const { t } = useTranslation()
   const onDrop = useCallback((accepted: File[]) => {
@@ -128,7 +127,7 @@ function FileUploader({ label, files, onChange }: { label: string; files: File[]
                 <span className="text-[#0a2540] dark:text-white truncate">{f.name}</span>
                 <span className="text-[#697386] dark:text-[#8e8e93] text-xs flex-shrink-0">({(f.size / 1024).toFixed(0)}KB)</span>
               </div>
-              <button onClick={() => remove(i)} className="text-[#697386] dark:text-[#8e8e93] hover:text-[#ef4444] transition-colors flex-shrink-0">
+              <button onClick={() => remove(i)} className="text-[#697386] dark:text-[#8e8e93] hover:text-[#d8a84e] transition-colors flex-shrink-0">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -139,7 +138,7 @@ function FileUploader({ label, files, onChange }: { label: string; files: File[]
   )
 }
 
-// ── Signature Pad ─────────────────────────────────────────────────────────────
+// â”€â”€ Signature Pad â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function SignaturePad({ onSave }: { onSave: (dataUrl: string) => void }) {
   const { t } = useTranslation()
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -205,22 +204,22 @@ function SignaturePad({ onSave }: { onSave: (dataUrl: string) => void }) {
         {!hasSignature && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <span className="text-sm text-[#697386] dark:text-[#8e8e93] flex items-center gap-2">
-              <PenLine className="w-4 h-4" /> {t('apply.signHere')}
+              <PenLine className="w-4 h-4" /> Signez ici
             </span>
           </div>
         )}
       </div>
-      <button type="button" onClick={clear} className="text-xs text-[#697386] dark:text-[#8e8e93] hover:text-[#ef4444] transition-colors">
-        {t('apply.clearSignature')}
+      <button type="button" onClick={clear} className="text-xs text-[#697386] dark:text-[#8e8e93] hover:text-[#d8a84e] transition-colors">
+        Effacer la signature
       </button>
     </div>
   )
 }
 
-// ── Reusable form helpers ──────────────────────────────────────────────────────
+// â”€â”€ Reusable form helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const inputClass = "input"
 
-// ── Destination dropdown ──────────────────────────────────────────────────────
+// â”€â”€ Destination dropdown â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Options come from the admin-managed list; only destinations inside their
 // availability period are returned by the API, so the list closes itself.
 function DestinationSelect({
@@ -241,10 +240,10 @@ function DestinationSelect({
       <option value="">{loading ? t('form.placeholders.loading') : t('form.placeholders.select')}</option>
       {destinations.map(d => (
         <option key={d.code} value={d.code}>
-          {d.flag ? `${d.flag} ` : ''}{d.name}
+          {(d.country_code || '').toUpperCase()}{d.country_code ? ' â€” ' : ''}{d.name}
         </option>
       ))}
-      {allowMultiple && <option value="multiple">🌍 {t('form.options.multiple_countries')}</option>}
+      {allowMultiple && <option value="multiple">{t('form.options.multiple_countries')}</option>}
     </select>
   )
 }
@@ -290,7 +289,7 @@ function BudgetField({ label, register, name, placeholder, required, currencies,
   )
 }
 
-// ── Selection grid (study fields / professions / categories) ──────────────────
+// â”€â”€ Selection grid (study fields / professions / categories) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function SelectCards({ items, value, onChange }: {
   items: { id: string; name: string; icon: React.ElementType; sub?: string }[]
   value: string
@@ -322,15 +321,15 @@ function SelectCards({ items, value, onChange }: {
   )
 }
 
-// ── Apply Page Content ────────────────────────────────────────────────────────
+// â”€â”€ Apply Page Content â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function ApplyContent() {
   const { t, tList } = useTranslation()
   const { formatRange } = useCurrency()
 
-  // Salaire et horaires d'un métier, dans la devise et la langue du visiteur
+  // Salaire et horaires d'un mÃ©tier, dans la devise et la langue du visiteur
   const professionSummary = (p: { salaryMin: number; salaryMax: number; hoursMin: number; hoursMax: number }) => {
-    const hours = p.hoursMin === p.hoursMax ? `${p.hoursMin}` : `${p.hoursMin}–${p.hoursMax}`
-    return `${formatRange(p.salaryMin, p.salaryMax, { compact: true })} · ${hours} ${t('form.field_info.per_week')}`
+    const hours = p.hoursMin === p.hoursMax ? `${p.hoursMin}` : `${p.hoursMin}â€“${p.hoursMax}`
+    return `${formatRange(p.salaryMin, p.salaryMax, { compact: true })} Â· ${hours} ${t('form.field_info.per_week')}`
   }
   const searchParams = useSearchParams()
   const urlProfile = (searchParams.get('profile') || '') as Profile
@@ -383,7 +382,7 @@ function ApplyContent() {
           signature, currency, values, savedAt: Date.now(),
         }))
       } catch {
-        /* storage full — ignore */
+        /* storage full â€” ignore */
       }
     }, 600)
     return () => clearTimeout(t)
@@ -450,11 +449,6 @@ function ApplyContent() {
     { key: 'visitor' as Profile, icon: Plane, label: t('profiles.visitor.title'), desc: t('profiles.visitor.description') },
   ]
 
-  const educationLevels = tList('apply.educationLevels')
-  const targetDegrees = tList('apply.targetDegrees')
-  const workHours = tList('apply.workHours')
-  const durations = tList('apply.durations')
-
   const showSignature = profile === 'student' || profile === 'worker'
 
   return (
@@ -479,12 +473,12 @@ function ApplyContent() {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-          {/* STEP 1 — Profile */}
+          {/* STEP 1 â€” Profile */}
           <div className="card p-6 md:p-8">
             <div className="flex items-center justify-between mb-5">
-              <h2 className="font-semibold text-lg text-[#0a2540] dark:text-white">1. {t('form.steps.profile')} <span className="text-[#ef4444]">*</span></h2>
+              <h2 className="font-semibold text-lg text-[#0a2540] dark:text-white">1. {t('form.steps.profile')} <span className="text-[#d8a84e]">*</span></h2>
               {hasDraft && (
-                <button type="button" onClick={clearDraft} className="text-xs flex items-center gap-1 text-[#697386] dark:text-[#8e8e93] hover:text-[#ef4444] transition-colors">
+                <button type="button" onClick={clearDraft} className="text-xs flex items-center gap-1 text-[#697386] dark:text-[#8e8e93] hover:text-[#d8a84e] transition-colors">
                   <Trash2 className="w-3.5 h-3.5" /> {t('form.clear_draft')}
                 </button>
               )}
@@ -512,11 +506,11 @@ function ApplyContent() {
             </div>
           </div>
 
-          {/* STEP 2 — Field / Job / Category */}
+          {/* STEP 2 â€” Field / Job / Category */}
           {profile && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="card p-6 md:p-8">
               <h2 className="font-semibold text-lg text-[#0a2540] dark:text-white mb-5">
-                2. {profile === 'student' ? t('form.steps.field_step') : profile === 'worker' ? t('form.steps.job_step') : t('form.steps.category_step')} <span className="text-[#ef4444]">*</span>
+                2. {profile === 'student' ? t('form.steps.field_step') : profile === 'worker' ? t('form.steps.job_step') : t('form.steps.category_step')} <span className="text-[#d8a84e]">*</span>
               </h2>
               {profile === 'student' && (
                 <Field label={t('form.labels.field')} required>
@@ -545,7 +539,7 @@ function ApplyContent() {
             </motion.div>
           )}
 
-          {/* STEP 3 — Details */}
+          {/* STEP 3 â€” Details */}
           {profile && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="card p-6 md:p-8">
               <h2 className="font-semibold text-lg text-[#0a2540] dark:text-white mb-5">3. {t('form.steps.details')}</h2>
@@ -645,7 +639,7 @@ function ApplyContent() {
             </motion.div>
           )}
 
-          {/* STEP 4 — Documents & signature */}
+          {/* STEP 4 â€” Documents & signature */}
           {profile && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="card p-6 md:p-8 space-y-6">
               <h2 className="font-semibold text-lg text-[#0a2540] dark:text-white">4. {t('form.steps.documents')}</h2>

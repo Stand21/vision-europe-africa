@@ -5,27 +5,19 @@ import { GraduationCap, Clock, MapPin, MessageCircle, Info, HelpCircle } from 'l
 import { useTranslation } from '@/hooks/useTranslation'
 import { scholarshipWhatsappLink, type Scholarship } from '@/hooks/useScholarships'
 
-/** Couleur du compte à rebours — 4 paliers (voir cahier des charges bourses). */
+/** Couleur du compte à rebours — or pour urgence, gris sinon. */
 export function deadlineTone(days?: number | null) {
   if (days == null) return 'text-[#697386] dark:text-[#8e8e93]'
-  if (days <= 6) return 'text-[#ef4444] font-semibold'
-  if (days <= 14) return 'text-[#f59e0b] font-semibold'
-  if (days <= 30) return 'text-[#ca8a04] dark:text-[#eab308] font-semibold'
+  if (days <= 30) return 'text-[#d8a84e] font-semibold'
   return 'text-[#697386] dark:text-[#8e8e93]'
 }
 
 const FUNDING_BADGE: Record<string, { key: string; className: string }> = {
-  full: { key: 'scholarships.fully_funded', className: 'bg-[#22c55e] text-white' },
-  partial: { key: 'scholarships.partially_funded', className: 'bg-[#f59e0b] text-white' },
+  full: { key: 'scholarships.fully_funded', className: 'bg-[#d8a84e] text-[#0a2540]' },
+  partial: { key: 'scholarships.partially_funded', className: 'bg-[#635bff]/10 text-[#635bff]' },
   varies: { key: 'scholarships.funding_varies', className: 'bg-[#635bff] text-white' },
 }
 
-/**
- * Carte de bourse. Le bouton « Détails » mène à la fiche complète
- * (/bourses/[id]) ; « Postuler » ouvre WhatsApp avec un message pré-rempli
- * décrivant précisément la bourse — l'objectif reste de faire parler le
- * candidat à un conseiller plutôt que de le laisser seul sur un site tiers.
- */
 export function ScholarshipCard({
   scholarship: s,
   settings,
@@ -52,7 +44,7 @@ export function ScholarshipCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.4, delay: Math.min(index, 8) * 0.05 }}
-      className="rounded-3xl overflow-hidden bg-white dark:bg-[#1c1c1e] border border-[#e3e8ee] dark:border-[#38383a] shadow-sm hover:shadow-lg hover:border-[#635bff]/30 transition-all flex flex-col"
+      className="rounded-2xl overflow-hidden bg-white dark:bg-[#1c1c1e] border border-[#e3e8ee] dark:border-[#38383a] shadow-sm hover:shadow-md hover:border-[#635bff]/20 transition-all flex flex-col"
     >
       <Link href={`/bourses/${s.id}`} className="relative h-48 block bg-[#f6f9fc] dark:bg-[#2c2c2e] overflow-hidden group">
         {s.imageUrl
@@ -64,9 +56,8 @@ export function ScholarshipCard({
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           )
-          : <GraduationCap className="w-12 h-12 text-[#635bff]/30 absolute inset-0 m-auto" />}
+          : <GraduationCap className="w-12 h-12 text-[#635bff]/20 absolute inset-0 m-auto" />}
 
-        {/* Overlay léger : garantit la lisibilité des badges quelle que soit l'image */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/0 to-black/10" />
 
         {fundingBadge && (
@@ -100,7 +91,7 @@ export function ScholarshipCard({
         {s.levels.length > 0 && (
           <div className="flex gap-1.5 flex-wrap mb-3">
             {s.levels.slice(0, 3).map(l => (
-              <span key={l} className="text-[11px] px-2 py-1 rounded-full bg-[#635bff]/10 text-[#635bff] font-medium capitalize">{l}</span>
+              <span key={l} className="text-[11px] px-2 py-1 rounded-full bg-[#635bff]/8 text-[#635bff] font-medium capitalize">{l}</span>
             ))}
           </div>
         )}
@@ -119,7 +110,7 @@ export function ScholarshipCard({
         <div className="flex items-center gap-2 mt-4">
           <Link
             href={`/bourses/${s.id}`}
-            className="inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2.5 text-xs font-semibold border border-[#e3e8ee] dark:border-[#38383a] text-[#0a2540] dark:text-white hover:border-[#635bff] transition-colors whitespace-nowrap"
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg px-4 py-2.5 text-xs font-semibold border border-[#e3e8ee] dark:border-[#38383a] text-[#0a2540] dark:text-white hover:border-[#635bff] transition-colors whitespace-nowrap"
           >
             <Info className="w-3.5 h-3.5" />
             {t('scholarships.details')}
@@ -129,7 +120,7 @@ export function ScholarshipCard({
               href={wa}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 inline-flex items-center justify-center gap-2 rounded-full btn-gradient px-4 py-2.5 text-xs font-semibold"
+              className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-[#635bff] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#4b45c6] transition-colors"
             >
               <MessageCircle className="w-4 h-4" />
               {t('scholarships.apply_wa')}
