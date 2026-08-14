@@ -16,9 +16,9 @@ export default function Footer() {
   }))
 
   return (
-    <footer id="contact" className="relative bg-[#0a2540] text-white pt-20 overflow-hidden">
+    <footer id="contact" className="relative bg-[#0a2540] text-white pt-16 md:pt-20 overflow-hidden">
       <div className="relative container-custom pb-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
           {/* Brand */}
           <div className="lg:col-span-2">
             <div className="flex items-start gap-3 mb-5">
@@ -104,7 +104,7 @@ export default function Footer() {
         </div>
 
         {/* Trust strip */}
-        <div className="mt-14 grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="mt-10 md:mt-14 grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
           {[
             { icon: ShieldCheck, label: t('footer.trust.legal') },
             { icon: Clock, label: t('footer.trust.response') },
@@ -118,19 +118,19 @@ export default function Footer() {
         </div>
 
         {/* Newsletter */}
-        <div className="mt-10 rounded-2xl p-8 md:p-10 bg-[#0d1f36] border border-white/[0.06]">
+        <div className="mt-8 md:mt-10 rounded-2xl p-5 md:p-8 bg-[#0d1f36] border border-white/[0.06]">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
               <h3 className="text-xl font-bold text-white mb-1">{t('footer.newsletter.title')}</h3>
               <p className="text-sm text-[#94a3b8]">{t('footer.newsletter.subtitle')}</p>
             </div>
-            <div className="flex flex-col sm:flex-row w-full md:w-auto gap-3 min-w-0">
+            <div className="flex flex-col sm:flex-row w-full md:w-auto gap-3 min-w-0 overflow-hidden">
               <input
                 type="email"
                 placeholder={t('footer.newsletter.placeholder')}
                 className="w-full sm:w-auto sm:flex-1 md:w-72 min-w-0 px-5 py-3 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-white/40 focus:outline-none focus:border-[#635bff] transition-colors"
               />
-              <button className="w-full sm:w-auto min-w-0 px-6 py-3 rounded-lg bg-[#635bff] text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#4b45c6] transition-colors whitespace-nowrap">
+              <button className="w-full sm:w-auto px-5 py-3 rounded-lg bg-[#635bff] text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#4b45c6] transition-colors whitespace-nowrap">
                 {t('footer.newsletter.button')} <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -138,7 +138,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="mt-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="mt-8 md:mt-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-[#64748b] text-center sm:text-left">
             © {year} Vision Europe Africa. {t('footer.rights')} — {t('footer.legal')}
           </p>

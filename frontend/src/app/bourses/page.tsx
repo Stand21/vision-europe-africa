@@ -92,7 +92,7 @@ export default function ScholarshipsPage() {
           {loading ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[0, 1, 2, 3, 4, 5].map(i => (
-                <div key={i} className="rounded-3xl h-96 bg-black/5 dark:bg-white/5 animate-pulse" />
+                <div key={i} className="rounded-2xl h-96 bg-black/5 dark:bg-white/5 animate-pulse" />
               ))}
             </div>
           ) : !available ? (

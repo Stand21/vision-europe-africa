@@ -103,8 +103,8 @@ export default function Navbar() {
       transition={{ duration: 0.5, ease: 'easeOut' }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-white/95 dark:bg-black/95 backdrop-blur-md border-b border-[#e3e8ee] dark:border-[#38383a] shadow-sm'
-          : 'bg-white/80 dark:bg-black/60 backdrop-blur-xl border-b border-transparent'
+          ? 'bg-white/95 dark:bg-black/95 backdrop-blur-md shadow-sm'
+          : 'bg-white/80 dark:bg-black/60 backdrop-blur-xl'
       }`}
     >
       <div className="container-custom flex items-center justify-between">
@@ -147,7 +147,7 @@ export default function Navbar() {
           {/* Dark mode toggle */}
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-lg border border-[#e3e8ee] dark:border-[#38383a] text-[#425466] dark:text-[#ebebf5] hover:border-[#cbd5e1] dark:hover:border-[#48484a] hover:text-[#0a2540] dark:hover:text-white transition-all"
+            className="p-2 rounded-lg text-[#425466] dark:text-[#ebebf5] hover:text-[#0a2540] dark:hover:text-white transition-all"
             aria-label={mounted && darkMode ? t('common.theme_light') : t('common.theme_dark')}
           >
             {mounted && darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -159,7 +159,7 @@ export default function Navbar() {
               onClick={() => { setCurrencyOpen(!currencyOpen); setLangOpen(false) }}
               aria-expanded={currencyOpen}
               aria-label={t('common.currency')}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg border border-[#e3e8ee] dark:border-[#38383a] text-sm text-[#425466] dark:text-[#ebebf5] hover:border-[#cbd5e1] dark:hover:border-[#48484a] hover:text-[#0a2540] dark:hover:text-white transition-all"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-[#425466] dark:text-[#ebebf5] hover:text-[#0a2540] dark:hover:text-white transition-all"
             >
               <Coins className="w-4 h-4" />
               <span className="text-xs font-medium">{currency}</span>
@@ -172,10 +172,10 @@ export default function Navbar() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 6 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute right-0 top-full mt-2 w-44 max-h-72 overflow-y-auto bg-white dark:bg-[#1c1c1e] border border-[#e3e8ee] dark:border-[#38383a] rounded-xl shadow-lg"
+                  className="absolute right-0 top-full mt-2 w-44 max-h-72 overflow-y-auto bg-white dark:bg-[#1c1c1e] rounded-xl shadow-lg"
                 >
                   {autoDetected && (
-                    <div className="px-4 py-2 text-[10px] uppercase tracking-wider text-[#697386] dark:text-[#8e8e93] border-b border-[#e3e8ee] dark:border-[#38383a]">
+                    <div className="px-4 py-2 text-[10px] uppercase tracking-wider text-[#697386] dark:text-[#8e8e93]">
                       {t('common.auto_detected')}
                     </div>
                   )}
@@ -201,7 +201,7 @@ export default function Navbar() {
             <button
               onClick={() => setLangOpen(!langOpen)}
               aria-expanded={langOpen}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg border border-[#e3e8ee] dark:border-[#38383a] text-sm text-[#425466] dark:text-[#ebebf5] hover:border-[#cbd5e1] dark:hover:border-[#48484a] hover:text-[#0a2540] dark:hover:text-white transition-all"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-[#425466] dark:text-[#ebebf5] hover:text-[#0a2540] dark:hover:text-white transition-all"
             >
               <span className="flex h-5 w-5 items-center justify-center rounded bg-[#635bff]/10 text-[9px] font-bold text-[#635bff] dark:text-[#a5a3ff]">
                 {(currentLang.code || '').toUpperCase()}
@@ -216,7 +216,7 @@ export default function Navbar() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 6 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute right-0 top-full mt-2 w-40 bg-white dark:bg-[#1c1c1e] border border-[#e3e8ee] dark:border-[#38383a] rounded-xl overflow-hidden shadow-lg"
+                  className="absolute right-0 top-full mt-2 w-40 bg-white dark:bg-[#1c1c1e] rounded-xl overflow-hidden shadow-lg"
                 >
                   {LANGUAGES.map(lang => (
                     <button
@@ -251,7 +251,7 @@ export default function Navbar() {
           {/* Mobile toggle */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="lg:hidden p-2 rounded-lg border border-[#e3e8ee] dark:border-[#38383a] text-[#425466] dark:text-[#ebebf5]"
+            className="lg:hidden p-2 rounded-lg text-[#425466] dark:text-[#ebebf5]"
             aria-label="Menu"
             aria-expanded={mobileOpen}
           >
@@ -268,7 +268,7 @@ export default function Navbar() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="lg:hidden bg-white dark:bg-[#1c1c1e] border-t border-[#e3e8ee] dark:border-[#38383a] max-h-[calc(100dvh-4.5rem)] overflow-y-auto"
+            className="lg:hidden bg-white dark:bg-[#1c1c1e] max-h-[calc(100dvh-4.5rem)] overflow-y-auto"
           >
             <div className="container-custom py-5 flex flex-col gap-1">
               {navLinks.map(({ href, id, label }) => (
