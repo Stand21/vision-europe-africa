@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 import React, { useState, useRef, useCallback, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
@@ -24,17 +24,17 @@ const DRAFT_KEY = 'vea_application_draft'
 
 type Profile = 'student' | 'worker' | 'visitor'
 
-// â”€â”€ Currencies (fallback; live list comes from /api/currencies) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Currencies (fallback; live list comes from /api/currencies) ───────────────
 const FALLBACK_CURRENCIES = [
-  { code: 'EUR', symbol: 'â‚¬', label: 'Euro' },
+  { code: 'EUR', symbol: '€', label: 'Euro' },
   { code: 'USD', symbol: '$', label: 'US Dollar' },
-  { code: 'GBP', symbol: 'Â£', label: 'British Pound' },
+  { code: 'GBP', symbol: '£', label: 'British Pound' },
   { code: 'CHF', symbol: 'Fr', label: 'Swiss Franc' },
   { code: 'XOF', symbol: 'CFA', label: 'West African CFA (BCEAO)' },
   { code: 'XAF', symbol: 'CFA', label: 'Central African CFA (BEAC)' },
   { code: 'GNF', symbol: 'GFr', label: 'Guinean Franc' },
-  { code: 'NGN', symbol: 'â‚¦', label: 'Nigerian Naira' },
-  { code: 'GHS', symbol: 'â‚µ', label: 'Ghanaian Cedi' },
+  { code: 'NGN', symbol: '₦', label: 'Nigerian Naira' },
+  { code: 'GHS', symbol: '₵', label: 'Ghanaian Cedi' },
   { code: 'KES', symbol: 'KSh', label: 'Kenyan Shilling' },
   { code: 'TZS', symbol: 'TSh', label: 'Tanzanian Shilling' },
   { code: 'UGX', symbol: 'USh', label: 'Ugandan Shilling' },
@@ -42,12 +42,12 @@ const FALLBACK_CURRENCIES = [
   { code: 'CDF', symbol: 'FC', label: 'Congolese Franc' },
   { code: 'MAD', symbol: 'DH', label: 'Moroccan Dirham' },
   { code: 'DZD', symbol: 'DA', label: 'Algerian Dinar' },
-  { code: 'EGP', symbol: 'EÂ£', label: 'Egyptian Pound' },
+  { code: 'EGP', symbol: 'E£', label: 'Egyptian Pound' },
 ]
 
-// â”€â”€ FiliÃ¨res d'Ã©tudes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// Les montants sont en euros : ils sont convertis Ã  l'affichage dans la devise
-// du visiteur. Les libellÃ©s viennent des traductions (form.study_fields.*).
+// ── Filières d'études ────────────────────────────────────────────────────────
+// Les montants sont en euros : ils sont convertis à l'affichage dans la devise
+// du visiteur. Les libellés viennent des traductions (form.study_fields.*).
 const STUDY_FIELDS = [
   { id: 'cs',     icon: Code,       tuitionMin: 0,    tuitionMax: 500,  yearsMin: 3, yearsMax: 5, salary: 45000 },
   { id: 'cyber',  icon: Lock,       tuitionMin: 500,  tuitionMax: 1500, yearsMin: 3, yearsMax: 4, salary: 55000 },
@@ -61,8 +61,8 @@ const STUDY_FIELDS = [
   { id: 'trade',  icon: Globe,      tuitionMin: 0,    tuitionMax: 1500, yearsMin: 3, yearsMax: 3, salary: 44000 },
 ]
 
-// â”€â”€ MÃ©tiers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// salaryMin / salaryMax en euros bruts annuels ; demand est une clÃ© de traduction.
+// ── Métiers ──────────────────────────────────────────────────────────────────
+// salaryMin / salaryMax en euros bruts annuels ; demand est une clé de traduction.
 const PROFESSIONS = [
   { id: 'dev',          icon: Code,       salaryMin: 45000, salaryMax: 80000, demand: 'very_high', hoursMin: 40, hoursMax: 40 },
   { id: 'driver',       icon: Car,        salaryMin: 28000, salaryMax: 38000, demand: 'high',      hoursMin: 40, hoursMax: 50 },
@@ -77,7 +77,7 @@ const PROFESSIONS = [
   { id: 'hospitality',  icon: Utensils,   salaryMin: 20000, salaryMax: 32000, demand: 'high',      hoursMin: 40, hoursMax: 40 },
 ]
 
-// â”€â”€ CatÃ©gories de visite â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Catégories de visite ─────────────────────────────────────────────────────
 // Nom et description viennent des traductions (form.categories.*).
 const VISITOR_CATEGORIES = [
   { id: 'tourism',    icon: Camera },
@@ -87,7 +87,7 @@ const VISITOR_CATEGORIES = [
   { id: 'discovery',  icon: Globe },
 ]
 
-// â”€â”€ File Uploader â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── File Uploader ─────────────────────────────────────────────────────────────
 function FileUploader({ label, files, onChange }: { label: string; files: File[]; onChange: (f: File[]) => void }) {
   const { t } = useTranslation()
   const onDrop = useCallback((accepted: File[]) => {
@@ -138,7 +138,7 @@ function FileUploader({ label, files, onChange }: { label: string; files: File[]
   )
 }
 
-// â”€â”€ Signature Pad â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Signature Pad ─────────────────────────────────────────────────────────────
 function SignaturePad({ onSave }: { onSave: (dataUrl: string) => void }) {
   const { t } = useTranslation()
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -216,10 +216,10 @@ function SignaturePad({ onSave }: { onSave: (dataUrl: string) => void }) {
   )
 }
 
-// â”€â”€ Reusable form helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Reusable form helpers ──────────────────────────────────────────────────────
 const inputClass = "input"
 
-// â”€â”€ Destination dropdown â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Destination dropdown ──────────────────────────────────────────────────────
 // Options come from the admin-managed list; only destinations inside their
 // availability period are returned by the API, so the list closes itself.
 function DestinationSelect({
@@ -240,7 +240,7 @@ function DestinationSelect({
       <option value="">{loading ? t('form.placeholders.loading') : t('form.placeholders.select')}</option>
       {destinations.map(d => (
         <option key={d.code} value={d.code}>
-          {(d.country_code || '').toUpperCase()}{d.country_code ? ' â€” ' : ''}{d.name}
+          {(d.country_code || '').toUpperCase()}{d.country_code ? ' — ' : ''}{d.name}
         </option>
       ))}
       {allowMultiple && <option value="multiple">{t('form.options.multiple_countries')}</option>}
@@ -289,7 +289,7 @@ function BudgetField({ label, register, name, placeholder, required, currencies,
   )
 }
 
-// â”€â”€ Selection grid (study fields / professions / categories) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Selection grid (study fields / professions / categories) ──────────────────
 function SelectCards({ items, value, onChange }: {
   items: { id: string; name: string; icon: React.ElementType; sub?: string }[]
   value: string
@@ -321,15 +321,15 @@ function SelectCards({ items, value, onChange }: {
   )
 }
 
-// â”€â”€ Apply Page Content â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Apply Page Content ────────────────────────────────────────────────────────
 function ApplyContent() {
   const { t, tList } = useTranslation()
   const { formatRange } = useCurrency()
 
-  // Salaire et horaires d'un mÃ©tier, dans la devise et la langue du visiteur
+  // Salaire et horaires d'un métier, dans la devise et la langue du visiteur
   const professionSummary = (p: { salaryMin: number; salaryMax: number; hoursMin: number; hoursMax: number }) => {
-    const hours = p.hoursMin === p.hoursMax ? `${p.hoursMin}` : `${p.hoursMin}â€“${p.hoursMax}`
-    return `${formatRange(p.salaryMin, p.salaryMax, { compact: true })} Â· ${hours} ${t('form.field_info.per_week')}`
+    const hours = p.hoursMin === p.hoursMax ? `${p.hoursMin}` : `${p.hoursMin}–${p.hoursMax}`
+    return `${formatRange(p.salaryMin, p.salaryMax, { compact: true })} · ${hours} ${t('form.field_info.per_week')}`
   }
   const searchParams = useSearchParams()
   const urlProfile = (searchParams.get('profile') || '') as Profile
@@ -382,7 +382,7 @@ function ApplyContent() {
           signature, currency, values, savedAt: Date.now(),
         }))
       } catch {
-        /* storage full â€” ignore */
+        /* storage full — ignore */
       }
     }, 600)
     return () => clearTimeout(t)
@@ -473,7 +473,7 @@ function ApplyContent() {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-          {/* STEP 1 â€” Profile */}
+          {/* STEP 1 — Profile */}
           <div className="card p-6 md:p-8">
             <div className="flex items-center justify-between mb-5">
               <h2 className="font-semibold text-lg text-[#0a2540] dark:text-white">1. {t('form.steps.profile')} <span className="text-[#d8a84e]">*</span></h2>
@@ -506,7 +506,7 @@ function ApplyContent() {
             </div>
           </div>
 
-          {/* STEP 2 â€” Field / Job / Category */}
+          {/* STEP 2 — Field / Job / Category */}
           {profile && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="card p-6 md:p-8">
               <h2 className="font-semibold text-lg text-[#0a2540] dark:text-white mb-5">
@@ -539,7 +539,7 @@ function ApplyContent() {
             </motion.div>
           )}
 
-          {/* STEP 3 â€” Details */}
+          {/* STEP 3 — Details */}
           {profile && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="card p-6 md:p-8">
               <h2 className="font-semibold text-lg text-[#0a2540] dark:text-white mb-5">3. {t('form.steps.details')}</h2>
@@ -639,7 +639,7 @@ function ApplyContent() {
             </motion.div>
           )}
 
-          {/* STEP 4 â€” Documents & signature */}
+          {/* STEP 4 — Documents & signature */}
           {profile && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="card p-6 md:p-8 space-y-6">
               <h2 className="font-semibold text-lg text-[#0a2540] dark:text-white">4. {t('form.steps.documents')}</h2>

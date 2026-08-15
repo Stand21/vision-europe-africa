@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
@@ -22,7 +22,7 @@ import { scholarshipWhatsappLink } from '@/hooks/useScholarships'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
 
-// â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Types ─────────────────────────────────────────────────────────────────────
 interface Application {
   id: string
   fullName: string
@@ -40,15 +40,15 @@ interface Application {
 }
 
 const CURRENCY_SYMBOLS: Record<string, string> = {
-  EUR: 'â‚¬', USD: '$', GBP: 'Â£', CHF: 'Fr',
-  XOF: 'CFA', XAF: 'CFA', GNF: 'GFr', NGN: 'â‚¦', GHS: 'â‚µ',
+  EUR: '€', USD: '$', GBP: '£', CHF: 'Fr',
+  XOF: 'CFA', XAF: 'CFA', GNF: 'GFr', NGN: '₦', GHS: '₵',
   KES: 'KSh', TZS: 'TSh', UGX: 'USh', ZAR: 'R',
-  CDF: 'FC', MAD: 'DH', DZD: 'DA', EGP: 'EÂ£',
+  CDF: 'FC', MAD: 'DH', DZD: 'DA', EGP: 'E£',
 }
 
 const formatBudget = (a: Application) => {
-  const symbol = CURRENCY_SYMBOLS[a.currency || 'EUR'] || (a.currency ? `${a.currency} ` : 'â‚¬')
-  return `${symbol}${a.budget || 'â€”'}`
+  const symbol = CURRENCY_SYMBOLS[a.currency || 'EUR'] || (a.currency ? `${a.currency} ` : '€')
+  return `${symbol}${a.budget || '—'}`
 }
 
 interface Stats {
@@ -82,7 +82,7 @@ interface Testimonial {
   videoUrl?: string
   isActive: boolean
   sortOrder: number
-  /** Aplati par l'API publique ; absent cÃ´tÃ© admin */
+  /** Aplati par l'API publique ; absent côté admin */
   text?: string
   role?: string
   destination?: string
@@ -113,11 +113,11 @@ interface AdminDestination {
   cost_level?: string | null
   visa_weeks_min?: number | string | null
   visa_weeks_max?: number | string | null
-  /** calculÃ© cÃ´tÃ© serveur : active | scheduled | expired | disabled */
+  /** calculé côté serveur : active | scheduled | expired | disabled */
   status: string
 }
 
-// â”€â”€ Login Form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Login Form ─────────────────────────────────────────────────────────────────
 function AdminLogin({ onLogin }: { onLogin: (token: string) => void }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -130,7 +130,7 @@ function AdminLogin({ onLogin }: { onLogin: (token: string) => void }) {
       const { data } = await axios.post(`${API}/admin/login`, { email, password })
       Cookies.set('admin_token', data.token, { expires: 1 })
       onLogin(data.token)
-      toast.success('Bienvenue Admin ! ðŸŽ‰')
+      toast.success('Bienvenue Admin ! 🎉')
     } catch {
       toast.error('Identifiants incorrects.')
     } finally {
@@ -152,7 +152,7 @@ function AdminLogin({ onLogin }: { onLogin: (token: string) => void }) {
             <Shield className="w-8 h-8 text-white" />
           </div>
           <h1 className="font-display text-2xl font-bold text-white">Espace administrateur</h1>
-          <p className="text-gray-400 text-sm mt-1">Vision Europe Africa â€” AccÃ¨s sÃ©curisÃ©</p>
+          <p className="text-gray-400 text-sm mt-1">Vision Europe Africa — Accès sécurisé</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
@@ -174,29 +174,29 @@ function AdminLogin({ onLogin }: { onLogin: (token: string) => void }) {
               value={password}
               onChange={e => setPassword(e.target.value)}
               className="input-premium"
-              placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+              placeholder="••••••••"
               required
             />
           </div>
           <button type="submit" disabled={loading} className="w-full btn-gold justify-center mt-2">
-            {loading ? <><Loader2 className="w-5 h-5 animate-spin" /> Connexionâ€¦</> : <><Lock className="w-4 h-4" /> Se connecter</>}
+            {loading ? <><Loader2 className="w-5 h-5 animate-spin" /> Connexion…</> : <><Lock className="w-4 h-4" /> Se connecter</>}
           </button>
         </form>
 
         <p className="text-center text-gray-400 text-xs mt-6">
-          AccÃ¨s protÃ©gÃ© et journalisÃ©.
+          Accès protégé et journalisé.
         </p>
       </motion.div>
     </div>
   )
 }
 
-// â”€â”€ Status Badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Status Badge ──────────────────────────────────────────────────────────────
 const STATUS_LABELS: Record<string, string> = {
   pending: 'En attente',
   reviewing: 'En cours d\'examen',
-  approved: 'ApprouvÃ©',
-  rejected: 'RefusÃ©',
+  approved: 'Approuvé',
+  rejected: 'Refusé',
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -213,7 +213,7 @@ function StatusBadge({ status }: { status: string }) {
   )
 }
 
-// â”€â”€ Currency Manager â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Currency Manager ───────────────────────────────────────────────────────────
 function CurrencyManager({ token }: { token: string }) {
   const headers = { headers: { Authorization: `Bearer ${token}` } }
   const [currencies, setCurrencies] = useState<Currency[]>([])
@@ -240,7 +240,7 @@ function CurrencyManager({ token }: { token: string }) {
     if (!code || !symbol || !label) { toast.error('Code, symbole et nom requis'); return }
     try {
       await axios.post(`${API}/admin/currencies`, { code, symbol, label, sort_order: sortOrder }, headers)
-      toast.success(`Devise ${code} ajoutÃ©e âœ”`)
+      toast.success(`Devise ${code} ajoutée ✔`)
       setCode(''); setSymbol(''); setLabel(''); setSortOrder(0)
       load()
     } catch (e: any) {
@@ -253,7 +253,7 @@ function CurrencyManager({ token }: { token: string }) {
       await axios.patch(`${API}/admin/currencies/${c.code}`, { is_active: !c.isActive }, headers)
       load()
     } catch {
-      toast.error('Erreur de mise Ã  jour')
+      toast.error('Erreur de mise à jour')
     }
   }
 
@@ -261,7 +261,7 @@ function CurrencyManager({ token }: { token: string }) {
     if (!window.confirm(`Supprimer la devise ${c.code} ?`)) return
     try {
       await axios.delete(`${API}/admin/currencies/${c.code}`, headers)
-      toast.success('Devise supprimÃ©e')
+      toast.success('Devise supprimée')
       load()
     } catch (e: any) {
       toast.error(e?.response?.data?.error || 'Erreur de suppression')
@@ -300,12 +300,12 @@ function CurrencyManager({ token }: { token: string }) {
                   <td className="text-gray-300">{c.label}</td>
                   <td>
                     <button onClick={() => toggle(c)} className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-colors ${c.isActive ? 'bg-[#635bff]/20 text-[#a5a3ff]' : 'bg-gray-500/20 text-gray-400'}`}>
-                      {c.isActive ? 'ActivÃ©' : 'DÃ©sactivÃ©'}
+                      {c.isActive ? 'Activé' : 'Désactivé'}
                     </button>
                   </td>
                   <td>
                     <div className="flex items-center gap-1">
-                      <button onClick={() => toggle(c)} title={c.isActive ? 'DÃ©sactiver' : 'Activer'} className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors">
+                      <button onClick={() => toggle(c)} title={c.isActive ? 'Désactiver' : 'Activer'} className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors">
                         <Check className="w-3.5 h-3.5" />
                       </button>
                       <button onClick={() => remove(c)} title="Supprimer" className="p-1.5 rounded-lg hover:bg-black/30 text-gray-400 hover:text-[#8e8e93] transition-colors">
@@ -329,7 +329,7 @@ function CurrencyManager({ token }: { token: string }) {
   )
 }
 
-// â”€â”€ RÃ©glages WhatsApp et bourses â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Réglages WhatsApp et bourses ──────────────────────────────────────────────
 function WhatsAppSettings({ token }: { token: string }) {
   const headers = { headers: { Authorization: `Bearer ${token}` } }
   const [number, setNumber] = useState('')
@@ -344,14 +344,14 @@ function WhatsAppSettings({ token }: { token: string }) {
         setNumber(map.whatsapp_number || '')
         setMessage(map.whatsapp_message || '')
       })
-      .catch(() => toast.error('Erreur de chargement des rÃ©glages'))
+      .catch(() => toast.error('Erreur de chargement des réglages'))
       .finally(() => setLoading(false))
   }, [])
 
   const save = async () => {
     const digits = number.replace(/[^\d]/g, '')
     if (digits && digits.length < 8) {
-      toast.error('NumÃ©ro trop court â€” utilisez le format international sans + ni espaces')
+      toast.error('Numéro trop court — utilisez le format international sans + ni espaces')
       return
     }
     setSaving(true)
@@ -361,7 +361,7 @@ function WhatsAppSettings({ token }: { token: string }) {
         whatsapp_message: message,
       }, headers)
       setNumber(digits)
-      toast.success('RÃ©glages enregistrÃ©s âœ”')
+      toast.success('Réglages enregistrés ✔')
     } catch {
       toast.error('Erreur lors de l\'enregistrement')
     } finally {
@@ -371,17 +371,17 @@ function WhatsAppSettings({ token }: { token: string }) {
 
   const previewScholarship = {
     id: '0',
-    title: 'Global Korea Scholarship â€” Graduate Degree Program',
+    title: 'Global Korea Scholarship — Graduate Degree Program',
     provider: 'National Institute for International Education (NIIED)',
-    country: 'CorÃ©e du Sud',
+    country: 'Corée du Sud',
     levels: ['master', 'doctorat'],
     fields: [],
     fundingType: 'full',
     covers: { tuition: true, accommodation: false, travel: true, stipend: true },
     deadline: null,
-    applicationUrl: 'https://www.studyinkorea.go.kr/â€¦',
-    sourceUrl: 'https://www.studyinkorea.go.kr/â€¦',
-    sourceName: 'Study in Korea / GKS â€” Official',
+    applicationUrl: 'https://www.studyinkorea.go.kr/…',
+    sourceUrl: 'https://www.studyinkorea.go.kr/…',
+    sourceName: 'Study in Korea / GKS — Official',
   } as unknown as Parameters<typeof scholarshipWhatsappLink>[1]
 
   const preview = scholarshipWhatsappLink({ whatsapp_number: number, whatsapp_message: message }, previewScholarship)
@@ -392,7 +392,7 @@ function WhatsAppSettings({ token }: { token: string }) {
         <MessageSquare className="w-4 h-4 text-gold-400" /> Contact WhatsApp
       </h3>
       <p className="text-xs text-gray-400">
-        Ce numÃ©ro apparaÃ®t Ã  cÃ´tÃ© de chaque bourse. Laissez vide pour masquer le bouton.
+        Ce numéro apparaît à côté de chaque bourse. Laissez vide pour masquer le bouton.
       </p>
 
       {loading ? (
@@ -400,7 +400,7 @@ function WhatsAppSettings({ token }: { token: string }) {
       ) : (
         <>
           <div>
-            <label className="block text-xs text-gray-400 mb-1">NumÃ©ro (format international, sans + ni espaces)</label>
+            <label className="block text-xs text-gray-400 mb-1">Numéro (format international, sans + ni espaces)</label>
             <input
               value={number}
               onChange={e => setNumber(e.target.value)}
@@ -409,25 +409,25 @@ function WhatsAppSettings({ token }: { token: string }) {
             />
           </div>
           <div>
-            <label className="block text-xs text-gray-400 mb-1">Gabarit du message prÃ©-rempli</label>
+            <label className="block text-xs text-gray-400 mb-1">Gabarit du message pré-rempli</label>
             <textarea
               value={message}
               onChange={e => setMessage(e.target.value)}
-              placeholder="Laisser vide pour utiliser le gabarit par dÃ©faut du site"
+              placeholder="Laisser vide pour utiliser le gabarit par défaut du site"
               rows={5}
               className="input-premium text-sm w-full resize-y"
             />
             <p className="text-[11px] text-gray-500 mt-1">
               Variables disponibles : <code className="text-gold-400">{'{{title}} {{country}} {{provider}} {{levels}} {{fundingType}} {{deadline}} {{sourceName}} {{applicationUrl}}'}</code>.
-              Laissez vide pour le gabarit complet par dÃ©faut du site.
+              Laissez vide pour le gabarit complet par défaut du site.
             </p>
           </div>
 
           {preview && (
             <div className="text-xs text-gray-400 break-all">
-              AperÃ§u (avec une bourse d&apos;exemple) :{' '}
+              Aperçu (avec une bourse d&apos;exemple) :{' '}
               <a href={preview} target="_blank" rel="noopener noreferrer" className="text-gold-400 hover:underline">
-                {preview.slice(0, 90)}â€¦
+                {preview.slice(0, 90)}…
               </a>
             </div>
           )}
@@ -442,7 +442,7 @@ function WhatsAppSettings({ token }: { token: string }) {
   )
 }
 
-// â”€â”€ Bourses d'Ã©tudes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Bourses d'études ──────────────────────────────────────────────────────────
 interface AdminScholarship {
   id: string
   title: string
@@ -498,7 +498,7 @@ function ScholarshipsManager({ token }: { token: string }) {
     const done = await patch(editing, { image_url: image })
     setSaving(false)
     if (done) {
-      toast.success(image ? 'Visuel enregistrÃ© âœ”' : 'Visuel retirÃ©')
+      toast.success(image ? 'Visuel enregistré ✔' : 'Visuel retiré')
       setEditing(null)
     }
   }
@@ -507,13 +507,13 @@ function ScholarshipsManager({ token }: { token: string }) {
     return (
       <div className="stat-card rounded-2xl p-6 space-y-3">
         <h3 className="text-white font-semibold flex items-center gap-2">
-          <GraduationCap className="w-4 h-4 text-gold-400" /> Bourses d&apos;Ã©tudes
+          <GraduationCap className="w-4 h-4 text-gold-400" /> Bourses d&apos;études
         </h3>
         <p className="text-sm text-gray-400">
-          Le service de bourses n&apos;est pas joignable. VÃ©rifiez que le backend tourne et que
-          la base PostgreSQL contient des bourses synchronisÃ©es (voir
+          Le service de bourses n&apos;est pas joignable. Vérifiez que le backend tourne et que
+          la base PostgreSQL contient des bourses synchronisées (voir
           <code className="text-gold-400"> backend/src/scripts/sync-scholarships.js</code>).
-          La section Bourses reste masquÃ©e sur le site public.
+          La section Bourses reste masquée sur le site public.
         </p>
       </div>
     )
@@ -523,12 +523,12 @@ function ScholarshipsManager({ token }: { token: string }) {
     <div className="space-y-6">
       <div className="stat-card rounded-2xl p-4 md:p-6 space-y-2">
         <h3 className="text-white font-semibold flex items-center gap-2">
-          <GraduationCap className="w-4 h-4 text-gold-400" /> Bourses d&apos;Ã©tudes
+          <GraduationCap className="w-4 h-4 text-gold-400" /> Bourses d&apos;études
         </h3>
         <p className="text-xs text-gray-400">
-          Les bourses sont synchronisÃ©es automatiquement depuis les sources officielles. Vous ne
-          pouvez pas modifier leurs donnÃ©es ici, mais vous pouvez leur ajouter une affiche, les
-          mettre en avant ou les masquer du site â€” ces rÃ©glages sont conservÃ©s chez nous.
+          Les bourses sont synchronisées automatiquement depuis les sources officielles. Vous ne
+          pouvez pas modifier leurs données ici, mais vous pouvez leur ajouter une affiche, les
+          mettre en avant ou les masquer du site — ces réglages sont conservés chez nous.
         </p>
       </div>
 
@@ -546,7 +546,7 @@ function ScholarshipsManager({ token }: { token: string }) {
                     : <GraduationCap className="w-8 h-8 text-gold-400/30" />}
                   {custom && (
                     <span className="absolute top-2 left-2 px-2 py-0.5 rounded bg-gold-400 text-black text-[10px] font-bold">
-                      Visuel personnalisÃ©
+                      Visuel personnalisé
                     </span>
                   )}
                   {s.override?.is_featured && (
@@ -562,7 +562,7 @@ function ScholarshipsManager({ token }: { token: string }) {
                     {s.country && <span>{s.country}</span>}
                     {s.daysRemaining != null && (
                       <span className={s.daysRemaining < 0 ? 'text-[#8e8e93]' : s.daysRemaining <= 7 ? 'text-[#e9c48a]' : ''}>
-                        Â· {s.daysRemaining < 0 ? 'clÃ´turÃ©e' : `${s.daysRemaining} j`}
+                        · {s.daysRemaining < 0 ? 'clôturée' : `${s.daysRemaining} j`}
                       </span>
                     )}
                   </div>
@@ -583,7 +583,7 @@ function ScholarshipsManager({ token }: { token: string }) {
                     </button>
                     <button
                       onClick={() => patch(s, { is_hidden: !s.override?.is_hidden })}
-                      title={s.override?.is_hidden ? 'RÃ©afficher sur le site' : 'Masquer du site'}
+                      title={s.override?.is_hidden ? 'Réafficher sur le site' : 'Masquer du site'}
                       className="p-2 rounded-xl hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
                     >
                       {s.override?.is_hidden ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
@@ -612,7 +612,7 @@ function ScholarshipsManager({ token }: { token: string }) {
               onChange={setImage}
               token={token}
               label="Affiche de la bourse"
-              hint="Format paysage conseillÃ© (1200 Ã— 630), comme les affiches de Ma Bourse d'Ã‰tudes."
+              hint="Format paysage conseillé (1200 × 630), comme les affiches de Ma Bourse d'Études."
             />
             <div className="flex gap-2 justify-end pt-2">
               <button onClick={() => setEditing(null)} className="px-4 py-2.5 rounded-xl border border-white/20 text-gray-400 hover:text-white text-sm transition-colors">
@@ -630,11 +630,11 @@ function ScholarshipsManager({ token }: { token: string }) {
   )
 }
 
-// â”€â”€ Destinations Manager â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Destinations Manager ───────────────────────────────────────────────────────
 const CONTENT_LANGUAGES: { code: string; label: string }[] = [
-  { code: 'fr', label: 'FranÃ§ais' },
+  { code: 'fr', label: 'Français' },
   { code: 'en', label: 'English' },
-  { code: 'pt', label: 'PortuguÃªs' },
+  { code: 'pt', label: 'Português' },
   { code: 'de', label: 'Deutsch' },
 ]
 
@@ -649,18 +649,18 @@ const EMPTY_DESTINATION: AdminDestination = {
 }
 
 const PROFILE_LABELS: Record<string, string> = {
-  student: 'Ã‰tudiant', worker: 'Travailleur', visitor: 'Visiteur',
+  student: 'Étudiant', worker: 'Travailleur', visitor: 'Visiteur',
 }
 
 const COST_LABELS: Record<string, string> = {
-  low: 'Abordable', medium: 'ModÃ©rÃ©', high: 'Ã‰levÃ©',
+  low: 'Abordable', medium: 'Modéré', high: 'Élevé',
 }
 
 const DESTINATION_STATUS: Record<string, { label: string; className: string }> = {
   active:    { label: 'En ligne',  className: 'bg-[#635bff]/20 text-[#a5a3ff]' },
-  scheduled: { label: 'ProgrammÃ©', className: 'bg-[#635bff]/20 text-[#a5a3ff]' },
-  expired:   { label: 'ExpirÃ©',    className: 'bg-[#d8a84e]/20 text-[#e9c48a]' },
-  disabled:  { label: 'DÃ©sactivÃ©', className: 'bg-gray-500/20 text-gray-400' },
+  scheduled: { label: 'Programmé', className: 'bg-[#635bff]/20 text-[#a5a3ff]' },
+  expired:   { label: 'Expiré',    className: 'bg-[#d8a84e]/20 text-[#e9c48a]' },
+  disabled:  { label: 'Désactivé', className: 'bg-gray-500/20 text-gray-400' },
 }
 
 function DestinationsManager({ token }: { token: string }) {
@@ -689,12 +689,12 @@ function DestinationsManager({ token }: { token: string }) {
     setForm({ ...form, [k]: target.type === 'checkbox' ? target.checked : target.value })
   }
 
-  // Les champs `languages` (langues parlÃ©es du pays) restent communs Ã  toutes
-  // les langues d'interface : un Ã©lÃ©ment par ligne.
+  // Les champs `languages` (langues parlées du pays) restent communs à toutes
+  // les langues d'interface : un élément par ligne.
   const setList = (k: 'languages') => (e: React.ChangeEvent<HTMLTextAreaElement>) =>
     setForm({ ...form, [k]: e.target.value.split('\n') })
 
-  // Champs traduisibles : on ne modifie que la langue actuellement sÃ©lectionnÃ©e.
+  // Champs traduisibles : on ne modifie que la langue actuellement sélectionnée.
   const i18nText = (k: 'name_i18n' | 'tagline_i18n' | 'description_i18n') =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       setForm({ ...form, [k]: { ...(form[k] || {}), [lang]: e.target.value } })
@@ -703,7 +703,7 @@ function DestinationsManager({ token }: { token: string }) {
     (e: React.ChangeEvent<HTMLTextAreaElement>) =>
       setForm({ ...form, [k]: { ...(form[k] || {}), [lang]: e.target.value.split('\n') } })
 
-  // Une langue est Â« remplie Â» si le slogan et les programmes existent.
+  // Une langue est « remplie » si le slogan et les programmes existent.
   const isFilled = (code: string) =>
     Boolean(form.name_i18n?.[code]?.trim())
     && Boolean(form.tagline_i18n?.[code]?.trim())
@@ -724,16 +724,16 @@ function DestinationsManager({ token }: { token: string }) {
       toast.error('Le nom et le code pays sont requis'); return
     }
     if (form.available_from && form.available_until && form.available_from > form.available_until) {
-      toast.error('La date de dÃ©but doit prÃ©cÃ©der la date de fin'); return
+      toast.error('La date de début doit précéder la date de fin'); return
     }
 
     if (!(form.profiles || []).length) {
-      toast.error('SÃ©lectionnez au moins un profil'); return
+      toast.error('Sélectionnez au moins un profil'); return
     }
     const wmin = form.visa_weeks_min === '' ? null : Number(form.visa_weeks_min)
     const wmax = form.visa_weeks_max === '' ? null : Number(form.visa_weeks_max)
     if (wmin != null && wmax != null && wmin > wmax) {
-      toast.error('Le dÃ©lai de visa minimum doit Ãªtre infÃ©rieur au maximum'); return
+      toast.error('Le délai de visa minimum doit être inférieur au maximum'); return
     }
 
     // On nettoie les lignes vides de chaque langue avant l'envoi
@@ -753,7 +753,7 @@ function DestinationsManager({ token }: { token: string }) {
       highlights_i18n: cleanLists(form.highlights_i18n),
       programs_i18n: cleanLists(form.programs_i18n),
       languages: (form.languages || []).filter(Boolean),
-      // '' signifie Â« effacer la date Â» pour l'API
+      // '' signifie « effacer la date » pour l'API
       available_from: form.available_from || null,
       available_until: form.available_until || null,
       sort_order: Number(form.sort_order) || 0,
@@ -766,10 +766,10 @@ function DestinationsManager({ token }: { token: string }) {
     try {
       if (editingId) {
         await axios.patch(`${API}/admin/destinations/${editingId}`, payload, headers)
-        toast.success('Destination modifiÃ©e âœ”')
+        toast.success('Destination modifiée ✔')
       } else {
         await axios.post(`${API}/admin/destinations`, payload, headers)
-        toast.success('Destination ajoutÃ©e âœ”')
+        toast.success('Destination ajoutée ✔')
       }
       setForm(EMPTY_DESTINATION); setEditingId(null); load()
     } catch (e: any) {
@@ -805,15 +805,15 @@ function DestinationsManager({ token }: { token: string }) {
       await axios.patch(`${API}/admin/destinations/${d.id}`, { is_active: !d.is_active }, headers)
       load()
     } catch {
-      toast.error('Erreur de mise Ã  jour')
+      toast.error('Erreur de mise à jour')
     }
   }
 
   const remove = async (d: AdminDestination) => {
-    if (!window.confirm(`Supprimer dÃ©finitivement la destination Â« ${d.name} Â» ?`)) return
+    if (!window.confirm(`Supprimer définitivement la destination « ${d.name} » ?`)) return
     try {
       await axios.delete(`${API}/admin/destinations/${d.id}`, headers)
-      toast.success('Destination supprimÃ©e')
+      toast.success('Destination supprimée')
       if (editingId === d.id) cancelEdit()
       load()
     } catch {
@@ -824,10 +824,10 @@ function DestinationsManager({ token }: { token: string }) {
   const expired = items.filter(d => d.status === 'expired')
 
   const purgeExpired = async () => {
-    if (!window.confirm(`Supprimer les ${expired.length} destination(s) dont la pÃ©riode est terminÃ©e ?`)) return
+    if (!window.confirm(`Supprimer les ${expired.length} destination(s) dont la période est terminée ?`)) return
     try {
       const { data } = await axios.post(`${API}/admin/destinations/purge-expired`, {}, headers)
-      toast.success(`${data.deleted} destination(s) supprimÃ©e(s)`)
+      toast.success(`${data.deleted} destination(s) supprimée(s)`)
       load()
     } catch (e: any) {
       toast.error(e?.response?.data?.error || 'Erreur lors du nettoyage')
@@ -840,13 +840,13 @@ function DestinationsManager({ token }: { token: string }) {
       <div className="stat-card rounded-2xl p-4 md:p-6 space-y-4">
         <h3 className="text-white font-semibold flex items-center gap-2">
           <Globe2 className="w-4 h-4 text-gold-400" />
-          {editingId ? `Modifier Â« ${form.name} Â»` : 'Ajouter une destination'}
+          {editingId ? `Modifier « ${form.name} »` : 'Ajouter une destination'}
         </h3>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
           <input value={form.name} onChange={set('name')} placeholder="Nom interne * (ex. France)" className="input-premium text-sm" />
           <input value={form.country_code} onChange={e => setForm({ ...form, country_code: e.target.value.toUpperCase() })} placeholder="Code ISO * (ex. FR)" maxLength={5} className="input-premium text-sm" />
-          <input value={form.flag || ''} onChange={set('flag')} placeholder="Drapeau (rÃ©servÃ©, inutilisÃ© en UI)" className="input-premium text-sm" />
+          <input value={form.flag || ''} onChange={set('flag')} placeholder="Drapeau (réservé, inutilisé en UI)" className="input-premium text-sm" />
           <input value={form.sort_order} onChange={set('sort_order')} type="number" placeholder="Ordre d'affichage" className="input-premium text-sm" />
           <input value={form.accent_color || ''} onChange={set('accent_color')} placeholder="Couleur (#635bff)" className="input-premium text-sm" />
         </div>
@@ -856,16 +856,16 @@ function DestinationsManager({ token }: { token: string }) {
           onChange={url => setForm({ ...form, image_url: url })}
           token={token}
           label="Photo de la destination"
-          hint="Format paysage conseillÃ© (1200 Ã— 800). Sans photo, un dÃ©gradÃ© avec le drapeau s'affiche."
+          hint="Format paysage conseillé (1200 × 800). Sans photo, un dégradé avec le drapeau s'affiche."
         />
 
-        {/* â”€â”€ Contenu traduisible â”€â”€ */}
+        {/* ── Contenu traduisible ── */}
         <div className="rounded-xl border border-white/10 p-4 space-y-3">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-2 text-sm text-white font-medium">
-              <Globe2 className="w-4 h-4 text-gold-400" /> Contenu affichÃ© sur le site
+              <Globe2 className="w-4 h-4 text-gold-400" /> Contenu affiché sur le site
             </div>
-            {/* Onglets de langue â€” la pastille signale une langue incomplÃ¨te */}
+            {/* Onglets de langue — la pastille signale une langue incomplète */}
             <div className="flex gap-1 rounded-xl bg-black/25 p-1">
               {CONTENT_LANGUAGES.map(l => (
                 <button
@@ -879,7 +879,7 @@ function DestinationsManager({ token }: { token: string }) {
                   <span className="mr-1">{l.code.toUpperCase()}</span>{l.label}
                   {!isFilled(l.code) && (
                     <span
-                      title="Traduction incomplÃ¨te"
+                      title="Traduction incomplète"
                       className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#d8a84e]"
                     />
                   )}
@@ -889,8 +889,8 @@ function DestinationsManager({ token }: { token: string }) {
           </div>
 
           <p className="text-xs text-gray-400">
-            Chaque langue a son propre texte. Une langue laissÃ©e vide affiche automatiquement
-            le franÃ§ais sur le site â€” rien ne reste jamais blanc.
+            Chaque langue a son propre texte. Une langue laissée vide affiche automatiquement
+            le français sur le site — rien ne reste jamais blanc.
           </p>
 
           <div>
@@ -898,7 +898,7 @@ function DestinationsManager({ token }: { token: string }) {
             <input
               value={form.name_i18n?.[lang] || ''}
               onChange={i18nText('name_i18n')}
-              placeholder={lang === 'fr' ? 'ex. Allemagne' : 'Laisser vide pour reprendre le franÃ§ais'}
+              placeholder={lang === 'fr' ? 'ex. Allemagne' : 'Laisser vide pour reprendre le français'}
               className="input-premium text-sm w-full"
             />
           </div>
@@ -908,7 +908,7 @@ function DestinationsManager({ token }: { token: string }) {
             <input
               value={form.tagline_i18n?.[lang] || ''}
               onChange={i18nText('tagline_i18n')}
-              placeholder={lang === 'fr' ? 'ex. La destination francophone' : 'Laisser vide pour reprendre le franÃ§ais'}
+              placeholder={lang === 'fr' ? 'ex. La destination francophone' : 'Laisser vide pour reprendre le français'}
               className="input-premium text-sm w-full"
             />
           </div>
@@ -919,7 +919,7 @@ function DestinationsManager({ token }: { token: string }) {
               value={form.description_i18n?.[lang] || ''}
               onChange={i18nText('description_i18n')}
               rows={2}
-              placeholder={lang === 'fr' ? 'Description affichÃ©e sur la carteâ€¦' : 'Laisser vide pour reprendre le franÃ§ais'}
+              placeholder={lang === 'fr' ? 'Description affichée sur la carte…' : 'Laisser vide pour reprendre le français'}
               className="input-premium text-sm w-full"
             />
           </div>
@@ -931,7 +931,7 @@ function DestinationsManager({ token }: { token: string }) {
                 value={(form.highlights_i18n?.[lang] || []).join('\n')}
                 onChange={i18nList('highlights_i18n')}
                 rows={4}
-                placeholder={'CoÃ»t de la vie abordable\nVisa D7\nâ€¦'}
+                placeholder={'Coût de la vie abordable\nVisa D7\n…'}
                 className="input-premium text-sm w-full"
               />
             </div>
@@ -941,17 +941,17 @@ function DestinationsManager({ token }: { token: string }) {
                 value={(form.programs_i18n?.[lang] || []).join('\n')}
                 onChange={i18nList('programs_i18n')}
                 rows={4}
-                placeholder={'Visa Ã‰tudiant\nVisa Travail\nâ€¦'}
+                placeholder={'Visa Étudiant\nVisa Travail\n…'}
                 className="input-premium text-sm w-full"
               />
             </div>
           </div>
         </div>
 
-        {/* CritÃ¨res de filtrage du site public */}
+        {/* Critères de filtrage du site public */}
         <div className="rounded-xl border border-white/10 p-4 space-y-3">
           <div className="flex items-center gap-2 text-sm text-white font-medium">
-            <Filter className="w-4 h-4 text-gold-400" /> CritÃ¨res de recherche
+            <Filter className="w-4 h-4 text-gold-400" /> Critères de recherche
           </div>
           <p className="text-xs text-gray-400">
             Ces champs alimentent les filtres et le tri de la section Destinations sur la page d&apos;accueil.
@@ -959,35 +959,35 @@ function DestinationsManager({ token }: { token: string }) {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div>
-              <label className="block text-xs text-gray-400 mb-1">Salaire moyen (â‚¬ / an)</label>
+              <label className="block text-xs text-gray-400 mb-1">Salaire moyen (€ / an)</label>
               <input value={form.avg_salary ?? ''} onChange={set('avg_salary')} type="number" min={0} placeholder="45000" className="input-premium text-sm w-full" />
             </div>
             <div>
-              <label className="block text-xs text-gray-400 mb-1">CoÃ»t de la vie</label>
+              <label className="block text-xs text-gray-400 mb-1">Coût de la vie</label>
               <select value={form.cost_level || ''} onChange={e => setForm({ ...form, cost_level: e.target.value })} className="input-premium text-sm w-full">
-                <option value="">Non renseignÃ©</option>
+                <option value="">Non renseigné</option>
                 <option value="low">Abordable</option>
-                <option value="medium">ModÃ©rÃ©</option>
-                <option value="high">Ã‰levÃ©</option>
+                <option value="medium">Modéré</option>
+                <option value="high">Élevé</option>
               </select>
             </div>
             <div>
-              <label className="block text-xs text-gray-400 mb-1">Visa : dÃ©lai min. (semaines)</label>
+              <label className="block text-xs text-gray-400 mb-1">Visa : délai min. (semaines)</label>
               <input value={form.visa_weeks_min ?? ''} onChange={set('visa_weeks_min')} type="number" min={0} placeholder="6" className="input-premium text-sm w-full" />
             </div>
             <div>
-              <label className="block text-xs text-gray-400 mb-1">Visa : dÃ©lai max. (semaines)</label>
+              <label className="block text-xs text-gray-400 mb-1">Visa : délai max. (semaines)</label>
               <input value={form.visa_weeks_max ?? ''} onChange={set('visa_weeks_max')} type="number" min={0} placeholder="10" className="input-premium text-sm w-full" />
             </div>
           </div>
 
           <div className="grid sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs text-gray-400 mb-1">Langues parlÃ©es (une par ligne)</label>
-              <textarea value={(form.languages || []).join('\n')} onChange={setList('languages')} rows={3} placeholder={'FranÃ§ais\nAnglais'} className="input-premium text-sm w-full" />
+              <label className="block text-xs text-gray-400 mb-1">Langues parlées (une par ligne)</label>
+              <textarea value={(form.languages || []).join('\n')} onChange={setList('languages')} rows={3} placeholder={'Français\nAnglais'} className="input-premium text-sm w-full" />
             </div>
             <div>
-              <label className="block text-xs text-gray-400 mb-1">Profils acceptÃ©s</label>
+              <label className="block text-xs text-gray-400 mb-1">Profils acceptés</label>
               <div className="flex flex-col gap-2 pt-1">
                 {['student', 'worker', 'visitor'].map(profile => (
                   <label key={profile} className="flex items-center gap-2 text-sm text-gray-300">
@@ -1008,19 +1008,19 @@ function DestinationsManager({ token }: { token: string }) {
         {/* Availability period */}
         <div className="rounded-xl border border-white/10 p-4 space-y-3">
           <div className="flex items-center gap-2 text-sm text-white font-medium">
-            <Clock className="w-4 h-4 text-gold-400" /> PÃ©riode de disponibilitÃ©
+            <Clock className="w-4 h-4 text-gold-400" /> Période de disponibilité
           </div>
           <p className="text-xs text-gray-400">
-            Laissez vide pour une destination permanente. Une fois la date de fin passÃ©e, la destination
-            disparaÃ®t automatiquement du site et du formulaire â€” elle reste ici et peut Ãªtre rÃ©activÃ©e.
+            Laissez vide pour une destination permanente. Une fois la date de fin passée, la destination
+            disparaît automatiquement du site et du formulaire — elle reste ici et peut être réactivée.
           </p>
           <div className="grid sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs text-gray-400 mb-1">Ouverture (Ã  partir du)</label>
+              <label className="block text-xs text-gray-400 mb-1">Ouverture (à partir du)</label>
               <input value={form.available_from || ''} onChange={set('available_from')} type="date" className="input-premium text-sm w-full" />
             </div>
             <div>
-              <label className="block text-xs text-gray-400 mb-1">ClÃ´ture (jusqu&apos;au)</label>
+              <label className="block text-xs text-gray-400 mb-1">Clôture (jusqu&apos;au)</label>
               <input value={form.available_until || ''} onChange={set('available_until')} type="date" className="input-premium text-sm w-full" />
             </div>
           </div>
@@ -1055,10 +1055,10 @@ function DestinationsManager({ token }: { token: string }) {
         <div className="stat-card rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-[#d8a84e]/30">
           <div className="text-sm text-[#e9c48a] flex items-center gap-2">
             <Clock className="w-4 h-4" />
-            {expired.length} destination(s) ont dÃ©passÃ© leur date de clÃ´ture et ne sont plus visibles publiquement.
+            {expired.length} destination(s) ont dépassé leur date de clôture et ne sont plus visibles publiquement.
           </div>
           <button onClick={purgeExpired} className="text-sm px-4 py-2 rounded-xl bg-[#d8a84e]/20 text-[#e9c48a] hover:bg-[#d8a84e]/30 transition-colors flex items-center gap-2">
-            <Trash2 className="w-3.5 h-3.5" /> Supprimer les expirÃ©es
+            <Trash2 className="w-3.5 h-3.5" /> Supprimer les expirées
           </button>
         </div>
       )}
@@ -1071,7 +1071,7 @@ function DestinationsManager({ token }: { token: string }) {
           <div className="overflow-x-auto">
             <table className="table-premium w-full">
               <thead>
-                <tr><th>Destination</th><th>PÃ©riode</th><th>Statut</th><th>Ordre</th><th>Actions</th></tr>
+                <tr><th>Destination</th><th>Période</th><th>Statut</th><th>Ordre</th><th>Actions</th></tr>
               </thead>
               <tbody>
                 {items.map(d => {
@@ -1080,16 +1080,16 @@ function DestinationsManager({ token }: { token: string }) {
                     <tr key={d.id}>
                       <td>
                         <div className="font-medium text-white text-sm flex items-center gap-2">
-                          <span className="text-xs font-bold tracking-widest bg-white/10 rounded-md px-1.5 py-1">{d.country_code || 'â€”'}</span>
+                          <span className="text-xs font-bold tracking-widest bg-white/10 rounded-md px-1.5 py-1">{d.country_code || '—'}</span>
                           {d.name}
                           {d.is_featured && <Star className="w-3 h-3 text-gold-400" />}
                         </div>
-                        <div className="text-gray-400 text-xs">{d.country_code} Â· {d.code}</div>
+                        <div className="text-gray-400 text-xs">{d.country_code} · {d.code}</div>
                       </td>
                       <td className="text-xs text-gray-400 whitespace-nowrap">
                         {d.available_from || d.available_until ? (
                           <>
-                            {d.available_from || 'â€”'} â†’ {d.available_until || 'âˆž'}
+                            {d.available_from || '—'} → {d.available_until || '∞'}
                           </>
                         ) : (
                           <span className="text-gray-500">Permanente</span>
@@ -1103,7 +1103,7 @@ function DestinationsManager({ token }: { token: string }) {
                       <td className="text-sm text-gray-400">{d.sort_order}</td>
                       <td>
                         <div className="flex items-center gap-1">
-                          <button onClick={() => toggle(d)} title={d.is_active ? 'DÃ©sactiver' : 'Activer'} className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors">
+                          <button onClick={() => toggle(d)} title={d.is_active ? 'Désactiver' : 'Activer'} className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors">
                             {d.is_active ? <X className="w-3.5 h-3.5" /> : <Check className="w-3.5 h-3.5" />}
                           </button>
                           <button onClick={() => startEdit(d)} title="Modifier" className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors">
@@ -1127,14 +1127,14 @@ function DestinationsManager({ token }: { token: string }) {
       </div>
 
       <p className="text-xs text-gray-400">
-        Les destinations actives et dans leur pÃ©riode apparaissent automatiquement sur la page d&apos;accueil
+        Les destinations actives et dans leur période apparaissent automatiquement sur la page d&apos;accueil
         et dans le formulaire de candidature.
       </p>
     </div>
   )
 }
 
-// â”€â”€ Testimonials Manager â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Testimonials Manager ───────────────────────────────────────────────────────
 function TestimonialsManager({ token }: { token: string }) {
   const headers = { headers: { Authorization: `Bearer ${token}` } }
   const [items, setItems] = useState<Testimonial[]>([])
@@ -1148,7 +1148,7 @@ function TestimonialsManager({ token }: { token: string }) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [lang, setLang] = useState('fr')
 
-  // Champs traduisibles : on ne touche que la langue sÃ©lectionnÃ©e
+  // Champs traduisibles : on ne touche que la langue sélectionnée
   const setI18n = (k: 'textI18n' | 'roleI18n' | 'destinationI18n') =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       setForm({ ...form, [k]: { ...(form[k] || {}), [lang]: e.target.value } })
@@ -1161,7 +1161,7 @@ function TestimonialsManager({ token }: { token: string }) {
       const { data } = await axios.get(`${API}/admin/testimonials`, headers)
       setItems(data.testimonials || [])
     } catch {
-      toast.error('Erreur de chargement des tÃ©moignages')
+      toast.error('Erreur de chargement des témoignages')
     } finally {
       setLoading(false)
     }
@@ -1177,10 +1177,10 @@ function TestimonialsManager({ token }: { token: string }) {
     try {
       if (editingId) {
         await axios.patch(`${API}/admin/testimonials/${editingId}`, form, headers)
-        toast.success('TÃ©moignage modifiÃ© âœ”')
+        toast.success('Témoignage modifié ✔')
       } else {
         await axios.post(`${API}/admin/testimonials`, form, headers)
-        toast.success('TÃ©moignage ajoutÃ© âœ”')
+        toast.success('Témoignage ajouté ✔')
       }
       setForm(emptyForm); setEditingId(null); load()
     } catch {
@@ -1203,10 +1203,10 @@ function TestimonialsManager({ token }: { token: string }) {
   }
 
   const remove = async (t: Testimonial) => {
-    if (!window.confirm(`Supprimer le tÃ©moignage de ${t.name} ?`)) return
+    if (!window.confirm(`Supprimer le témoignage de ${t.name} ?`)) return
     try {
       await axios.delete(`${API}/admin/testimonials/${t.id}`, headers)
-      toast.success('TÃ©moignage supprimÃ©')
+      toast.success('Témoignage supprimé')
       if (editingId === t.id) cancelEdit()
       load()
     } catch {
@@ -1219,7 +1219,7 @@ function TestimonialsManager({ token }: { token: string }) {
       {/* Form */}
       <div className="stat-card rounded-2xl p-6 space-y-4">
         <h3 className="text-white font-semibold flex items-center gap-2">
-          <Star className="w-4 h-4 text-gold-400" /> {editingId ? 'Modifier le tÃ©moignage' : 'Ajouter un tÃ©moignage'}
+          <Star className="w-4 h-4 text-gold-400" /> {editingId ? 'Modifier le témoignage' : 'Ajouter un témoignage'}
         </h3>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
           <input value={form.name} onChange={set('name')} placeholder="Nom complet *" className="input-premium text-sm" />
@@ -1227,14 +1227,14 @@ function TestimonialsManager({ token }: { token: string }) {
           <input value={form.rating} onChange={set('rating')} placeholder="Note (1-5)" type="number" min={1} max={5} className="input-premium text-sm" />
           <input value={form.sortOrder} onChange={set('sortOrder')} placeholder="Ordre" type="number" className="input-premium text-sm" />
           <input value={form.photoUrl} onChange={set('photoUrl')} placeholder="URL photo (avatar)" className="input-premium text-sm" />
-          <input value={form.videoUrl} onChange={set('videoUrl')} placeholder="URL vidÃ©o (YouTube/Vimeo)" className="input-premium text-sm" />
+          <input value={form.videoUrl} onChange={set('videoUrl')} placeholder="URL vidéo (YouTube/Vimeo)" className="input-premium text-sm" />
         </div>
 
-        {/* â”€â”€ Contenu traduisible â”€â”€ */}
+        {/* ── Contenu traduisible ── */}
         <div className="rounded-xl border border-white/10 p-4 space-y-3">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-2 text-sm text-white font-medium">
-              <Globe2 className="w-4 h-4 text-gold-400" /> Texte affichÃ© sur le site
+              <Globe2 className="w-4 h-4 text-gold-400" /> Texte affiché sur le site
             </div>
             <div className="flex gap-1 rounded-xl bg-black/25 p-1">
               {CONTENT_LANGUAGES.map(l => (
@@ -1249,7 +1249,7 @@ function TestimonialsManager({ token }: { token: string }) {
                   <span className="mr-1">{l.code.toUpperCase()}</span>{l.label}
                   {!isFilled(l.code) && (
                     <span
-                      title="Traduction incomplÃ¨te"
+                      title="Traduction incomplète"
                       className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#d8a84e]"
                     />
                   )}
@@ -1259,21 +1259,21 @@ function TestimonialsManager({ token }: { token: string }) {
           </div>
 
           <p className="text-xs text-gray-400">
-            Le nom et le pays d&apos;origine sont communs Ã  toutes les langues. Une langue laissÃ©e
-            vide reprend automatiquement le franÃ§ais.
+            Le nom et le pays d&apos;origine sont communs à toutes les langues. Une langue laissée
+            vide reprend automatiquement le français.
           </p>
 
           <div className="grid sm:grid-cols-2 gap-3">
             <input
               value={form.roleI18n?.[lang] || ''}
               onChange={setI18n('roleI18n')}
-              placeholder={lang === 'fr' ? 'MÃ©tier (ex. InfirmiÃ¨re)' : 'Laisser vide pour reprendre le franÃ§ais'}
+              placeholder={lang === 'fr' ? 'Métier (ex. Infirmière)' : 'Laisser vide pour reprendre le français'}
               className="input-premium text-sm"
             />
             <input
               value={form.destinationI18n?.[lang] || ''}
               onChange={setI18n('destinationI18n')}
-              placeholder={lang === 'fr' ? 'Ville (ex. Berlin)' : 'Laisser vide pour reprendre le franÃ§ais'}
+              placeholder={lang === 'fr' ? 'Ville (ex. Berlin)' : 'Laisser vide pour reprendre le français'}
               className="input-premium text-sm"
             />
           </div>
@@ -1282,7 +1282,7 @@ function TestimonialsManager({ token }: { token: string }) {
             value={form.textI18n?.[lang] || ''}
             onChange={setI18n('textI18n')}
             rows={3}
-            placeholder={lang === 'fr' ? 'Texte du tÃ©moignageâ€¦' : 'Laisser vide pour reprendre le franÃ§ais'}
+            placeholder={lang === 'fr' ? 'Texte du témoignage…' : 'Laisser vide pour reprendre le français'}
             className="input-premium text-sm w-full"
           />
         </div>
@@ -1312,7 +1312,7 @@ function TestimonialsManager({ token }: { token: string }) {
           <div className="overflow-x-auto">
             <table className="table-premium w-full">
               <thead>
-                <tr><th>Nom</th><th>Destination</th><th>Note</th><th>MÃ©dia</th><th>Actif</th><th>Actions</th></tr>
+                <tr><th>Nom</th><th>Destination</th><th>Note</th><th>Média</th><th>Actif</th><th>Actions</th></tr>
               </thead>
               <tbody>
                 {items.map(t => (
@@ -1325,31 +1325,31 @@ function TestimonialsManager({ token }: { token: string }) {
                         {t.name}
                       </div>
                        <div className="text-gray-400 text-xs flex items-center gap-2 flex-wrap">
-                        <span>{t.roleI18n?.fr || 'â€”'}</span>
+                        <span>{t.roleI18n?.fr || '—'}</span>
                         {(t.missingTranslations || []).length > 0 && (
                           <span
-                            title={`Traduction incomplÃ¨te : ${(t.missingTranslations || []).join(', ').toUpperCase()}`}
+                            title={`Traduction incomplète : ${(t.missingTranslations || []).join(', ').toUpperCase()}`}
                             className="px-1.5 py-0.5 rounded bg-[#d8a84e]/20 text-[#e9c48a] text-[10px] font-semibold"
                           >
-                            {(t.missingTranslations || []).map(c => c.toUpperCase()).join(' ')} Ã  traduire
+                            {(t.missingTranslations || []).map(c => c.toUpperCase()).join(' ')} à traduire
                           </span>
                         )}
                       </div>
                     </td>
-                    <td className="text-sm text-gray-400">{t.destinationI18n?.fr || 'â€”'}</td>
-                    <td className="text-sm text-gold-400">{'â˜…'.repeat(t.rating || 0)}</td>
+                    <td className="text-sm text-gray-400">{t.destinationI18n?.fr || '—'}</td>
+                    <td className="text-sm text-gold-400">{'★'.repeat(t.rating || 0)}</td>
                     <td className="text-sm">
-                         {t.videoUrl ? <span className="flex items-center gap-1 text-[#a5a3ff]"><Video className="w-3.5 h-3.5" /> VidÃ©o</span> : <span className="text-gray-400">â€”</span>}
+                         {t.videoUrl ? <span className="flex items-center gap-1 text-[#a5a3ff]"><Video className="w-3.5 h-3.5" /> Vidéo</span> : <span className="text-gray-400">—</span>}
                     </td>
                     <td>
                       <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${t.isActive ? 'bg-[#635bff]/20 text-[#a5a3ff]' : 'bg-gray-500/20 text-gray-400'}`}>
-                        {t.isActive ? 'ActivÃ©' : 'DÃ©sactivÃ©'}
+                        {t.isActive ? 'Activé' : 'Désactivé'}
                       </span>
                     </td>
                     <td>
                       <div className="flex items-center gap-1">
                         {t.videoUrl && (
-                          <a href={t.videoUrl} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors" title="Voir la vidÃ©o">
+                          <a href={t.videoUrl} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors" title="Voir la vidéo">
                             <ExternalLink className="w-3.5 h-3.5" />
                           </a>
                         )}
@@ -1364,7 +1364,7 @@ function TestimonialsManager({ token }: { token: string }) {
                   </tr>
                 ))}
                  {items.length === 0 && (
-                  <tr><td colSpan={6} className="text-center text-gray-400 py-6">Aucun tÃ©moignage</td></tr>
+                  <tr><td colSpan={6} className="text-center text-gray-400 py-6">Aucun témoignage</td></tr>
                 )}
               </tbody>
             </table>
@@ -1375,7 +1375,7 @@ function TestimonialsManager({ token }: { token: string }) {
   )
 }
 
-// â”€â”€ Dashboard Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Dashboard Page ─────────────────────────────────────────────────────────────
 function Dashboard({ token }: { token: string }) {
   const [activeTab, setActiveTab] = useState('dashboard')
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -1416,7 +1416,7 @@ function Dashboard({ token }: { token: string }) {
         const fresh = apps.filter(a => !knownIds.current.has(a.id))
         if (fresh.length > 0) {
           setNewApps(n => n + fresh.length)
-          toast.success(`ðŸ“© ${fresh.length} nouvelle(s) candidature(s) â€” ${fresh[0].fullName}`)
+          toast.success(`📩 ${fresh.length} nouvelle(s) candidature(s) — ${fresh[0].fullName}`)
         }
       }
       apps.forEach(a => knownIds.current.add(a.id))
@@ -1468,9 +1468,9 @@ function Dashboard({ token }: { token: string }) {
     { id: 'applications', icon: FileText, label: 'Candidatures' },
     { id: 'destinations', icon: Globe2, label: 'Destinations' },
     { id: 'scholarships', icon: GraduationCap, label: 'Bourses' },
-    { id: 'testimonials', icon: Star, label: 'TÃ©moignages' },
+    { id: 'testimonials', icon: Star, label: 'Témoignages' },
     { id: 'users', icon: Users, label: 'Utilisateurs' },
-    { id: 'settings', icon: Settings, label: 'RÃ©glages' },
+    { id: 'settings', icon: Settings, label: 'Réglages' },
   ]
 
   const COLORS = ['#635bff', '#8b5cf6', '#a5a3ff', '#d8a84e']
@@ -1561,7 +1561,7 @@ function Dashboard({ token }: { token: string }) {
             </div>
           )}
 
-          {/* â”€â”€ DASHBOARD TAB â”€â”€ */}
+          {/* ── DASHBOARD TAB ── */}
           {!loading && activeTab === 'dashboard' && stats && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
               {/* Stat Cards */}
@@ -1618,7 +1618,7 @@ function Dashboard({ token }: { token: string }) {
 
                {/* Recent Applications */}
                <div className="stat-card rounded-2xl p-4 md:p-6">
-                <h3 className="text-white font-semibold mb-4">Candidatures rÃ©centes</h3>
+                <h3 className="text-white font-semibold mb-4">Candidatures récentes</h3>
                 <div className="overflow-x-auto">
                   <table className="table-premium">
                     <thead>
@@ -1643,7 +1643,7 @@ function Dashboard({ token }: { token: string }) {
             </motion.div>
           )}
 
-          {/* â”€â”€ APPLICATIONS TAB â”€â”€ */}
+          {/* ── APPLICATIONS TAB ── */}
           {!loading && activeTab === 'applications' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
               {/* Filters */}
@@ -1653,7 +1653,7 @@ function Dashboard({ token }: { token: string }) {
                   <input
                     value={search}
                     onChange={e => { setSearch(e.target.value); setPage(1) }}
-                    placeholder="Rechercher par nom ou emailâ€¦"
+                    placeholder="Rechercher par nom ou email…"
                     className="input-premium pl-9 text-sm"
                   />
                 </div>
@@ -1662,12 +1662,12 @@ function Dashboard({ token }: { token: string }) {
                     <option value="all">Tous les statuts</option>
                     <option value="pending">En attente</option>
                     <option value="reviewing">En cours d'examen</option>
-                    <option value="approved">ApprouvÃ©</option>
-                    <option value="rejected">RefusÃ©</option>
+                    <option value="approved">Approuvé</option>
+                    <option value="rejected">Refusé</option>
                   </select>
                   <select value={profileFilter} onChange={e => setProfileFilter(e.target.value)} className="input-premium w-auto text-sm bg-dark-200">
                     <option value="all">Tous les profils</option>
-                    <option value="student">Ã‰tudiant</option>
+                    <option value="student">Étudiant</option>
                     <option value="worker">Travailleur</option>
                     <option value="visitor">Visiteur</option>
                   </select>
@@ -1694,7 +1694,7 @@ function Dashboard({ token }: { token: string }) {
                              <div className="text-gray-400 text-xs">{a.email}</div>
                           </td>
                           <td><span className="capitalize text-sm">{a.profile}</span></td>
-                          <td className="text-sm text-gray-400">{a.field || a.profession || 'â€”'}</td>
+                          <td className="text-sm text-gray-400">{a.field || a.profession || '—'}</td>
                           <td className="text-sm capitalize">{a.destination}</td>
                           <td className="text-sm text-gray-400">{formatBudget(a)}</td>
                           <td><StatusBadge status={a.status} /></td>
@@ -1737,34 +1737,34 @@ function Dashboard({ token }: { token: string }) {
             </motion.div>
           )}
 
-          {/* â”€â”€ DESTINATIONS TAB â”€â”€ */}
+          {/* ── DESTINATIONS TAB ── */}
           {!loading && activeTab === 'destinations' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <DestinationsManager token={token} />
             </motion.div>
           )}
 
-          {/* â”€â”€ BOURSES TAB â”€â”€ */}
+          {/* ── BOURSES TAB ── */}
           {!loading && activeTab === 'scholarships' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <ScholarshipsManager token={token} />
             </motion.div>
           )}
 
-          {/* â”€â”€ TESTIMONIALS TAB â”€â”€ */}
+          {/* ── TESTIMONIALS TAB ── */}
           {!loading && activeTab === 'testimonials' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <TestimonialsManager token={token} />
             </motion.div>
           )}
 
-          {/* â”€â”€ SETTINGS TAB â”€â”€ */}
+          {/* ── SETTINGS TAB ── */}
           {!loading && activeTab === 'settings' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
               <WhatsAppSettings token={token} />
               <CurrencyManager token={token} />
               <div className="stat-card rounded-2xl p-4 md:p-6 space-y-4 max-w-2xl">
-                <h3 className="text-white font-semibold">RÃ©glages administrateur</h3>
+                <h3 className="text-white font-semibold">Réglages administrateur</h3>
                 <div className="space-y-3">
                   <div>
                     <label className="block text-sm text-gray-400 mb-1">Telegram Bot Token</label>
@@ -1778,7 +1778,7 @@ function Dashboard({ token }: { token: string }) {
                     <label className="block text-sm text-gray-400 mb-1">Email de notification</label>
                     <input className="input-premium text-sm" placeholder="admin@visioneuropeafrica.com" />
                   </div>
-                  <button className="btn-gold text-sm px-6 py-2.5">Enregistrer les rÃ©glages</button>
+                  <button className="btn-gold text-sm px-6 py-2.5">Enregistrer les réglages</button>
                 </div>
               </div>
             </motion.div>
@@ -1835,10 +1835,10 @@ function Dashboard({ token }: { token: string }) {
   )
 }
 
-// â”€â”€ Mock Data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Mock Data ─────────────────────────────────────────────────────────────────
 const MOCK_APPLICATIONS: Application[] = Array.from({ length: 25 }, (_, i) => ({
   id: String(i + 1),
-  fullName: ['Jean Kabila','Marie Nkosi','Amara Diallo','Fatou Sow','Christian Mbeki','Adaeze Okafor','Samuel Bongo','Aminata KonÃ©','Pierre Lukoki','Grace Mwamba'][i % 10],
+  fullName: ['Jean Kabila','Marie Nkosi','Amara Diallo','Fatou Sow','Christian Mbeki','Adaeze Okafor','Samuel Bongo','Aminata Koné','Pierre Lukoki','Grace Mwamba'][i % 10],
   email: `user${i + 1}@example.com`,
   phone: `+243${String(i + 1).padStart(9, '0')}`,
   whatsapp: `+243${String(i + 1).padStart(9, '0')}`,
@@ -1876,7 +1876,7 @@ const MOCK_STATS: Stats = {
   ],
 }
 
-// â”€â”€ Admin Root â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Admin Root ─────────────────────────────────────────────────────────────────
 export default function AdminPage() {
   const [token, setToken] = useState<string | null>(null)
 
