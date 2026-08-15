@@ -22,7 +22,24 @@ import { scholarshipWhatsappLink } from '@/hooks/useScholarships'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
 
+// Fichiers uploadés : servis sur /uploads/{profile}/{filename} (pas sous /api).
+const uploadsUrl = (app: Application, doc: ApplicationDocument) =>
+  `${API.replace(/\/api\/?$/, '')}/uploads/${app.profile}/${doc.filename}`
+
+const formatFileSize = (bytes: number) => {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} Ko`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`
+}
+
 // ── Types ─────────────────────────────────────────────────────────────────────
+interface ApplicationDocument {
+  filename: string
+  originalname: string
+  size: number
+  mimetype: string
+}
+
 interface Application {
   id: string
   fullName: string
@@ -37,6 +54,7 @@ interface Application {
   currency?: string
   status: 'pending' | 'reviewing' | 'approved' | 'rejected'
   createdAt: string
+  documents?: ApplicationDocument[]
 }
 
 const CURRENCY_SYMBOLS: Record<string, string> = {
@@ -1824,6 +1842,35 @@ function Dashboard({ token }: { token: string }) {
                 </div>
               ))}
             </div>
+            {selectedApp.documents && selectedApp.documents.length > 0 ? (
+              <div className="mt-5">
+                <h4 className="text-xs text-gray-400 mb-2 flex items-center gap-2">
+                  <FileText className="w-3.5 h-3.5" /> Documents ({selectedApp.documents.length})
+                </h4>
+                <div className="space-y-2">
+                  {selectedApp.documents.map((d, i) => (
+                    <a
+                      key={i}
+                      href={uploadsUrl(selectedApp, d)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 hover:border-[#d8a84e]/40 hover:bg-white/10 transition-all"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-[#635bff]/20 flex items-center justify-center flex-shrink-0">
+                        <FileText className="w-4 h-4 text-[#a5a3ff]" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-white text-sm font-medium truncate">{d.originalname}</div>
+                        <div className="text-gray-400 text-xs">{formatFileSize(d.size)} · {d.mimetype}</div>
+                      </div>
+                      <Download className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <p className="text-xs text-gray-500 mt-5">Aucun document joint</p>
+            )}
             <div className="flex gap-3 mt-6">
               <button onClick={() => { updateStatus(selectedApp.id, 'approved'); setSelectedApp(null) }} className="flex-1 btn-primary py-2.5 text-sm justify-center">
                 <CheckCircle className="w-4 h-4" /> Approve

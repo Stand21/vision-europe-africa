@@ -338,6 +338,7 @@ const fr = {
       drag: 'Glissez-déposez vos fichiers ici, ou cliquez pour sélectionner',
       hint: 'PDF, JPG, PNG — 10 Mo maximum',
       remove: 'Retirer',
+      too_many: 'Maximum 5 fichiers par candidature',
     },
     signature: {
       label: 'Signature',
@@ -759,6 +760,7 @@ const en: Translation = {
       drag: 'Drag and drop your files here, or click to browse',
       hint: 'PDF, JPG, PNG — 10 MB maximum',
       remove: 'Remove',
+      too_many: 'Maximum 5 files per application',
     },
     signature: {
       label: 'Signature',
@@ -1177,6 +1179,7 @@ const pt: Translation = {
       drag: 'Arraste os ficheiros para aqui, ou clique para selecionar',
       hint: 'PDF, JPG, PNG — máximo 10 MB',
       remove: 'Remover',
+      too_many: 'Máximo de 5 ficheiros por candidatura',
     },
     signature: {
       label: 'Assinatura',
@@ -1595,6 +1598,7 @@ const de: Translation = {
       drag: 'Dateien hierher ziehen oder zum Auswählen klicken',
       hint: 'PDF, JPG, PNG — maximal 10 MB',
       remove: 'Entfernen',
+      too_many: 'Maximal 5 Dateien pro Bewerbung',
     },
     signature: {
       label: 'Unterschrift',

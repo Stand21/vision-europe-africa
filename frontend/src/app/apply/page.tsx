@@ -88,11 +88,19 @@ const VISITOR_CATEGORIES = [
 ]
 
 // ── File Uploader ─────────────────────────────────────────────────────────────
+const MAX_DOCUMENTS = 5
+
 function FileUploader({ label, files, onChange }: { label: string; files: File[]; onChange: (f: File[]) => void }) {
   const { t } = useTranslation()
   const onDrop = useCallback((accepted: File[]) => {
-    onChange([...files, ...accepted])
-  }, [files, onChange])
+    const remaining = Math.max(0, MAX_DOCUMENTS - files.length)
+    if (remaining === 0) {
+      toast.error(t('form.upload.too_many'))
+      return
+    }
+    onChange([...files, ...accepted.slice(0, remaining)])
+    if (accepted.length > remaining) toast.error(t('form.upload.too_many'))
+  }, [files, onChange, t])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
