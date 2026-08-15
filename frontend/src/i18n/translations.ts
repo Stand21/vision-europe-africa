@@ -363,6 +363,8 @@ const fr = {
     required: 'Ce champ est obligatoire',
     back: 'Retour',
     next: 'Continuer',
+    show_more: 'Voir plus ({count})',
+    show_less: 'Voir moins',
     study_fields: {
       cs: 'Informatique',
       cyber: 'Cybersécurité',
@@ -782,6 +784,8 @@ const en: Translation = {
     required: 'This field is required',
     back: 'Back',
     next: 'Continue',
+    show_more: 'Show more ({count})',
+    show_less: 'Show less',
     study_fields: {
       cs: 'Computer Science',
       cyber: 'Cybersecurity',
@@ -1198,6 +1202,8 @@ const pt: Translation = {
     required: 'Este campo é obrigatório',
     back: 'Voltar',
     next: 'Continuar',
+    show_more: 'Ver mais ({count})',
+    show_less: 'Ver menos',
     study_fields: {
       cs: 'Informática',
       cyber: 'Cibersegurança',
@@ -1614,6 +1620,8 @@ const de: Translation = {
     required: 'Dieses Feld ist erforderlich',
     back: 'Zurück',
     next: 'Weiter',
+    show_more: 'Mehr anzeigen ({count})',
+    show_less: 'Weniger anzeigen',
     study_fields: {
       cs: 'Informatik',
       cyber: 'Cybersicherheit',

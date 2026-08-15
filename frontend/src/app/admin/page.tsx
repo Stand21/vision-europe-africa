@@ -379,12 +379,16 @@ function WhatsAppSettings({ token }: { token: string }) {
     fundingType: 'full',
     covers: { tuition: true, accommodation: false, travel: true, stipend: true },
     deadline: null,
-    applicationUrl: 'https://www.studyinkorea.go.kr/…',
-    sourceUrl: 'https://www.studyinkorea.go.kr/…',
+    applicationUrl: 'https://www.studyinkorea.go.kr/admission',
+    sourceUrl: 'https://www.studyinkorea.go.kr/admission',
     sourceName: 'Study in Korea / GKS — Official',
   } as unknown as Parameters<typeof scholarshipWhatsappLink>[1]
 
   const preview = scholarshipWhatsappLink({ whatsapp_number: number, whatsapp_message: message }, previewScholarship)
+  const previewText = preview
+    ? decodeURIComponent(new URL(preview).searchParams.get('text') || '')
+    : ''
+  const displayPreview = previewText.length > 160 ? `${previewText.slice(0, 160)}…` : previewText
 
   return (
     <div className="stat-card rounded-2xl p-4 md:p-6 space-y-4">
@@ -426,8 +430,8 @@ function WhatsAppSettings({ token }: { token: string }) {
           {preview && (
             <div className="text-xs text-gray-400 break-all">
               Aperçu (avec une bourse d&apos;exemple) :{' '}
-              <a href={preview} target="_blank" rel="noopener noreferrer" className="text-gold-400 hover:underline">
-                {preview.slice(0, 90)}…
+              <a href={preview} target="_blank" rel="noopener noreferrer" className="text-gold-400 hover:underline whitespace-pre-wrap">
+                {displayPreview}
               </a>
             </div>
           )}

@@ -290,33 +290,51 @@ function BudgetField({ label, register, name, placeholder, required, currencies,
 }
 
 // ── Selection grid (study fields / professions / categories) ──────────────────
-function SelectCards({ items, value, onChange }: {
+function SelectCards({ items, value, onChange, collapsible = false, visible = 4 }: {
   items: { id: string; name: string; icon: React.ElementType; sub?: string }[]
   value: string
   onChange: (id: string) => void
+  collapsible?: boolean
+  visible?: number
 }) {
+  const { t } = useTranslation()
+  const [expanded, setExpanded] = useState(false)
+  const shown = collapsible && !expanded ? items.slice(0, visible) : items
+  const hiddenCount = items.length - visible
+
   return (
-    <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
-      {items.map(item => (
+    <div>
+      <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
+        {shown.map(item => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => onChange(value === item.id ? '' : item.id)}
+            className={`card p-4 text-left transition-all ${
+              value === item.id ? 'border-[#635bff] ring-2 ring-[#635bff]/30' : 'hover:border-[#635bff]'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${value === item.id ? 'bg-[#635bff] text-white' : 'bg-[#f6f9fc] dark:bg-[#2c2c2e] text-[#635bff]'}`}>
+                {React.createElement(item.icon, { className: 'w-4 h-4' })}
+              </div>
+              <div>
+                <div className="font-medium text-sm text-[#0a2540] dark:text-white">{item.name}</div>
+                {item.sub && <div className="text-xs text-[#697386] dark:text-[#8e8e93]">{item.sub}</div>}
+              </div>
+            </div>
+          </button>
+        ))}
+      </div>
+      {collapsible && hiddenCount > 0 && (
         <button
-          key={item.id}
           type="button"
-          onClick={() => onChange(value === item.id ? '' : item.id)}
-          className={`card p-4 text-left transition-all ${
-            value === item.id ? 'border-[#635bff] ring-2 ring-[#635bff]/30' : 'hover:border-[#635bff]'
-          }`}
+          onClick={() => setExpanded(e => !e)}
+          className="mt-3 w-full py-2.5 rounded-xl border border-dashed border-[#cbd5e1] dark:border-[#38383a] text-sm font-medium text-[#635bff] hover:bg-[#f6f9fc] dark:hover:bg-[#2c2c2e] transition-all"
         >
-          <div className="flex items-center gap-3">
-            <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${value === item.id ? 'bg-[#635bff] text-white' : 'bg-[#f6f9fc] dark:bg-[#2c2c2e] text-[#635bff]'}`}>
-              {React.createElement(item.icon, { className: 'w-4 h-4' })}
-            </div>
-            <div>
-              <div className="font-medium text-sm text-[#0a2540] dark:text-white">{item.name}</div>
-              {item.sub && <div className="text-xs text-[#697386] dark:text-[#8e8e93]">{item.sub}</div>}
-            </div>
-          </div>
+          {expanded ? t('form.show_less') : t('form.show_more', { count: hiddenCount })}
         </button>
-      ))}
+      )}
     </div>
   )
 }
@@ -527,6 +545,7 @@ function ApplyContent() {
                   items={PROFESSIONS.map(p => ({ ...p, name: t(`form.professions.${p.id}`), sub: professionSummary(p) }))}
                   value={selectedJob}
                   onChange={setSelectedJob}
+                  collapsible
                 />
               )}
               {profile === 'visitor' && (
