@@ -2,9 +2,8 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, ChevronDown, Moon, Sun, Coins } from 'lucide-react'
+import { Menu, X, ChevronDown, Coins } from 'lucide-react'
 import { useTranslation } from '@/hooks/useTranslation'
-import { useTheme } from '@/hooks/useTheme'
 import { useCurrency } from '@/i18n/CurrencyProvider'
 import type { Language } from '@/i18n/translations'
 
@@ -17,7 +16,6 @@ const LANGUAGES: { code: Language; label: string }[] = [
 
 export default function Navbar() {
   const { t, language, changeLanguage } = useTranslation()
-  const { darkMode, mounted, toggleTheme } = useTheme()
   const { currency, setCurrency, availableCurrencies, autoDetected } = useCurrency()
   const [currencyOpen, setCurrencyOpen] = useState(false)
   const [scrolled,    setScrolled]    = useState(false)
@@ -143,15 +141,6 @@ export default function Navbar() {
 
         {/* Right */}
         <div className="flex items-center gap-2">
-
-          {/* Dark mode toggle */}
-          <button
-            onClick={toggleTheme}
-            className="p-2 rounded-lg text-[#425466] dark:text-[#ebebf5] hover:text-[#0a2540] dark:hover:text-white transition-all"
-            aria-label={mounted && darkMode ? t('common.theme_light') : t('common.theme_dark')}
-          >
-            {mounted && darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
 
           {/* Currency switcher */}
           <div className="relative">
@@ -286,14 +275,6 @@ export default function Navbar() {
                   {active === id && <span className="w-1.5 h-1.5 rounded-full bg-[#635bff]" />}
                 </Link>
               ))}
-              <button
-                onClick={toggleTheme}
-                className="px-4 py-3 text-sm rounded-lg flex items-center justify-between text-[#425466] dark:text-[#ebebf5] hover:bg-[#f6f9fc] dark:hover:bg-[#2c2c2e] transition-all"
-              >
-                {mounted && darkMode ? t('common.theme_light') : t('common.theme_dark')}
-                {mounted && darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-              </button>
-
               <Link
                 href="/apply"
                 onClick={() => setMobileOpen(false)}

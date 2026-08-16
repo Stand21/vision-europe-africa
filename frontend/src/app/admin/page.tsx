@@ -1683,7 +1683,7 @@ function Dashboard({ token }: { token: string }) {
                   <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="input-premium w-auto text-sm bg-dark-200">
                     <option value="all">Tous les statuts</option>
                     <option value="pending">En attente</option>
-                    <option value="reviewing">En cours d'examen</option>
+                    <option value="reviewing">En cours d&apos;examen</option>
                     <option value="approved">Approuvé</option>
                     <option value="rejected">Refusé</option>
                   </select>

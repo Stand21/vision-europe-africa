@@ -32,8 +32,15 @@ export function ImageField({
   const [uploading, setUploading] = useState(false)
   const [broken, setBroken] = useState(false)
 
+  const IMAGE_TYPES = [
+    'image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif',
+    'image/svg+xml', 'image/avif', 'image/bmp', 'image/x-icon',
+    'image/vnd.microsoft.icon', 'image/tiff',
+  ]
+
   const upload = async (file: File) => {
-    if (!file.type.startsWith('image/')) {
+    const isImage = file.type.startsWith('image/') || IMAGE_TYPES.includes(file.type)
+    if (!isImage) {
       toast.error('Seules les images sont acceptées')
       return
     }
@@ -95,7 +102,7 @@ export function ImageField({
       <input
         ref={inputRef}
         type="file"
-        accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
+        accept="image/*,.avif,.bmp,.ico,.tif,.tiff"
         className="hidden"
         onChange={e => { const f = e.target.files?.[0]; if (f) upload(f) }}
       />

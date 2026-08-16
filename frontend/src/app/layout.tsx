@@ -33,13 +33,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         />
-        <script
-          dangerouslySetInnerHTML={{
-            // Applique le thème avant le premier rendu : évite tout flash au chargement.
-            // `color-scheme` aligne aussi les contrôles natifs (listes, ascenseurs).
-            __html: `try{var d=document.documentElement,c=('; '+document.cookie).match(/; vea_dark=([^;]*)/),k=c?c[1]==='1':window.matchMedia('(prefers-color-scheme: dark)').matches;d.classList.toggle('dark',k);d.style.colorScheme=k?'dark':'light'}catch(e){}`,
-          }}
-        />
       </head>
       <body className="antialiased">
         <LocaleProviders>{children}</LocaleProviders>

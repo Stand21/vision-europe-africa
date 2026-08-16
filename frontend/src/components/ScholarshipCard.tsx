@@ -1,4 +1,5 @@
 'use client'
+import { useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { GraduationCap, Clock, MapPin, MessageCircle, Info, HelpCircle } from 'lucide-react'
@@ -28,6 +29,7 @@ export function ScholarshipCard({
   index?: number
 }) {
   const { t } = useTranslation()
+  const [imgError, setImgError] = useState(false)
   const wa = scholarshipWhatsappLink(settings, s)
 
   const countdown =
@@ -47,12 +49,13 @@ export function ScholarshipCard({
       className="rounded-2xl overflow-hidden bg-white dark:bg-[#1c1c1e] border border-[#e3e8ee] dark:border-[#38383a] shadow-sm hover:shadow-md hover:border-[#635bff]/20 transition-all flex flex-col"
     >
       <Link href={`/bourses/${s.id}`} className="relative h-48 block bg-[#f6f9fc] dark:bg-[#2c2c2e] overflow-hidden group">
-        {s.imageUrl
+        {s.imageUrl && !imgError
           ? (
             <img
               src={s.imageUrl}
               alt=""
               loading="lazy"
+              onError={() => setImgError(true)}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           )

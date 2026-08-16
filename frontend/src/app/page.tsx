@@ -394,6 +394,7 @@ function DestinationsSection() {
   const [sort, setSort] = useState('default')
   const [openCode, setOpenCode] = useState<string | null>(null)
   const [showFilters, setShowFilters] = useState(false)
+  const [brokenImages, setBrokenImages] = useState<Record<string, boolean>>({})
 
   const languageOptions = Array.from(
     new Set(destinations.flatMap(d => d.languages || []))
@@ -565,11 +566,12 @@ function DestinationsSection() {
                   transition={{ duration: 0.4, delay: Math.min(i, 5) * 0.05 }}
                   className="group relative rounded-2xl overflow-hidden min-h-[280px] md:min-h-[400px] shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col bg-white dark:bg-[#111827]"
                 >
-                  {dest.image_url ? (
+                  {dest.image_url && !brokenImages[dest.code] ? (
                     <img
                       src={dest.image_url}
                       alt={dest.name}
                       loading="lazy"
+                      onError={() => setBrokenImages(prev => ({ ...prev, [dest.code]: true }))}
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                     />
                   ) : (

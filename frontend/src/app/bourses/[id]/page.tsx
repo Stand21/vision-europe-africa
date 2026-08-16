@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   GraduationCap, Clock, MapPin, MessageCircle, ExternalLink, ArrowLeft,
@@ -33,6 +34,7 @@ export default function ScholarshipDetailPage() {
   const { language } = useLanguage()
   const { scholarship: s, loading, notFound } = useScholarship(id)
   const settings = usePublicSettings()
+  const [imgError, setImgError] = useState(false)
 
   const locale = LOCALES[language] || 'fr-FR'
 
@@ -94,8 +96,8 @@ export default function ScholarshipDetailPage() {
           ) : (
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
               <div className="relative h-64 sm:h-80 rounded-3xl overflow-hidden bg-[#f6f9fc] dark:bg-[#2c2c2e] mb-6">
-                {s.imageUrl
-                  ? <img src={s.imageUrl} alt="" className="w-full h-full object-cover" />
+                {s.imageUrl && !imgError
+                  ? <img src={s.imageUrl} alt="" onError={() => setImgError(true)} className="w-full h-full object-cover" />
                   : <GraduationCap className="w-16 h-16 text-[#635bff]/30 absolute inset-0 m-auto" />}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/0 to-black/10" />
                 {s.fundingType && FUNDING_LABEL_KEY[s.fundingType] && (
