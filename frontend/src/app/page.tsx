@@ -1185,7 +1185,7 @@ function CTASection() {
 function WhatsAppFloat() {
   return (
     <motion.a
-      href="https://wa.me/17788192065"
+      href="https://wa.me/447520603847"
       target="_blank"
       rel="noopener noreferrer"
       aria-label="WhatsApp"
