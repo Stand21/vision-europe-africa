@@ -8,11 +8,13 @@ import {
   ArrowRight, ArrowUpRight, Star, CheckCircle, Clock, Shield,
   ChevronDown, GraduationCap, Briefcase, Plane, MapPin, Users,
   Award, Globe, Send, PlaneTakeoff, Play, X, Quote, BadgeCheck, BookOpen, Search,
-  SlidersHorizontal, MessageCircle
+  SlidersHorizontal, MessageCircle, ShieldCheck
 } from 'lucide-react'
 import axios from 'axios'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
+import BottomSheetModal from '@/components/BottomSheetModal'
+import HighlightsSlider from '@/components/HighlightsSlider'
 import { useTranslation } from '@/hooks/useTranslation'
 import { useDestinations, type Destination } from '@/hooks/useDestinations'
 import { useCurrency } from '@/i18n/CurrencyProvider'
@@ -59,7 +61,7 @@ function HeroSection() {
       </div>
       <div className="absolute inset-0 bg-gradient-to-b from-[#0a2540]/40 to-[#0a2540]" />
 
-      <div className="relative z-10 container-custom pt-24 pb-12 md:pt-32 md:pb-24">
+      <div className="relative z-10 container-custom pt-20 pb-10 sm:pt-24 sm:pb-12 md:pt-32 md:pb-24">
         <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -74,7 +76,7 @@ function HeroSection() {
             </div>
 
             {/* Title */}
-            <h1 className="text-3xl font-bold leading-[1.15] tracking-tight text-white md:text-[3.5rem]">
+            <h1 className="text-[2rem] sm:text-3xl font-bold leading-[1.15] tracking-tight text-white md:text-[3.5rem]">
               {t('hero.title')}
               <span className="mt-1.5 block bg-gradient-to-r from-[#c7c6ff] to-[#a5a3ff] bg-clip-text text-transparent">
                 {t('hero.titleHighlight')}
@@ -86,17 +88,17 @@ function HeroSection() {
             </p>
 
             {/* CTA buttons */}
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-6 sm:mt-7 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/apply"
-                className="group inline-flex items-center justify-center gap-2 rounded-xl bg-[#635bff] px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-[#5550e6]"
+                className="group inline-flex items-center justify-center gap-2 rounded-xl bg-[#635bff] px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-[#5550e6] hover:shadow-lg hover:shadow-[#635bff]/25"
               >
                 {t('hero.cta_primary')}
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
               <button
                 onClick={() => document.getElementById('destinations')?.scrollIntoView({ behavior: 'smooth' })}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/[0.1] bg-white/[0.04] px-6 py-3.5 text-sm font-semibold text-white/90 transition-all hover:bg-white/[0.08]"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/[0.1] bg-white/[0.04] px-6 py-3.5 text-sm font-semibold text-white/90 transition-all hover:bg-white/[0.08] hover:border-white/[0.15]"
               >
                 {t('hero.cta_secondary')}
                 <ChevronDown className="h-4 w-4" />
@@ -104,7 +106,7 @@ function HeroSection() {
             </div>
 
             {/* Tags - hidden on very small screens */}
-            <div className="mt-8 hidden sm:flex flex-wrap items-center gap-2">
+            <div className="mt-7 sm:mt-8 hidden sm:flex flex-wrap items-center gap-2">
               {['Études', 'Travail', 'Visas', '24/7'].map((label, i) => (
                 <span
                   key={label}
@@ -120,7 +122,7 @@ function HeroSection() {
             </div>
 
             {/* Trust row - hidden on mobile */}
-            <div className="mt-10 hidden sm:flex items-center gap-4">
+            <div className="mt-8 sm:mt-10 hidden sm:flex items-center gap-4">
               <div className="flex -space-x-2.5">
                 {AVATARS.map((src, i) => (
                   <img
@@ -308,6 +310,9 @@ function ProfileSection() {
           <p className="mx-auto max-w-xl text-[0.9rem] leading-relaxed text-[#425466] dark:text-[#8e8e93] md:text-[1.05rem]">
             {t('profiles.subtitle')}
           </p>
+          <p className="mx-auto max-w-2xl text-[0.85rem] text-[#697386] dark:text-[#8e8e93] mt-2">
+            Études, emploi ou séjour temporaire — nous adaptons l&apos;accompagnement à votre situation et votre budget.
+          </p>
         </motion.div>
 
         <div className="grid gap-5 md:gap-7 md:grid-cols-3">
@@ -323,7 +328,7 @@ function ProfileSection() {
               >
                 <Link
                   href={p.href}
-                  className="group block h-full rounded-2xl border border-[#e3e8ee]/70 bg-white overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-[#2c2c2e] dark:bg-[#111827]"
+                  className="group block h-full rounded-2xl border border-[#e3e8ee]/70 bg-white overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#635bff]/5 dark:border-[#2c2c2e] dark:bg-[#111827]"
                 >
                   {/* Image */}
                   <div className="relative h-40 md:h-52 overflow-hidden">
@@ -358,9 +363,9 @@ function ProfileSection() {
                       ))}
                     </ul>
 
-                    <div className="mt-5 inline-flex items-center gap-1.5 text-xs font-semibold text-[#635bff]">
+                    <div className="mt-5 inline-flex items-center gap-1.5 text-xs font-semibold text-[#635bff] group-hover:text-[#5550e6] transition-colors">
                       {p.cta}
-                      <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                      <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                     </div>
                   </div>
                 </Link>
@@ -564,7 +569,7 @@ function DestinationsSection() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: Math.min(i, 5) * 0.05 }}
-                  className="group relative rounded-2xl overflow-hidden min-h-[280px] md:min-h-[400px] shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col bg-white dark:bg-[#111827]"
+                  className="group relative rounded-2xl overflow-hidden min-h-[280px] md:min-h-[400px] shadow-sm hover:shadow-xl hover:shadow-[#635bff]/8 transition-all duration-300 flex flex-col bg-white dark:bg-[#111827]"
                 >
                   {dest.image_url && !brokenImages[dest.code] ? (
                     <img
@@ -634,7 +639,7 @@ function DestinationsSection() {
                       </Link>
                       <button
                         onClick={() => setOpenCode(dest.code)}
-                        className="rounded-xl px-3 py-2 text-xs font-semibold text-white/90 border border-white/[0.12] hover:bg-white/[0.08] transition-all"
+                        className="rounded-xl px-3 py-2 text-xs font-semibold text-white/90 border border-white/[0.12] hover:bg-white/[0.12] hover:border-white/[0.2] transition-all"
                       >
                         {t('destinations.card.details')}
                       </button>
@@ -807,7 +812,7 @@ function ScholarshipsSection() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: Math.min(i, 5) * 0.05 }}
-                  className="rounded-2xl overflow-hidden bg-white dark:bg-[#111827] border border-[#e3e8ee]/50 dark:border-[#1e293b] shadow-sm hover:shadow-md hover:border-[#635bff]/15 transition-all duration-300 flex flex-col"
+                  className="rounded-2xl overflow-hidden bg-white dark:bg-[#111827] border border-[#e3e8ee]/50 dark:border-[#1e293b] shadow-sm hover:shadow-lg hover:shadow-[#635bff]/5 hover:border-[#635bff]/20 transition-all duration-300 flex flex-col"
                 >
                   <div className="relative h-36 md:h-44 bg-[#f8fafc] dark:bg-[#1c1c1e] flex items-center justify-center overflow-hidden">
                     {s.imageUrl ? (
@@ -897,6 +902,9 @@ function ProcessSection() {
           <div className="section-kicker justify-center">{t('process.title')}</div>
           <h2 className="section-title mt-4 mb-3 text-[#0a2540] dark:text-white">{t('process.subtitle')}</h2>
           <p className="mx-auto max-w-xl text-[0.9rem] text-[#425466] dark:text-[#8e8e93] md:text-[1.05rem]">{t('process.subtitle')}</p>
+          <p className="mx-auto max-w-2xl text-[0.85rem] text-[#697386] dark:text-[#8e8e93] mt-2">
+            Chaque dossier est suivi par un consultant dédié — de la première analyse jusqu&apos;à votre arrivée en Europe.
+          </p>
         </motion.div>
 
         <div className="grid grid-cols-2 gap-3 md:gap-5 md:grid-cols-3 lg:grid-cols-5">
@@ -927,6 +935,79 @@ function ProcessSection() {
             {t('cta.primary')} <ArrowRight className="h-4 w-4" />
           </Link>
         </motion.div>
+      </div>
+    </section>
+  )
+}
+
+// ── Why Us ────────────────────────────────────────────────────────────────────
+function WhyUsSection() {
+  const { t } = useTranslation()
+  const features = [
+    {
+      icon: ShieldCheck,
+      title: 'Certifié & Légal',
+      desc: 'Agence enregistrée, transparente à 100%. Aucun frais cachés, aucun faux promesses.',
+      color: 'from-[#635bff] to-[#8b87ff]',
+    },
+    {
+      icon: Clock,
+      title: 'Réponse sous 48h',
+      desc: 'Votre dossier est analysé en moins de 2 jours par nos spécialistes.',
+      color: 'from-[#0a2540] to-[#1e40af]',
+    },
+    {
+      icon: Award,
+      title: '97% de réussite',
+      desc: "L'une des meilleurs taux de réussite du secteur grâce à notre rigueur.",
+      color: 'from-[#d8a84e] to-[#e9c48a]',
+    },
+    {
+      icon: Users,
+      title: '5 000+ accompagnés',
+      desc: 'Des milliers de candidats nous ont fait confiance depuis notre création.',
+      color: 'from-[#635bff] to-[#a5a3ff]',
+    },
+  ]
+
+  return (
+    <section className="py-16 md:py-24 bg-[#f8fafc] dark:bg-[#080808]">
+      <div className="container-custom">
+        <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-10 md:mb-14 text-center">
+          <div className="section-kicker justify-center">
+            <Shield className="w-3.5 h-3.5" />
+            {t('process.title')}
+          </div>
+          <h2 className="section-title mt-4 mb-3 text-[#0a2540] dark:text-white">
+            Pourquoi nous <span className="gradient-text">choisir</span>
+          </h2>
+          <p className="mx-auto max-w-xl text-[0.9rem] text-[#425466] dark:text-[#8e8e93] md:text-[1.05rem]">
+            Une approche humaine, professionnelle et efficace pour votre projet d&apos;immigration.
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          {features.map((f, i) => {
+            const Icon = f.icon
+            return (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.08 }}
+                className="group rounded-2xl border border-[#e3e8ee]/50 bg-white p-5 md:p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-[#1e293b] dark:bg-[#111827]"
+              >
+                <div className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${f.color} text-white shadow-sm`}
+                >
+                  <Icon className="h-5 w-5" />
+                </div>
+                <h4 className="mb-2 text-sm font-bold text-[#0a2540] dark:text-white">{f.title}</h4>
+                <p className="text-xs leading-relaxed text-[#425466] dark:text-[#8e8e93]">{f.desc}</p>
+              </motion.div>
+            )
+          })}
+        </div>
       </div>
     </section>
   )
@@ -991,7 +1072,7 @@ function TestimonialsSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.04 }}
-                className="bg-white dark:bg-[#111827] rounded-2xl border border-[#e3e8ee]/50 dark:border-[#1e293b] p-4 md:p-6 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col"
+                className="bg-white dark:bg-[#111827] rounded-2xl border border-[#e3e8ee]/50 dark:border-[#1e293b] p-4 md:p-6 shadow-sm hover:shadow-lg hover:shadow-[#635bff]/5 transition-all duration-300 flex flex-col"
               >
                 {/* Stars */}
                 <div className="flex items-center justify-between mb-4">
@@ -1088,7 +1169,7 @@ function FAQSection() {
               }`}
             >
               <button
-                className="w-full flex items-center justify-between p-4 md:p-5 text-left gap-3 bg-white dark:bg-[#111827]"
+                className="w-full flex items-center justify-between p-4 md:p-5 text-left gap-3 bg-white dark:bg-[#111827] hover:bg-[#f6f9fc] dark:hover:bg-[#1c1c1e] transition-colors"
                 onClick={() => setOpen(open === i ? null : i)}
                 aria-expanded={open === i}
               >
@@ -1130,8 +1211,13 @@ function CTASection() {
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="relative overflow-hidden rounded-2xl bg-[#0a2540] p-6 md:p-12"
+          className="relative overflow-hidden rounded-2xl p-6 md:p-12"
         >
+          {/* Gradient background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#0a2540] via-[#0f2d4a] to-[#0a2540]" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#635bff]/10 to-transparent" />
+          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#635bff]/8 blur-3xl" />
+          <div className="absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-[#d8a84e]/6 blur-3xl" />
           <div className="relative z-10 grid items-center gap-8 lg:grid-cols-[1fr_0.8fr]">
             <div>
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-wider text-slate-300">
@@ -1189,7 +1275,7 @@ function WhatsAppFloat() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="WhatsApp"
-      className="whatsapp-float fixed bottom-5 right-5 z-50 w-12 h-12 rounded-full flex items-center justify-center shadow-lg bg-[#635bff] hover:bg-[#5550e6] transition-colors"
+      className="whatsapp-float fixed bottom-5 right-5 z-50 w-12 h-12 rounded-full flex items-center justify-center shadow-lg shadow-[#635bff]/30 bg-[#635bff] hover:bg-[#5550e6] hover:shadow-xl hover:shadow-[#635bff]/40 transition-all"
       initial={{ scale: 0 }}
       animate={{ scale: 1 }}
       transition={{ delay: 2.5, type: 'spring', stiffness: 200, damping: 15 }}
@@ -1207,17 +1293,20 @@ export default function HomePage() {
       <Navbar />
       <main className="overflow-x-hidden">
         <HeroSection />
+        <HighlightsSlider />
         <TrustBar />
         <ProfileSection />
         <DestinationsSection />
         <ScholarshipsSection />
         <ProcessSection />
+        <WhyUsSection />
         <TestimonialsSection />
         <FAQSection />
         <CTASection />
       </main>
       <Footer />
       <WhatsAppFloat />
+      <BottomSheetModal />
     </>
   )
 }

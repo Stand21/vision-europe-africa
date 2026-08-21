@@ -101,7 +101,7 @@ export default function Navbar() {
       transition={{ duration: 0.5, ease: 'easeOut' }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-white/95 dark:bg-black/95 backdrop-blur-md shadow-sm'
+          ? 'bg-white/95 dark:bg-black/95 backdrop-blur-md shadow-[0_1px_3px_rgba(60,66,87,0.08)]'
           : 'bg-white/80 dark:bg-black/60 backdrop-blur-xl'
       }`}
     >
@@ -121,10 +121,10 @@ export default function Navbar() {
             <Link
               key={href}
               href={href}
-              className={`relative px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+              className={`relative px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                 active === id
                   ? 'text-[#635bff] dark:text-[#a5a3ff]'
-                  : 'text-[#425466] dark:text-[#ebebf5] hover:text-[#0a2540] dark:hover:text-white'
+                  : 'text-[#425466] dark:text-[#ebebf5] hover:text-[#0a2540] dark:hover:text-white hover:bg-[#f6f9fc] dark:hover:bg-white/5'
               }`}
             >
               {label}
@@ -232,7 +232,7 @@ export default function Navbar() {
           {/* CTA */}
           <Link
             href="/apply"
-            className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#635bff] text-white text-sm font-semibold hover:bg-[#4b45c6] transition-colors shadow-sm"
+            className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#635bff] text-white text-sm font-semibold hover:bg-[#5550e6] hover:shadow-lg hover:shadow-[#635bff]/25 transition-all shadow-sm"
           >
             {t('nav.apply')}
           </Link>

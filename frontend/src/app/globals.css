@@ -167,6 +167,24 @@ p { color: var(--text-secondary); line-height: 1.7; }
 }
 .animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
 
+/* ── Smooth hover transitions ── */
+.hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.hover-lift:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(99, 91, 255, 0.12); }
+
+/* ── Section divider ── */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+  max-width: 200px;
+  margin: 0 auto;
+}
+
+/* ── Focus ring ── */
+.focus-ring:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 /* ── Marquee ── */
 .marquee-track { display: flex; width: max-content; animation: marquee 30s linear infinite; }
 .marquee-track:hover { animation-play-state: paused; }

@@ -118,8 +118,9 @@ export default function Footer() {
         </div>
 
         {/* Newsletter */}
-        <div className="mt-8 md:mt-10 rounded-2xl p-5 md:p-8 bg-[#0d1f36] border border-white/[0.06]">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="mt-8 md:mt-10 rounded-2xl p-5 md:p-8 bg-[#0d1f36] border border-white/[0.06] relative overflow-hidden">
+          <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-[#635bff]/8 blur-3xl" />
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
               <h3 className="text-xl font-bold text-white mb-1">{t('footer.newsletter.title')}</h3>
               <p className="text-sm text-[#94a3b8]">{t('footer.newsletter.subtitle')}</p>
@@ -128,9 +129,9 @@ export default function Footer() {
               <input
                 type="email"
                 placeholder={t('footer.newsletter.placeholder')}
-                className="w-full sm:w-auto sm:flex-1 md:w-72 min-w-0 px-5 py-3 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder-white/40 focus:outline-none focus:border-[#635bff] transition-colors"
+                className="w-full sm:w-auto sm:flex-1 md:w-72 min-w-0 px-5 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm placeholder-white/40 focus:outline-none focus:border-[#635bff] focus:ring-1 focus:ring-[#635bff]/20 transition-all"
               />
-              <button className="w-full sm:w-auto px-5 py-3 rounded-lg bg-[#635bff] text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#4b45c6] transition-colors whitespace-nowrap">
+              <button className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-[#635bff] text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#5550e6] hover:shadow-lg hover:shadow-[#635bff]/25 transition-all whitespace-nowrap">
                 {t('footer.newsletter.button')} <ArrowRight className="w-4 h-4" />
               </button>
             </div>
